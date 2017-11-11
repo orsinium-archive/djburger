@@ -6,10 +6,12 @@ from django.views.generic import View
 
 
 Rule = namedtuple('Rule', [
-    'decorators', 'validator', 'error_response',
-    'controller', 'post_validator', 'response',
+    'decorators', 'validator', 'error_serializer',
+    'controller', 'post_validator', 'serializer',
     ])
 
+
+__all__ = ['Rule', 'ViewBase']
 
 
 def ViewBase(View):
@@ -57,13 +59,13 @@ def ViewBase(View):
         else:
             return self.request_invalid(validator)
 
-    # error_response
+    # error_serializer
     def request_invalid(self, validator):
         '''
-            Вызывает error_response, а если не задан - response.
+            Вызывает error_serializer, а если не задан - response.
             Передает в них параметр errors.
         '''
-        resp = self.rule.error_response or self.rule.response
+        resp = self.rule.error_serializer or self.rule.serializer
         return resp(errors=validator.errors)
 
     # controller
@@ -118,7 +120,7 @@ def ViewBase(View):
         '''
             Формирует response 
         '''
-        return self.rule.response(data=data)
+        return self.rule.serializer(data=data)
 
     # send request and data into validator
     def get_validator_kwargs(self, data):

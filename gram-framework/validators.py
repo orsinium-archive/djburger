@@ -9,6 +9,10 @@ from django.forms import Form, ModelForm
 
 
 class IValidator(with_metaclass(abc.ABCMeta)):
+    '''
+        Абстрактный базовый класс.
+        Используйте его, чтобы не забыть реализовать что-то нужное.
+    '''
 
     @abc.abstractmethod
     def __init__(self):
@@ -75,7 +79,6 @@ class DictValidator(ListValidator):
     '''
         Валидация значений словаря
     '''
-
     def is_valid(self):
         self.cleaned_data = {}
         for key, data in self.data_dict.items():

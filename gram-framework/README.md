@@ -1,12 +1,12 @@
 1. Decorators
 2. Validator
-3. ErrorResponse
+3. ErrorSerializer
 4. Controller
 5. PostValidator
-6. Response
+6. Serializer
 
 Required:
 1. Controller
-2. Response
+2. Serializer
 
 
