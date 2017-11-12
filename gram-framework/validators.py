@@ -144,20 +144,28 @@ class DictMixedValidatorFactory(IValidator):
         return True
 
 
-class IsBoolValidator(IValidator):
+class TypeValidator(IValidator):
+    '''
+        Проверяет, что результат является объектом заданного типа
+    '''
     cleaned_data = None
     errors = None
-    error_msg = 'Invalid data format: {}'
+    error_msg = 'Invalid data format: {}. Required {}.'
 
-    def __init__(self, data, **kwargs):
+    def __init__(self, data, data_type, **kwargs):
         self.data = data
+        self.data_type = data_type
 
     def is_valid(self):
-        if isinstance(self.data, bool):
+        if isinstance(self.data, self.data_type):
             self.cleaned_data = self.data
             return True
-        t = type(self.data).__name__
-        self.errors = {'__all__': self.error_msg.format(t)}
+        self.errors = {
+            '__all__': self.error_msg.format(
+                type(self.data).__name__,
+                self.data_type.__name__,
+            ),
+        }
         return False
 
 
@@ -169,3 +177,8 @@ DictFormValidator = partial(DictValidator, validator=FormValidator)
 ListModelFormValidator = partial(ListValidator, validator=ModelFormValidator)
 # Валидация значений словаря с помощью модельных форм Django
 DictModelFormValidator = partial(DictValidator, validator=ModelFormValidator)
+
+IsBoolValidator = partial(TypeValidator, data_type=bool)
+IsIntValidator = partial(TypeValidator, data_type=int)
+IsFloatValidator = partial(TypeValidator, data_type=float)
+IsStrValidator = partial(TypeValidator, data_type=str)
