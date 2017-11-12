@@ -66,7 +66,7 @@ class ListValidator(IValidator):
         self.cleaned_data = []
         for data in self.data_list:
             validator = self.validator(data=data, **self.kwargs)
-            if validator.is_valid()
+            if validator.is_valid():
                 self.cleaned_data.append(validator.cleaned_data)
             else:
                 self.cleaned_data = []
@@ -91,7 +91,7 @@ class DictValidator(IValidator):
         self.cleaned_data = {}
         for key, data in self.data_dict.items():
             validator = self.validator(data=data, **self.kwargs)
-            if validator.is_valid()
+            if validator.is_valid():
                 self.cleaned_data[key] = validator.cleaned_data
             else:
                 self.cleaned_data = {}
@@ -103,13 +103,20 @@ class DictValidator(IValidator):
 class DictMixedValidatorFactory(IValidator):
     '''
         Валидация значений словаря различными валидаторами
+
+        validators - словарь валидаторов, где ключ совпадает с ключом
+            валидируемых данных
+        validate_all - если отсутствует валидатор для какого-либо ключа, то...
+            True - возвращает ошибку валидации
+            False - Добавляет в результат данные без валидации
     '''
     cleaned_data = None
     errors = None
+    error_msg = 'No validator for {}'
 
-    def __init__(self, validators, error_msg='Bad count of elements'):
+    def __init__(self, validators, validate_all=True):
         self.validators = validators
-        self.error_msg = error_msg
+        self.validate_all = validate_all
 
     def __call__(self, data, **kwargs):
         self.data_dict = data
@@ -118,19 +125,40 @@ class DictMixedValidatorFactory(IValidator):
     def is_valid(self):
         self.cleaned_data = {}
 
-        if len(self.validators) != len(self.data_dict):
-            self.errors = {'__all__': self.error_msg}
-            return False
-
         for key, data in self.data_dict.items():
-            validator = self.validators[key](data=data, **self.kwargs)
-            if validator.is_valid()
+            if key in self.validators:
+                validator = self.validators[key](data=data, **self.kwargs)
+            elif self.validate_all:
+                self.errors = {'__all__': error_msg.format(key)}
+                return False
+            else:
+                self.cleaned_data[key] = data
+                continue
+
+            if validator.is_valid():
                 self.cleaned_data[key] = validator.cleaned_data
             else:
                 self.cleaned_data = {}
                 self.errors = validator.errors
                 return False
         return True
+
+
+class IsBoolValidator(IValidator):
+    cleaned_data = None
+    errors = None
+    error_msg = 'Invalid data format: {}'
+
+    def __init__(self, data, **kwargs):
+        self.data = data
+
+    def is_valid(self):
+        if isinstance(self.data, bool):
+            self.cleaned_data = self.data
+            return True
+        t = type(self.data).__name__
+        self.errors = {'__all__': self.error_msg.format(t)}
+        return False
 
 
 # Валидация элементов списка с помощью Django-форм

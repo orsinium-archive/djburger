@@ -81,8 +81,7 @@ def ViewBase(View):
             # data for validation
             data = request.GET if self.request.method == 'get' else request.POST
         # get response from controller
-        controller = self.rule.controller(self.request)
-        response = controller(data, **self.kwargs)
+        response = self.rule.controller(self.request, data, **self.kwargs)
         return self.validate_response(response)
 
     # post_validator
