@@ -66,7 +66,7 @@ def ViewBase(View):
             Передает в них параметр errors.
         '''
         resp = self.rule.error_serializer or self.rule.serializer
-        return resp(self.request, validator=validator)
+        return resp(request=self.request, validator=validator)
 
     # controller
     def request_valid(self, validator=None):
@@ -120,7 +120,7 @@ def ViewBase(View):
         '''
             Формирует response 
         '''
-        return self.rule.serializer(self.request, data=data)
+        return self.rule.serializer(request=self.request, data=data)
 
     # send request and data into validator
     def get_validator_kwargs(self, data):

@@ -3,7 +3,7 @@
 from functools import partial
 # django
 from django.core import serializers
-from django.http import HttpResponse
+from django.http import HttpResponseRedirect
 from django.shortcuts import render
 
 
@@ -67,3 +67,13 @@ YAMLSerializer = partial(
     serializer=partial(serializers.serialize, 'yaml'),
     content_name='queryset',
 )
+
+
+class RedirectSerializer(object):
+
+    def __init__(self, url=None):
+        self.url = url
+
+    def __call__(self, data=None, **kwargs):
+        url = self.url or data
+        return HttpResponseRedirect(url=url)

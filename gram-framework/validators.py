@@ -59,7 +59,6 @@ class ListValidator(IValidator):
 
     def __init__(self, validator, data, **kwargs):
         self.validator = validator
-        self.request = request
         self.data_list = data
         self.kwargs = kwargs
 
@@ -70,15 +69,24 @@ class ListValidator(IValidator):
             if validator.is_valid()
                 self.cleaned_data.append(validator.cleaned_data)
             else:
+                self.cleaned_data = []
                 self.errors = validator.errors
                 return False
         return True
 
 
-class DictValidator(ListValidator):
+class DictValidator(IValidator):
     '''
         Валидация значений словаря
     '''
+    cleaned_data = None
+    errors = None
+
+    def __init__(self, validator, data, **kwargs):
+        self.validator = validator
+        self.data_dict = data
+        self.kwargs = kwargs
+
     def is_valid(self):
         self.cleaned_data = {}
         for key, data in self.data_dict.items():
@@ -86,6 +94,40 @@ class DictValidator(ListValidator):
             if validator.is_valid()
                 self.cleaned_data[key] = validator.cleaned_data
             else:
+                self.cleaned_data = {}
+                self.errors = validator.errors
+                return False
+        return True
+
+
+class DictMixedValidatorFactory(IValidator):
+    '''
+        Валидация значений словаря различными валидаторами
+    '''
+    cleaned_data = None
+    errors = None
+
+    def __init__(self, validators, error_msg='Bad count of elements'):
+        self.validators = validators
+        self.error_msg = error_msg
+
+    def __call__(self, data, **kwargs):
+        self.data_dict = data
+        self.kwargs = kwargs
+
+    def is_valid(self):
+        self.cleaned_data = {}
+
+        if len(self.validators) != len(self.data_dict):
+            self.errors = {'__all__': self.error_msg}
+            return False
+
+        for key, data in self.data_dict.items():
+            validator = self.validators[key](data=data, **self.kwargs)
+            if validator.is_valid()
+                self.cleaned_data[key] = validator.cleaned_data
+            else:
+                self.cleaned_data = {}
                 self.errors = validator.errors
                 return False
         return True
