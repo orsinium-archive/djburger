@@ -1,6 +1,7 @@
 
 # built-in
 import abc
+from collections import Iterator
 from functools import partial
 # external
 from six import with_metaclass
@@ -48,6 +49,9 @@ class ModelFormValidator(ModelForm):
     def __init__(self, request, **kwargs):
         self.request = request
         super(FormValidator, self).__init__(**kwargs)
+
+    def save(self, *args, **kwargs):
+        raise NotImplementedError('Saving object from validator not allowed')
 
 
 class ListValidator(IValidator):
@@ -121,6 +125,7 @@ class DictMixedValidatorFactory(IValidator):
     def __call__(self, data, **kwargs):
         self.data_dict = data
         self.kwargs = kwargs
+        return self
 
     def is_valid(self):
         self.cleaned_data = {}
@@ -129,7 +134,7 @@ class DictMixedValidatorFactory(IValidator):
             if key in self.validators:
                 validator = self.validators[key](data=data, **self.kwargs)
             elif self.validate_all:
-                self.errors = {'__all__': error_msg.format(key)}
+                self.errors = {'__all__': [error_msg.format(key)]}
                 return False
             else:
                 self.cleaned_data[key] = data
@@ -160,12 +165,12 @@ class TypeValidator(IValidator):
         if isinstance(self.data, self.data_type):
             self.cleaned_data = self.data
             return True
-        self.errors = {
-            '__all__': self.error_msg.format(
+        self.errors = {'__all__': [
+            self.error_msg.format(
                 type(self.data).__name__,
                 self.data_type.__name__,
             ),
-        }
+        ]}
         return False
 
 
@@ -173,6 +178,7 @@ class TypeValidator(IValidator):
 ListFormValidator = partial(ListValidator, validator=FormValidator)
 # Валидация значений словаря с помощью Django-форм
 DictFormValidator = partial(DictValidator, validator=FormValidator)
+
 # Валидация элементов списка с помощью модельных форм Django
 ListModelFormValidator = partial(ListValidator, validator=ModelFormValidator)
 # Валидация значений словаря с помощью модельных форм Django
@@ -182,3 +188,4 @@ IsBoolValidator = partial(TypeValidator, data_type=bool)
 IsIntValidator = partial(TypeValidator, data_type=int)
 IsFloatValidator = partial(TypeValidator, data_type=float)
 IsStrValidator = partial(TypeValidator, data_type=str)
+IsIterValidator = partial(TypeValidator, data_type=Iterator)

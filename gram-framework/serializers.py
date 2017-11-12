@@ -18,7 +18,7 @@ class SerializerFactory(object):
         self.content = content
         self.kwargs = kwargs
 
-    def __call__(self, request=None, data=None, validator=None):
+    def __call__(self, request, data=None, validator=None):
         # формируем контент (или контекст, если говорить о формах)
         content = {}
         # дополнительные данные для контента
@@ -34,7 +34,7 @@ class SerializerFactory(object):
         # параметры сериализатора
         params = self.kwargs.copy()
         params[content_name] = content
-        if self.request_name and request:
+        if self.request_name:
             params[self.request_name] = request
         # сериализация
         return self.serializer(**params)

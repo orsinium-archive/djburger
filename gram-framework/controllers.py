@@ -3,6 +3,12 @@ from django.shortcuts import get_object_or_404
 from django.views.generic import ListView
 
 
+__all__ = [
+    'ListController', 'InfoController',
+    'AddController', 'EditController', 'DeleteController',
+]
+
+
 class ListController(ListView):
 
     def __init__(self, only_data=True, **kwargs):
