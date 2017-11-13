@@ -1,5 +1,4 @@
 import djburger
-from . import controllers as c
 
 
 class IndexView(djburger.ViewBase):
@@ -8,10 +7,10 @@ class IndexView(djburger.ViewBase):
             decorators=None,
             validator=None,
             error_serializer=None,
-            controller=c.index_controller,
+            controller=lambda request, data, **kwargs: 'Hello, World!',
             post_validator=None,
             serializer=djburger.s.TemplateSerializer(
-                template_name='index.html'
+                template_name='index.html',
             ),
         ),
     }
