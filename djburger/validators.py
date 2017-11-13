@@ -134,7 +134,7 @@ class DictMixedValidatorFactory(IValidator):
             if key in self.validators:
                 validator = self.validators[key](data=data, **self.kwargs)
             elif self.validate_all:
-                self.errors = {'__all__': [error_msg.format(key)]}
+                self.errors = {'__all__': [self.error_msg.format(key)]}
                 return False
             else:
                 self.cleaned_data[key] = data

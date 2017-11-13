@@ -1,6 +1,7 @@
 
 # built-in
-from collections import namedtuple, Iterable
+from collections import namedtuple
+from functools import update_wrapper
 # django
 from django.views.generic import View
 
@@ -14,7 +15,7 @@ Rule = namedtuple('Rule', [
 __all__ = ['Rule', 'ViewBase']
 
 
-def ViewBase(View):
+class ViewBase(View):
     rules = None
     rule = None
 
@@ -79,7 +80,7 @@ def ViewBase(View):
             data = validator.cleaned_data
         else:
             # data for validation
-            data = request.GET if self.request.method == 'get' else request.POST
+            data = self.request.GET if self.request.method == 'get' else self.request.POST
         # get response from controller
         response = self.rule.controller(self.request, data, **self.kwargs)
         return self.validate_response(response)
@@ -114,10 +115,10 @@ def ViewBase(View):
             Вызывает make_response
         '''
         return self.make_response(validator.cleaned_data)
-    
+
     def make_response(self, data):
         '''
-            Формирует response 
+            Формирует response
         '''
         return self.rule.serializer(request=self.request, data=data)
 
@@ -126,7 +127,7 @@ def ViewBase(View):
         '''
             Формирует парметры, передаваемые в валидаторы
         '''
-        kwargs = super(ValidatorMixin, self).get_form_kwargs()
+        kwargs = super(ViewBase, self).get_form_kwargs()
         kwargs['request'] = self.request
         kwargs['data'] = data
         return kwargs

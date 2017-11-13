@@ -15,9 +15,9 @@ class ListController(ListView):
         self.only_data = only_data
         super(ListController, self).__init__(**kwargs)
 
-    def __call__(request, data, **kwargs):
+    def __call__(self, request, data, **kwargs):
         self.data = data
-        return self.get(self, request, *args, **kwargs)
+        return self.get(self, request, **kwargs)
 
     def get_queryset(self):
         q = super(ListController, self).get_queryset()
@@ -39,8 +39,8 @@ class InfoController(object):
     def __init__(self, queryset):
         self.q = queryset
 
-    def __call__(request, data, **kwargs):
-        return get_object_or_404(q, **kwargs)
+    def __call__(self, request, data, **kwargs):
+        return get_object_or_404(self.q, **kwargs)
 
 
 class AddController(object):
@@ -48,7 +48,7 @@ class AddController(object):
     def __init__(self, model):
         self.model = model
 
-    def __call__(request, data, **kwargs):
+    def __call__(self, request, data, **kwargs):
         return self.model._default_manager.create(**data)
 
 
@@ -57,7 +57,7 @@ class EditController(object):
     def __init__(self, model, filters=None):
         self.model = model
 
-    def __call__(request, data, **kwargs):
+    def __call__(self, request, data, **kwargs):
         obj = get_object_or_404(self.model, **kwargs)
         obj.__dict__.update(data)
         return obj.save(force_update=True)
@@ -68,6 +68,6 @@ class DeleteController(object):
     def __init__(self, model, filters=None):
         self.model = model
 
-    def __call__(request, data, **kwargs):
+    def __call__(self, request, data, **kwargs):
         obj = get_object_or_404(self.model, **kwargs)
         return obj.delete()

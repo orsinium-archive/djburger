@@ -33,7 +33,7 @@ class SerializerFactory(object):
             content[self.names.get('errors', 'errors')] = validator.errors
         # параметры сериализатора
         params = self.kwargs.copy()
-        params[content_name] = content
+        params[self.content_name] = content
         if self.request_name:
             params[self.request_name] = request
         # сериализация
