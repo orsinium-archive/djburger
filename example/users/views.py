@@ -1,10 +1,6 @@
 import djburger
 
 
-class IndexView(djburger.ViewBase):
-    pass
-
-
 class UserCommonAPIView(djburger.ViewBase):
     pass
 

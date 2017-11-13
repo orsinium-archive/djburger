@@ -5,11 +5,11 @@ from functools import partial       # noQA
 from django import forms            # noQA
 
 # project
-import controllers
-import serializers
-import validators
+from . import controllers
+from . import serializers
+from . import validators
 
-from views import Rule, ViewBase    # noQA
+from .views import Rule, ViewBase    # noQA
 
 
 # shortcuts

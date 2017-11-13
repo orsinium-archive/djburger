@@ -29,7 +29,7 @@ class SerializerFactory(object):
             content[self.names.get('data', 'data')] = data
         if validator and 'validator' in self.names:
             content[self.names['validator']] = validator
-        if validator.errors:
+        if validator and validator.errors:
             content[self.names.get('errors', 'errors')] = validator.errors
         # параметры сериализатора
         params = self.kwargs.copy()
