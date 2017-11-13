@@ -22,7 +22,7 @@ class ListController(ListView):
     def get_queryset(self):
         q = super(ListController, self).get_queryset()
         return q.filter(**self.data)
-    
+
     def get_context_data(self, **kwargs):
         context = super(ListController, self).get_context_data(**kwargs)
         # возвращаем только список объектов
