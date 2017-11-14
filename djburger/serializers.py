@@ -3,7 +3,7 @@
 from functools import partial
 # django
 from django.core import serializers
-from django.errors import ValidationError
+from django.core.exceptions import ValidationError
 from django.http import HttpResponseRedirect
 from django.shortcuts import render
 
