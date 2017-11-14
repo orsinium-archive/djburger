@@ -183,6 +183,27 @@ class TypeValidator(IValidator):
         return False
 
 
+class LambdaValidator(IValidator):
+    '''
+        Проверяет данные с помощью заданного выражения
+    '''
+    cleaned_data = None
+    errors = None
+    error_msg = 'Custom validation not passed'
+
+    def __init__(self, data, key, **kwargs):
+        self.data = data
+        self.key = key
+
+    def is_valid(self):
+        if self.key(self.data):
+            self.cleaned_data = self.data
+            return True
+
+        self.errors = {'__all__': [self.error_msg]}
+        return False
+
+
 class ChainValidator(IValidator):
     '''
         Вызывает валидаторы по порядку, передавая в каждый следующий
