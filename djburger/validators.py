@@ -162,13 +162,22 @@ class TypeValidator(IValidator):
         self.data_type = data_type
 
     def is_valid(self):
-        if isinstance(self.data, self.data_type):
+        if type(self.data_type) is type:
+            # строгая валидация для типов данных
+            passed = type(self.data) is self.data_type
+        else:
+            # валидация с наследованием для списка типов
+            # и других случаев
+            passed = isinstance(self.data, self.data_type)
+
+        if passed:
             self.cleaned_data = self.data
             return True
+
         self.errors = {'__all__': [
             self.error_msg.format(
                 type(self.data).__name__,
-                self.data_type.__name__,
+                getattr(self.data_type, '__name__', self.data_type),
             ),
         ]}
         return False
