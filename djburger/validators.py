@@ -2,7 +2,6 @@
 # built-in
 import abc
 from collections import Iterator
-from functools import partial
 # external
 from six import with_metaclass
 # django
@@ -48,23 +47,26 @@ class ModelFormValidator(ModelForm):
     '''
     def __init__(self, request, **kwargs):
         self.request = request
-        super(FormValidator, self).__init__(**kwargs)
+        super(ModelFormValidator, self).__init__(**kwargs)
 
     def save(self, *args, **kwargs):
         raise NotImplementedError('Saving object from validator not allowed')
 
 
-class _ListValidator(IValidator):
+class _ListValidatorFactory(IValidator):
     '''
         Валидация элементов списка
     '''
     cleaned_data = None
     errors = None
 
-    def __init__(self, validator, data, **kwargs):
+    def __init__(self, validator):
         self.validator = validator
+
+    def __call__(self, data, **kwargs):
         self.data_list = data
         self.kwargs = kwargs
+        return self
 
     def is_valid(self):
         self.cleaned_data = []
@@ -79,17 +81,20 @@ class _ListValidator(IValidator):
         return True
 
 
-class _DictValidator(IValidator):
+class _DictValidatorFactory(IValidator):
     '''
         Валидация значений словаря
     '''
     cleaned_data = None
     errors = None
 
-    def __init__(self, validator, data, **kwargs):
+    def __init__(self, validator):
         self.validator = validator
+
+    def __call__(self, data, **kwargs):
         self.data_dict = data
         self.kwargs = kwargs
+        return self
 
     def is_valid(self):
         self.cleaned_data = {}
@@ -149,7 +154,7 @@ class DictMixedValidatorFactory(IValidator):
         return True
 
 
-class TypeValidator(IValidator):
+class TypeValidatorFactory(IValidator):
     '''
         Проверяет, что результат является объектом заданного типа
     '''
@@ -157,9 +162,12 @@ class TypeValidator(IValidator):
     errors = None
     error_msg = 'Invalid data format: {}. Required {}.'
 
-    def __init__(self, data, data_type, **kwargs):
-        self.data = data
+    def __init__(self, data_type):
         self.data_type = data_type
+
+    def __call__(self, data, **kwargs):
+        self.data = data
+        return self
 
     def is_valid(self):
         if type(self.data_type) is type:
@@ -207,7 +215,7 @@ class LambdaValidatorFactory(IValidator):
         return False
 
 
-class ChainValidator(IValidator):
+class ChainValidatorFactory(IValidator):
     '''
         Вызывает валидаторы по порядку, передавая в каждый следующий
         очищенные данные из предыдущего.
@@ -215,10 +223,13 @@ class ChainValidator(IValidator):
     cleaned_data = None
     errors = None
 
-    def __init__(self, data, validators, **kwargs):
-        self.data = data
+    def __init__(self, validators):
         self.validators = validators
+
+    def __call__(self, data, **kwargs):
+        self.data = data
         self.kwargs = kwargs
+        return self
 
     def is_valid(self):
         for validator in self.validators:
@@ -233,24 +244,30 @@ class ChainValidator(IValidator):
 
 
 # Валидация типов данных
-IsBoolValidator = partial(TypeValidator, data_type=bool)
-IsIntValidator = partial(TypeValidator, data_type=int)
-IsFloatValidator = partial(TypeValidator, data_type=float)
-IsStrValidator = partial(TypeValidator, data_type=str)
-IsDictValidator = partial(TypeValidator, data_type=dict)
-IsListValidator = partial(TypeValidator, data_type=(list, tuple))
-IsIterValidator = partial(TypeValidator, data_type=Iterator)
+IsBoolValidator = TypeValidatorFactory(bool)
+IsIntValidator = TypeValidatorFactory(int)
+IsFloatValidator = TypeValidatorFactory(float)
+IsStrValidator = TypeValidatorFactory(str)
+IsDictValidator = TypeValidatorFactory(dict)
+IsListValidator = TypeValidatorFactory((list, tuple))
+IsIterValidator = TypeValidatorFactory(Iterator)
+
 
 # Цепляем к ListValidator и DictValidator проверку типов данных на входе
-ListValidator = partial(ChainValidator, validators=[IsListValidator, _ListValidator])
-DictValidator = partial(ChainValidator, validators=[IsDictValidator, _DictValidator])
+
+def ListValidatorFactory(validator): # noQA
+    return ChainValidatorFactory([IsListValidator, _ListValidatorFactory(validator)])
+
+def DictValidatorFactory(validator): # noQA
+    return ChainValidatorFactory([IsListValidator, _DictValidatorFactory(validator)])
+
 
 # Валидация элементов списка с помощью Django-форм
-ListFormValidator = partial(ListValidator, validator=FormValidator)
+ListFormValidatorFactory = ListValidatorFactory(FormValidator)
 # Валидация значений словаря с помощью Django-форм
-DictFormValidator = partial(DictValidator, validator=FormValidator)
+DictFormValidatorFactory = DictValidatorFactory(FormValidator)
 
 # Валидация элементов списка с помощью модельных форм Django
-ListModelFormValidator = partial(ListValidator, validator=ModelFormValidator)
+ListModelFormValidatorFactory = ListValidatorFactory(ModelFormValidator)
 # Валидация значений словаря с помощью модельных форм Django
-DictModelFormValidator = partial(DictValidator, validator=ModelFormValidator)
+DictModelFormValidatorFactory = ListValidatorFactory(ModelFormValidator)

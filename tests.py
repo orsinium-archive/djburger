@@ -8,12 +8,12 @@ class TestValidators(unittest.TestCase):
     def test_type_validator(self):
         # BASE
         with self.subTest(src_text='base pass'):
-            v = djburger.v.TypeValidator
-            v = v(3, int)
+            v = djburger.v.TypeValidatorFactory(int)
+            v = v(3)
             self.assertTrue(v.is_valid())
         with self.subTest(src_text='base not pass'):
-            v = djburger.v.TypeValidator
-            v = v('4', int)
+            v = djburger.v.TypeValidatorFactory(int)
+            v = v('3')
             self.assertFalse(v.is_valid())
 
         # BOOL
@@ -132,35 +132,33 @@ class TestValidators(unittest.TestCase):
 
     def test_list_validator(self):
         with self.subTest(src_text='list int pass'):
-            v = djburger.v.ListValidator
-            v = v([1, 2, 3], validator=djburger.v.IsIntValidator)
+            v = djburger.v.ListValidatorFactory(djburger.v.IsIntValidator)
+            v = v([1, 2, 3])
             self.assertTrue(v.is_valid())
         with self.subTest(src_text='list mixed not pass'):
-            v = djburger.v.ListValidator
-            v = v([1, '2', 3], validator=djburger.v.IsIntValidator)
+            v = djburger.v.ListValidatorFactory(djburger.v.IsIntValidator)
+            v = v([1, '2', 3])
             self.assertFalse(v.is_valid())
         with self.subTest(src_text='list str pass'):
-            v = djburger.v.ListValidator
-            v = v(['1', '2', '3'], validator=djburger.v.IsStrValidator)
+            v = djburger.v.ListValidatorFactory(djburger.v.IsStrValidator)
+            v = v(['1', '2', '3'])
             self.assertTrue(v.is_valid())
         with self.subTest(src_text='tuple str pass'):
-            v = djburger.v.ListValidator
-            v = v(('1', '2', '3'), validator=djburger.v.IsStrValidator)
+            v = djburger.v.ListValidatorFactory(djburger.v.IsStrValidator)
+            v = v(('1', '2', '3'))
             self.assertTrue(v.is_valid())
         with self.subTest(src_text='str not pass'):
-            v = djburger.v.ListValidator
-            v = v('123', validator=djburger.v.IsStrValidator)
+            v = djburger.v.ListValidatorFactory(djburger.v.IsStrValidator)
+            v = v('123')
             self.assertFalse(v.is_valid())
 
         with self.subTest(src_text='list list str pass'):
-            v = djburger.v.ListValidator
-            v = v(
-                data=[('1', '2'), ('3', '4', '5'), ('6', )],
-                validator=partial(
-                    djburger.v.ListValidator,
-                    validator=djburger.v.IsStrValidator,
-                ),
+            v = djburger.v.ListValidatorFactory(
+                djburger.v.ListValidatorFactory(
+                    djburger.v.IsStrValidator
+                )
             )
+            v = v(data=[('1', '2'), ('3', '4', '5'), ('6', )])
             self.assertTrue(v.is_valid())
 
     def test_dict_mixed_validator(self):
