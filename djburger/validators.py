@@ -174,6 +174,31 @@ class TypeValidator(IValidator):
         return False
 
 
+class ChainValidator(IValidator):
+    '''
+        Вызывает валидаторы по порядку, передавая в каждый следующий
+        очищенные данные из предыдущего.
+    '''
+    cleaned_data = None
+    errors = None
+
+    def __init__(self, data, validators, **kwargs):
+        self.data = data
+        self.validators = validators
+        self.kwargs = kwargs
+
+    def is_valid(self):
+        for validator in self.validators:
+            validator = validator(data=self.data, **self.kwargs)
+            if validator.is_valid():
+                self.data = validator.cleaned_data
+            else:
+                self.errors = validator.errors
+                return False
+        self.cleaned_data = self.data
+        return True
+
+
 # Валидация элементов списка с помощью Django-форм
 ListFormValidator = partial(ListValidator, validator=FormValidator)
 # Валидация значений словаря с помощью Django-форм
@@ -188,4 +213,5 @@ IsBoolValidator = partial(TypeValidator, data_type=bool)
 IsIntValidator = partial(TypeValidator, data_type=int)
 IsFloatValidator = partial(TypeValidator, data_type=float)
 IsStrValidator = partial(TypeValidator, data_type=str)
+IsDictValidator = partial(TypeValidator, data_type=dict)
 IsIterValidator = partial(TypeValidator, data_type=Iterator)
