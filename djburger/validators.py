@@ -54,7 +54,7 @@ class ModelFormValidator(ModelForm):
         raise NotImplementedError('Saving object from validator not allowed')
 
 
-class ListValidator(IValidator):
+class _ListValidator(IValidator):
     '''
         Валидация элементов списка
     '''
@@ -79,7 +79,7 @@ class ListValidator(IValidator):
         return True
 
 
-class DictValidator(IValidator):
+class _DictValidator(IValidator):
     '''
         Валидация значений словаря
     '''
@@ -199,6 +199,19 @@ class ChainValidator(IValidator):
         return True
 
 
+# Валидация типов данных
+IsBoolValidator = partial(TypeValidator, data_type=bool)
+IsIntValidator = partial(TypeValidator, data_type=int)
+IsFloatValidator = partial(TypeValidator, data_type=float)
+IsStrValidator = partial(TypeValidator, data_type=str)
+IsDictValidator = partial(TypeValidator, data_type=dict)
+IsListValidator = partial(TypeValidator, data_type=(list, tuple))
+IsIterValidator = partial(TypeValidator, data_type=Iterator)
+
+# Цепляем к ListValidator и DictValidator проверку типов данных на входе
+ListValidator = partial(ChainValidator, validators=[IsListValidator, _ListValidator])
+DictValidator = partial(ChainValidator, validators=[IsDictValidator, _DictValidator])
+
 # Валидация элементов списка с помощью Django-форм
 ListFormValidator = partial(ListValidator, validator=FormValidator)
 # Валидация значений словаря с помощью Django-форм
@@ -208,10 +221,3 @@ DictFormValidator = partial(DictValidator, validator=FormValidator)
 ListModelFormValidator = partial(ListValidator, validator=ModelFormValidator)
 # Валидация значений словаря с помощью модельных форм Django
 DictModelFormValidator = partial(DictValidator, validator=ModelFormValidator)
-
-IsBoolValidator = partial(TypeValidator, data_type=bool)
-IsIntValidator = partial(TypeValidator, data_type=int)
-IsFloatValidator = partial(TypeValidator, data_type=float)
-IsStrValidator = partial(TypeValidator, data_type=str)
-IsDictValidator = partial(TypeValidator, data_type=dict)
-IsIterValidator = partial(TypeValidator, data_type=Iterator)
