@@ -6,13 +6,45 @@ from functools import update_wrapper
 from django.views.generic import View
 
 
+__all__ = ['Rule', 'rule', 'ViewBase']
+
+
 Rule = namedtuple('Rule', [
-    'decorators', 'validator', 'error_serializer',
-    'controller', 'post_validator', 'serializer',
+    'decorators', 'validator', 'controller', 'post_validator',
+    'error_serializer', 'response_error_serializer', 'serializer',
     ])
 
 
-__all__ = ['Rule', 'ViewBase']
+def rule(controller, serializers, decorators=None, validators=None):
+    data = dict(decorators=decorators, controller=controller)
+
+    if not validators:
+        data['validator'], data['post_validator'] = None, None
+    elif len(validators) == 1:
+        data['validator'], data['post_validator'] = validators[0], None
+    elif len(validators) == 2:
+        data['validator'], data['post_validator'] = validators
+    else:
+        raise IndexError('Too many validators')
+
+    if len(serializers) == 0:
+        raise IndexError('Need 1-3 serializers')
+    elif len(serializers) == 1:
+        data['serializer'] = serializers[0]
+        data['error_serializer'] = serializers[0]
+        data['response_error_serializer'] = serializers[0]
+    elif len(serializers) == 2:
+        data['serializer'] = serializers[0]
+        data['error_serializer'] = serializers[1]
+        data['response_error_serializer'] = serializers[1]
+    elif len(serializers) == 3:
+        data['serializer'] = serializers[0]
+        data['error_serializer'] = serializers[1]
+        data['response_error_serializer'] = serializers[2]
+    else:
+        raise IndexError('Too many serializers')
+
+    return Rule(**data)
 
 
 class ViewBase(View):
@@ -66,8 +98,12 @@ class ViewBase(View):
             Вызывает error_serializer, а если не задан - response.
             Передает в них параметр errors.
         '''
-        resp = self.rule.error_serializer or self.rule.serializer
-        return resp(request=self.request, validator=validator)
+        if not self.rule.error_serializer:
+            raise NotImplementedError('error_serializer not implemented')
+        return self.rule.error_serializer(
+            request=self.request,
+            validator=validator,
+        )
 
     # controller
     def request_valid(self, validator=None):
@@ -107,7 +143,12 @@ class ViewBase(View):
         '''
             Вызывает request_invalid также, как при ошибке валидации запроса
         '''
-        return self.request_invalid(validator)
+        if not self.rule.response_error_serializer:
+            raise NotImplementedError('response_error_serializer not implemented')
+        return self.rule.response_error_serializer(
+            request=self.request,
+            validator=validator,
+        )
 
     # response
     def response_valid(self, validator):

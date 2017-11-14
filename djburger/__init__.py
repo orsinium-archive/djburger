@@ -9,7 +9,7 @@ from . import controllers
 from . import serializers
 from . import validators
 
-from .views import Rule, ViewBase    # noQA
+from .views import Rule, rule, ViewBase    # noQA
 
 
 # shortcuts

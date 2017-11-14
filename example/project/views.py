@@ -3,14 +3,10 @@ import djburger
 
 class IndexView(djburger.ViewBase):
     rules = {
-        'get': djburger.Rule(
-            decorators=None,
-            validator=None,
-            error_serializer=None,
+        'get': djburger.rule(
             controller=lambda request, data, **kwargs: 'Hello, World!',
-            post_validator=None,
-            serializer=djburger.s.TemplateSerializer(
-                template_name='index.html',
-            ),
+            serializers=[
+                djburger.s.TemplateSerializer(template_name='index.html'),
+            ]
         ),
     }
