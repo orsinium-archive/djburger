@@ -183,7 +183,7 @@ class TypeValidator(IValidator):
         return False
 
 
-class LambdaValidator(IValidator):
+class LambdaValidatorFactory(IValidator):
     '''
         Проверяет данные с помощью заданного выражения
     '''
@@ -191,9 +191,12 @@ class LambdaValidator(IValidator):
     errors = None
     error_msg = 'Custom validation not passed'
 
-    def __init__(self, data, key, **kwargs):
-        self.data = data
+    def __init__(self, key):
         self.key = key
+
+    def __call__(self, data, **kwargs):
+        self.data = data
+        return self
 
     def is_valid(self):
         if self.key(self.data):

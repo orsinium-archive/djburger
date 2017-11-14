@@ -1,3 +1,4 @@
+from functools import partial
 import unittest
 import djburger
 
@@ -150,6 +151,29 @@ class TestValidators(unittest.TestCase):
             v = djburger.v.ListValidator
             v = v('123', validator=djburger.v.IsStrValidator)
             self.assertFalse(v.is_valid())
+
+        with self.subTest(src_text='list list str pass'):
+            v = djburger.v.ListValidator
+            v = v(
+                data=[('1', '2'), ('3', '4', '5'), ('6', )],
+                validator=partial(
+                    djburger.v.ListValidator,
+                    validator=djburger.v.IsStrValidator,
+                ),
+            )
+            self.assertTrue(v.is_valid())
+
+    def test_dict_mixed_validator(self):
+        with self.subTest(src_text='dict int+str pass'):
+            v = djburger.v.DictMixedValidatorFactory(validators={
+                'ping': djburger.v.IsIntValidator,
+                'pong': djburger.v.IsStrValidator,
+            })
+            v = v(data={
+                'ping': 3,
+                'pong': 'test',
+            })
+            self.assertTrue(v.is_valid())
 
 
 if __name__ == '__main__':
