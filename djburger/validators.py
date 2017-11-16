@@ -115,17 +115,20 @@ class DictMixedValidatorFactory(IValidator):
 
         validators - словарь валидаторов, где ключ совпадает с ключом
             валидируемых данных
-        validate_all - если отсутствует валидатор для какого-либо ключа, то...
-            True - возвращает ошибку валидации
-            False - Добавляет в результат данные без валидации
+        policy - если отсутствует валидатор для какого-либо ключа, то...
+            error - возвращает ошибку валидации
+            ignore - Добавляет в результат данные без валидации
+            drop - Удаляет данные
     '''
     cleaned_data = None
     errors = None
     error_msg = 'No validator for {}'
 
-    def __init__(self, validators, validate_all=True):
+    def __init__(self, validators, policy='drop'):
         self.validators = validators
-        self.validate_all = validate_all
+        if policy not in ('error', 'ignore', 'drop'):
+            raise KeyError('Bad policy value. Allowe "error", "except" or "drop".')
+        self.policy = policy
 
     def __call__(self, data, **kwargs):
         self.data_dict = data
@@ -136,13 +139,15 @@ class DictMixedValidatorFactory(IValidator):
         self.cleaned_data = {}
 
         for key, data in self.data_dict.items():
-            if key in self.validators:
+            if key in self.validators:  # founded
                 validator = self.validators[key](data=data, **self.kwargs)
-            elif self.validate_all:
+            elif self.policy == 'error':
                 self.errors = {'__all__': [self.error_msg.format(key)]}
                 return False
-            else:
+            elif self.policy == 'ignore':
                 self.cleaned_data[key] = data
+                continue
+            else:  # drop
                 continue
 
             if validator.is_valid():
