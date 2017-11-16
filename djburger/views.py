@@ -30,17 +30,17 @@ def rule(controller, serializers, decorators=None, validators=None):
     if len(serializers) == 0:
         raise IndexError('Need 1-3 serializers')
     elif len(serializers) == 1:
-        data['serializer'] = serializers[0]
         data['error_serializer'] = serializers[0]
         data['response_error_serializer'] = serializers[0]
+        data['serializer'] = serializers[0]
     elif len(serializers) == 2:
-        data['serializer'] = serializers[0]
-        data['error_serializer'] = serializers[1]
-        data['response_error_serializer'] = serializers[1]
+        data['error_serializer'] = serializers[0]
+        data['response_error_serializer'] = serializers[0]
+        data['serializer'] = serializers[1]
     elif len(serializers) == 3:
-        data['serializer'] = serializers[0]
-        data['error_serializer'] = serializers[1]
-        data['response_error_serializer'] = serializers[2]
+        data['error_serializer'] = serializers[0]
+        data['response_error_serializer'] = serializers[1]
+        data['serializer'] = serializers[2]
     else:
         raise IndexError('Too many serializers')
 
