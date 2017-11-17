@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 
 # built-in
 import abc

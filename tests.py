@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 
 # built-in
 import os
@@ -7,6 +8,11 @@ import unittest
 import django
 # project
 import djburger
+
+
+# for python2
+if not hasattr(unittest.TestCase, 'subTest'):
+    import unittest2 as unittest
 
 
 sys.path.append(os.path.dirname(os.path.abspath(__file__)) + '/example')

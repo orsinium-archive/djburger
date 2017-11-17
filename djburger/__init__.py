@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 # built-in
 from functools import partial       # noQA
 
