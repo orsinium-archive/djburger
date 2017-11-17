@@ -2,9 +2,8 @@
 # built-in
 from functools import partial
 # django
-from django.core import serializers
 from django.core.exceptions import ValidationError
-from django.http import HttpResponseRedirect
+from django.http import HttpResponseRedirect, JsonResponse, HttpResponse
 from django.shortcuts import render
 
 
@@ -41,7 +40,7 @@ class SerializerFactory(object):
         return self.serializer(**params)
 
 
-TemplateSerializer = partial(
+TemplateSerializerFactory = partial(
     SerializerFactory,
     serializer=render,
     content_name='context',
@@ -49,25 +48,40 @@ TemplateSerializer = partial(
 )
 
 
-JSONSerializer = partial(
-    SerializerFactory,
-    serializer=partial(serializers.serialize, 'json'),
-    content_name='queryset',
-)
+class JSONSerializerFactory(object):
+
+    def __init__(self, flat=True, safe=False, data_name='data', errors_name='errors'):
+        self.flat = flat
+        self.safe = safe
+        self.data_name = data_name
+        self.errors_name = errors_name
+
+    def __call__(self, request=None, data=None, validator=None):
+        if self.flat:
+            content = data or (validator and validator.errors)
+        else:
+            content = {}
+            if data:
+                content[self.data_name] = data
+            if validator and validator.errors:
+                content[self.errors_name] = validator.errors
+        return JsonResponse(content, safe=self.safe)
 
 
-XMLSerializer = partial(
-    SerializerFactory,
-    serializer=partial(serializers.serialize, 'xml'),
-    content_name='queryset',
-)
+class HTTPSerializerFactory(object):
 
+    def __init__(self, status_code=200, **kwargs):
+        self.status_code = status_code
+        self.kwargs = kwargs
 
-YAMLSerializer = partial(
-    SerializerFactory,
-    serializer=partial(serializers.serialize, 'yaml'),
-    content_name='queryset',
-)
+    def __call__(self, request=None, data=None, validator=None):
+        if data is None:
+            raise ValueError("Data can't be None in HTTPSerializerFactory")
+        if type(data) is str:
+            data = data.encode()
+        response = HttpResponse(data, **self.kwargs)
+        response.status_code = self.status_code
+        return response
 
 
 class RedirectSerializer(object):

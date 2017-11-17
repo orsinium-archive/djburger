@@ -6,6 +6,7 @@ from django.views.generic import ListView
 __all__ = [
     'ListController', 'InfoController',
     'AddController', 'EditController', 'DeleteController',
+    'ViewAsController',
 ]
 
 
@@ -71,3 +72,18 @@ class DeleteController(object):
     def __call__(self, request, data, **kwargs):
         obj = get_object_or_404(self.model, **kwargs)
         return obj.delete()
+
+
+class ViewAsController(object):
+
+    def __init__(self, view, method=None):
+        self.view = view
+        self.method = method
+
+    def __call__(self, request, data, **kwargs):
+        method = self.method or request.method
+        if method.lower() == 'get':
+            request.GET = data
+        else:
+            request.POST = data
+        return self.view(request=request, **kwargs)
