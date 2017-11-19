@@ -52,12 +52,20 @@ class ViewBase(View):
     rules = None
     rule = None
 
-    def dispatch(self, request, *args, **kwargs):
-        '''
-            1. Выбирает правило, соответствующее запросу
-            2. Декорирует представление
-            3. Вызывает метод validate
-        '''
+    def dispatch(self, request, **kwargs):
+        """Entrypoint for view
+
+        1. Select rule from rules.
+        2. Decorate view
+        3. Call `validate` method.
+        
+        Args:
+            request (Request): Request object
+            **kwargs: kwargs from urls.py.
+
+        Returns:
+            HttpResponse: django http response
+        """
         method = request.method.lower()
         if method in self.rules:
             self.rule = self.rules[method]
@@ -73,65 +81,88 @@ class ViewBase(View):
             # take possible attributes set by decorators like csrf_exempt
             base = update_wrapper(base, self.validate, assigned=())
 
-        return base(request, *args, **kwargs)
+        return base(request, **kwargs)
 
     # validator
-    def validate(self, request, *args, **kwargs):
-        '''
-            1. Вызывает request_valid, если валидация пройдена или отсутствует
-            2. Вызывает request_invalid, если валидация провалена
-        '''
+    def validate(self, request, **kwargs):
+        """
+        1. Call `request_valid` method if validation is successfull or missed.
+        2. Call `request_invalid` method otherwise.
+        
+        Args:
+            request (Request): Request object
+            **kwargs: kwargs from urls.py.
+
+        Returns:
+            HttpResponse: django http response
+        """
+        # data
+        data = request.GET if self.request.method == 'get' else request.POST
+
         # no validator
         if not self.rule.validator:
-            return self.request_valid()
-        # data for validation
-        data = request.GET if self.request.method == 'get' else request.POST
+            return self.request_valid(data, **kwargs)
+
         # validate
         validator = self.rule.validator(**self.get_validator_kwargs(data))
         if validator.is_valid():
-            return self.request_valid(validator)
+            return self.request_valid(validator.cleaned_data, **kwargs)
         else:
             return self.request_invalid(validator)
 
     # error_serializer
     def request_invalid(self, validator):
-        '''
-            Вызывает error_serializer, а если не задан - response.
-            Передает в них параметр errors.
-        '''
-        if not self.rule.error_serializer:
-            raise NotImplementedError('error_serializer not implemented')
+        """Return result of error_serializer
+        
+        Args:
+            validator: validator object with `errors` attr.
+
+        Returns:
+            HttpResponse: django http response
+        """
         return self.rule.error_serializer(
             request=self.request,
             validator=validator,
         )
 
     # controller
-    def request_valid(self, validator=None):
-        '''
-            1. Получает response из controller
-            2. Вызывает validate_response
-        '''
-        # get data for controller
-        if validator:
-            data = validator.cleaned_data
-        else:
-            # data for validation
-            data = self.request.GET if self.request.method == 'get' else self.request.POST
+    def request_valid(self, data, **kwargs):
+        """Call controller.
+
+        Get response from controller and return result of validate_response
+        method.
+        
+        Args:
+            data: cleaned and validated data from user.
+            **kwargs: kwargs from urls.py.
+
+        Returns:
+            HttpResponse: django http response
+        """
         # get response from controller
-        response = self.rule.controller(self.request, data, **self.kwargs)
+        response = self.rule.controller(self.request, data, **kwargs)
         return self.validate_response(response)
 
     # post_validator
     def validate_response(self, response):
-        '''
-            1. Вызывает make_response, если post_validator отсутствует
-            2. Проверяет данные с помощью post_validator
-            3. Вызывает response_valid, если данные верные
-            4. Вызывает response_invalid, если данные неверные
-        '''
+        """Validate response by post-validator
+
+        1. Return make_response method result if post_validator is missed.
+        2. Validate data by post_validator otherwise and call
+            response_valid if validation is passed
+            or response_invalid otherwise.
+        
+        Args:
+            response: data from controller
+
+        Returns:
+            HttpResponse: django http response
+        """
+        # no post-validator
         if not self.rule.post_validator:
             return self.make_response(data=response)
+
+        # post-validation
         params = self.get_validator_kwargs(response)
         validator = self.rule.post_validator(**params)
         if validator.is_valid():
@@ -141,11 +172,14 @@ class ViewBase(View):
 
     # bad response
     def response_invalid(self, validator):
-        '''
-            Вызывает request_invalid также, как при ошибке валидации запроса
-        '''
-        if not self.rule.response_error_serializer:
-            raise NotImplementedError('response_error_serializer not implemented')
+        """Return result of response_error_serializer.
+        
+        Args:
+            validator: post_validator object with `errors` attr.
+
+        Returns:
+            HttpResponse: django http response
+        """
         return self.rule.response_error_serializer(
             request=self.request,
             validator=validator,
@@ -153,22 +187,37 @@ class ViewBase(View):
 
     # response
     def response_valid(self, validator):
-        '''
-            Вызывает make_response
-        '''
+        """Return result of make_response.
+        
+        Args:
+            validator: validator object with `cleaned_data` attr.
+
+        Returns:
+            HttpResponse: django http response
+        """
         return self.make_response(validator.cleaned_data)
 
     def make_response(self, data):
-        '''
-            Формирует response
-        '''
+        """Make response by serializer
+        
+        Args:
+            data: validated and cleaned data from controller
+
+        Returns:
+            HttpResponse: django http response
+        """
         return self.rule.serializer(request=self.request, data=data)
 
     # send request and data into validator
     def get_validator_kwargs(self, data):
-        '''
-            Формирует парметры, передаваемые в валидаторы
-        '''
+        """Get kwargs for validators
+        
+        Args:
+            data: source data from user.
+
+        Returns:
+            dict: kwargs for (post_)validator
+        """
         kwargs = super(ViewBase, self).get_form_kwargs()
         kwargs['request'] = self.request
         kwargs['data'] = data
