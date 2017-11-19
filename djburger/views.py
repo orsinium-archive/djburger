@@ -17,6 +17,8 @@ Rule = namedtuple('Rule', [
 
 
 def rule(controller, serializers, decorators=None, validators=None):
+    """Factory of Rule objects
+    """
     data = dict(decorators=decorators, controller=controller)
 
     if not validators:
@@ -49,6 +51,8 @@ def rule(controller, serializers, decorators=None, validators=None):
 
 
 class ViewBase(View):
+    """Base views for DjBurger usage
+    """
     rules = None
     rule = None
 
@@ -60,8 +64,8 @@ class ViewBase(View):
         3. Call `validate` method.
         
         Args:
-            request (Request): Request object
-            **kwargs: kwargs from urls.py.
+            - request (Request): Request object.
+            - \**kwargs: kwargs from urls.py.
 
         Returns:
             HttpResponse: django http response
@@ -90,11 +94,11 @@ class ViewBase(View):
         2. Call `request_invalid` method otherwise.
         
         Args:
-            request (Request): Request object
-            **kwargs: kwargs from urls.py.
+            - request (Request): Request object
+            - \**kwargs: kwargs from urls.py.
 
         Returns:
-            HttpResponse: django http response
+            - HttpResponse: django http response
         """
         # data
         data = request.GET if self.request.method == 'get' else request.POST
@@ -115,10 +119,10 @@ class ViewBase(View):
         """Return result of error_serializer
         
         Args:
-            validator: validator object with `errors` attr.
+            - validator: validator object with `errors` attr.
 
         Returns:
-            HttpResponse: django http response
+            - HttpResponse: django http response
         """
         return self.rule.error_serializer(
             request=self.request,
@@ -133,11 +137,11 @@ class ViewBase(View):
         method.
         
         Args:
-            data: cleaned and validated data from user.
-            **kwargs: kwargs from urls.py.
+            - data: cleaned and validated data from user.
+            - \**kwargs: kwargs from urls.py.
 
         Returns:
-            HttpResponse: django http response
+            - HttpResponse: django http response
         """
         # get response from controller
         response = self.rule.controller(self.request, data, **kwargs)
@@ -153,10 +157,10 @@ class ViewBase(View):
             or response_invalid otherwise.
         
         Args:
-            response: data from controller
+            - response: data from controller
 
         Returns:
-            HttpResponse: django http response
+            - HttpResponse: django http response
         """
         # no post-validator
         if not self.rule.post_validator:
@@ -175,10 +179,10 @@ class ViewBase(View):
         """Return result of response_error_serializer.
         
         Args:
-            validator: post_validator object with `errors` attr.
+            - validator: post_validator object with `errors` attr.
 
         Returns:
-            HttpResponse: django http response
+            - HttpResponse: django http response
         """
         return self.rule.response_error_serializer(
             request=self.request,
@@ -190,10 +194,10 @@ class ViewBase(View):
         """Return result of make_response.
         
         Args:
-            validator: validator object with `cleaned_data` attr.
+            - validator: validator object with `cleaned_data` attr.
 
         Returns:
-            HttpResponse: django http response
+            - HttpResponse: django http response
         """
         return self.make_response(validator.cleaned_data)
 
@@ -201,10 +205,10 @@ class ViewBase(View):
         """Make response by serializer
         
         Args:
-            data: validated and cleaned data from controller
+            - data: validated and cleaned data from controller
 
         Returns:
-            HttpResponse: django http response
+            - HttpResponse: django http response
         """
         return self.rule.serializer(request=self.request, data=data)
 
@@ -213,10 +217,10 @@ class ViewBase(View):
         """Get kwargs for validators
         
         Args:
-            data: source data from user.
+            - data: source data from user.
 
         Returns:
-            dict: kwargs for (post_)validator
+            - dict: kwargs for (post)validator
         """
         kwargs = super(ViewBase, self).get_form_kwargs()
         kwargs['request'] = self.request
