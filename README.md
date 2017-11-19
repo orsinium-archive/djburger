@@ -1,6 +1,6 @@
 # DjBurger
 
-DjBurger -- проект, направленный на более строгое, модульное программирования с использованием некоторых ключевыйх идей MVC, контрактного программирования, Django Forms и Django Rest Framework.
+DjBurger -- проект, направленный на более строгое, модульное программирования с использованием некоторых ключевых идей MVC, контрактного программирования, Django Forms и Django Rest Framework.
 
 Какие проблемы решает данный проект?
 
@@ -36,21 +36,23 @@ DjBurger -- проект, направленный на более строго�
 import djburger
 
 class ExampleView(djburger.ViewBase):
-  rules = {
+    rules = {
     'get': djburger.rule(
-			decorators=[login_required],
-			validators=[
-				SomeDjangoForm,  						 	# Validator
-				djburger.v.IsStrValidator,  	# PostValidator
-			],
-			controller=lambda request, data, **kwargs: 'Hello, World!',
-			serializers=[
-				djburger.s.JSONSerializer,  			# ErrorSerializer
-				djburger.s.ExceptionSerializer,  	# ErrorResponseSerializer
-		    djburger.s.TemplateSerializer(template_name='index.html'),  # Serializer
-			]
-    ),
-  }
+        decorators=[login_required],
+            validators=[
+                SomeDjangoForm,	            # Validator
+                djburger.v.IsStrValidator,  # PostValidator
+            ],
+            controller=lambda request, data, **kwargs: 'Hello, World!',
+            serializers=[
+                djburger.s.JSONSerializer,          # ErrorSerializer
+                djburger.s.ExceptionSerializer,     # ErrorResponseSerializer
+                djburger.s.TemplateSerializer(      # Serializer
+                    template_name='index.html',
+                ),
+            ]
+        ),
+    }
 ```
 
 Некоторые простые правила:
@@ -69,17 +71,17 @@ class ExampleView(djburger.ViewBase):
 import djburger
 
 class ExampleView(djburger.ViewBase):
-  rules = {
-    'get': djburger.Rule(
-			decorators=[login_required],
-			validator=SomeDjangoForm,
-			controller=lambda request, data, **kwargs: 'Hello, World!',
-			post_validator=djburger.v.IsStrValidator,
-			error_serializer=djburger.s.JSONSerializer,
-			response_error_serializer=djburger.s.ExceptionSerializer,
-			serializer=djburger.s.TemplateSerializer(template_name='index.html'),
-    ),
-  }
+    rules = {
+        'get': djburger.Rule(
+            decorators=[login_required],
+            validator=SomeDjangoForm,
+            controller=lambda request, data, **kwargs: 'Hello, World!',
+            post_validator=djburger.v.IsStrValidator,
+            error_serializer=djburger.s.JSONSerializer,
+            response_error_serializer=djburger.s.ExceptionSerializer,
+            serializer=djburger.s.TemplateSerializer(template_name='index.html'),
+        ),
+    }
 ```
 
 Т.к. Rule -- namedtuple, можно записать короче:
@@ -88,17 +90,17 @@ class ExampleView(djburger.ViewBase):
 import djburger
 
 class ExampleView(djburger.ViewBase):
-  rules = {
-    'get': djburger.Rule(
-			[login_required],
-			SomeDjangoForm,
-			lambda request, data, **kwargs: 'Hello, World!',
-			djburger.v.IsStrValidator,
-			djburger.s.JSONSerializer,
-			djburger.s.ExceptionSerializer,
-			djburger.s.TemplateSerializer(template_name='index.html'),
-    ),
-  }
+    rules = {
+        'get': djburger.Rule(
+            [login_required],
+            SomeDjangoForm,
+            lambda request, data, **kwargs: 'Hello, World!',
+            djburger.v.IsStrValidator,
+            djburger.s.JSONSerializer,
+            djburger.s.ExceptionSerializer,
+            djburger.s.TemplateSerializer(template_name='index.html'),
+        ),
+    }
 ```
 
 Рекомендации:
@@ -106,6 +108,21 @@ class ExampleView(djburger.ViewBase):
 * При использовании первого способа для валидаторов и сериализаторов рекомендуется оставлять краткий комментарий, который хотя бы указывает на то, на каком этапе он используется.
 
 Многие перечисленные компоненты уже реализованы в DjBurger или Django, а всё остальное необходимое Вы можете реализовать самостоятельно, используя описанные ниже интерфейсы и примеры.
+
+
+## Installation
+
+Через pip:
+
+```bash
+sudo pip install -e git+https://github.com/orsinium/djburger.git#egg=djburger
+```
+
+Как это добавить в `requirements.txt`? Ну как-то так:
+
+```bash
+-e git+https://github.com/orsinium/djburger.git#egg=djburger
+```
 
 
 ## Интерфейсы
@@ -140,85 +157,8 @@ class ExampleView(djburger.ViewBase):
 2. data - обработанный пост-валидатором ответ контроллера. Отсутствует, если при пост-валидации произошла ошибка.
 3. validator - валидатор или пост-валидатор, который не был пройден. Отсутствует, если валидация и пост-валидация прошли успешно (либо отсутствовали).
 
-## Встроенные объекты
 
-### Validator и PostValidator
+## Что дальше?
 
-Базовые валидаторы:
-
-+ **IValidator** -- описывает интерфейс для валидатора. Используйте его в качестве родительского объекта, чтобы не забыть реализовать что-то нужное.
-+ **FormValidator** -- пропатченные django-формы. Принимают на вход объект request. Собственно, на этом различия заканчиваются.
-+ **ModelFormValidator** -- аналогичный объект, но только для модельных форм.
-+ **ListValidatorFactory** -- валидация элементов списка. При инициализации принимает аргумент `validator`, задающий нужный валидатор.
-+ **DictValidatorFactory** -- объект, аналогичный `ListValidatorFactory`, но для валидации значений словаря.
-+ **DictMixedValidatorFactory** -- валидация значений словаря различными валидаторами. Инициализируется при объявлении и принимает следующие параметры:
-    + `validators` - словарь валидаторов, где ключ совпадает с ключом валидируемых данных
-    + `validate_all` - если отсутствует валидатор для какого-либо ключа, то...
-        `True` - возвращает ошибку валидации
-        `False` - Добавляет в результат данные без валидации
-+ **TypeValidatorFactory** - проверяет, что результат является объектом заданного типа. Тип данных задается при инициализации с помощью аргумента `data_type`.
-
-Дополнительные валидаторы на основе базовых:
-
-+ **ListFormValidator** -- Валидация элементов списка с помощью Django-форм
-+ **DictFormValidator** -- Валидация значений словаря с помощью Django-форм
-+ **ListModelFormValidator** -- Валидация элементов списка с помощью модельных форм Django
-+ **DictModelFormValidator** -- Валидация значений словаря с помощью модельных форм Django
-+ **IsBoolValidator** -- проверка того, что переданное значение является значением типа bool.
-+ **IsIntValidator** -- проверка того, что переданное значение является целым числом.
-+ **IsFloatValidator** -- проверка того, что переданное значение является числом с плавающей запятой.
-+ **IsStrValidator** -- проверка того, что переданное значение является строкой
-+ **IsIterValidator** -- проверка того, что переданное значение является итератором
-
-### Controller
-
-+ **ListController**
-+ **InfoController**
-+ **AddController**
-+ **EditController**
-+ **DeleteController**
-
-### Serializer и ErrorSerializer
-
-
-### Rule, ViewBase
-
-
-
-## Минимальный пример
-
-TODO
-
-```python
-import gram_framework as gf
-
-class UserAPIView(gf.ViewBase)
-	rules = {
-    	'get': gf.Rule(
-        	decorators=None,
-            validator=None,
-            error_serializer=None,
-            controller=None,
-            post_validator=None,
-            serializer=None,
-        ),
-    	'put': gf.Rule(
-        	decorators=None,
-            validator=None,
-            error_serializer=None,
-            controller=None,
-            post_validator=None,
-            serializer=None,
-        ),
-    	'delete': gf.Rule(
-        	decorators=None,
-            validator=None,
-            error_serializer=None,
-            controller=None,
-            post_validator=None,
-            serializer=None,
-        ),
-    }
-```
-
-## Ещё примеры
+1. Примеры использования DjBurger приведены в демонстрационном Django-проекте (example) и тестах (tests.py).
+2. Описание работы всех компонентов DjBurger приведено в docstring'ах. Не бойтесь заглядывать в исходники.
