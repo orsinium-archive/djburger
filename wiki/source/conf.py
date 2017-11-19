@@ -9,6 +9,17 @@ sys.path.append(
     os.path.abspath('../../')
 )
 
+
+def skip(app, what, name, obj, skip, options):
+    if name == "__init__":
+        return False
+    return skip
+
+def setup(app):
+    app.connect("autodoc-skip-member", skip)
+
+
+
 #
 # DjBurger documentation build configuration file, created by
 # sphinx-quickstart on Sun Nov 19 20:59:37 2017.
