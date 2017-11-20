@@ -104,16 +104,17 @@ class HTTPSerializerFactory(object):
         self.kwargs = kwargs
 
     def __call__(self, request=None, data=None, validator=None):
-        if data is None:
-            raise ValueError("Data can't be None in HTTPSerializerFactory")
-        if type(data) is str:
-            data = data.encode()
+        if not isinstance(data, (str, bytes, int, float, list)):
+            t = type(data)
+            if hasattr(t, '__name__'):
+                t = t.__name__
+            raise ValueError("Bad data format: {}".format(t))
         response = HttpResponse(data, **self.kwargs)
         response.status_code = self.status_code
         return response
 
 
-class RedirectSerializer(object):
+class RedirectSerializerFactory(object):
     """Redirect to URL
 
     URL can be passed into initialization or into data (str).
@@ -124,10 +125,10 @@ class RedirectSerializer(object):
 
     def __call__(self, data=None, **kwargs):
         url = self.url or data
-        return HttpResponseRedirect(url=url)
+        return HttpResponseRedirect(redirect_to=url)
 
 
-class ExceptionSerializer(object):
+class ExceptionSerializerFactory(object):
     """Raise Exception
 
     I'm reccomend use this serializer as ResponseErrorSerializer.
@@ -137,7 +138,7 @@ class ExceptionSerializer(object):
     def __init__(self, exception=ValidationError):
         self.exception = exception
 
-    def __call__(self, request, data=None, validator=None):
+    def __call__(self, request=None, data=None, validator=None):
         if validator and validator.errors:
             raise self.exception(validator.errors)
         else:

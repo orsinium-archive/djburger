@@ -6,6 +6,7 @@ import sys
 import unittest
 # external
 import django
+from django.core.exceptions import ValidationError
 # project
 import djburger
 
@@ -251,6 +252,46 @@ class TestSerializers(unittest.TestCase):
             data = 1516
             content = djburger.s.JSONSerializerFactory(flat=False)(data=data).content
             self.assertEqual(content, b'{"data": 1516}')
+
+    def test_http_serializer(self):
+        with self.subTest(src_text='str pass'):
+            data = 'test'
+            content = djburger.s.HTTPSerializerFactory()(data=data).content
+            self.assertEqual(content, b'test')
+        with self.subTest(src_text='bytes pass'):
+            data = b'test'
+            content = djburger.s.HTTPSerializerFactory()(data=data).content
+            self.assertEqual(content, b'test')
+        with self.subTest(src_text='int pass'):
+            data = 123
+            content = djburger.s.HTTPSerializerFactory()(data=data).content
+            self.assertEqual(content, b'123')
+        with self.subTest(src_text='list pass'):
+            data = [1, 2, '3']
+            content = djburger.s.HTTPSerializerFactory()(data=data).content
+            self.assertEqual(content, b'123')
+        with self.subTest(src_text='dict not pass'):
+            data = {'test': 'me'}
+            with self.assertRaises(ValueError):
+                content = djburger.s.HTTPSerializerFactory()(data=data)
+
+    def test_redirect_serializer(self):
+        with self.subTest(src_text='url by init: code'):
+            data = '/login/'
+            code = djburger.s.RedirectSerializerFactory()(data=data).status_code
+            self.assertEqual(code, 302)
+        with self.subTest(src_text='url by init: url'):
+            data = '/login/'
+            url = djburger.s.RedirectSerializerFactory()(data=data).url
+            self.assertEqual(url, '/login/')
+
+    def test_exception_serializer(self):
+        with self.subTest(src_text='ValidationError'):
+            with self.assertRaises(ValidationError):
+                djburger.s.ExceptionSerializerFactory()(data='test')
+        with self.subTest(src_text='AssertionError'):
+            with self.assertRaises(AssertionError):
+                djburger.s.ExceptionSerializerFactory(AssertionError)(data='test')
 
 
 if __name__ == '__main__':
