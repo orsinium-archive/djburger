@@ -1,11 +1,13 @@
 # DjBurger
 
 Documentation on other languages:
+
 * [Russian](README.ru.md)
 
 **DjBurger** -- patched views format for big projects on Django.
 
 Dataflow:
+
 1. **Decorators**.
 2. **Validator**.
 3. **ErrorSerializer**.
