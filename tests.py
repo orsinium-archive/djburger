@@ -329,7 +329,7 @@ class TestControllers(unittest.TestCase):
             self.assertIn(name2, names)
         # INFO
         with self.subTest(src_text='info'):
-            controller = djburger.c.InfoController(queryset=Group.objects.all())
+            controller = djburger.c.InfoController(model=Group)
             response = controller(request=None, data={}, name=name2)
             self.assertEqual(response.name, name2)
         # DELETE

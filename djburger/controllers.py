@@ -11,6 +11,16 @@ __all__ = [
 ]
 
 
+class _ModelControllerMixin(object):
+    def __init__(self, queryset=None, model=None):
+        if queryset:
+            self.q = queryset
+        elif model:
+            self.q = model._default_manager.all()
+        else:
+            raise ValueError("Queryset or model required.")
+
+
 class ListController(ListView):
     """Controller based on Django ListView
 
@@ -50,7 +60,7 @@ class ListController(ListView):
         return context
 
 
-class InfoController(object):
+class InfoController(_ModelControllerMixin):
     """Return one object from queryset
 
     1. Return object filtered by params from URL kwargs  (like `pk` or `slug`)
@@ -59,9 +69,6 @@ class InfoController(object):
         or data have only one key.
     3. Raise exception otherwise.
     """
-
-    def __init__(self, queryset):
-        self.q = queryset
 
     def __call__(self, request, data, **kwargs):
         if kwargs:
@@ -87,7 +94,7 @@ class AddController(object):
         return self.model._default_manager.create(**data)
 
 
-class EditController(object):
+class EditController(_ModelControllerMixin):
     """Controller for editing objects.
 
     1. Get object of initialized model by URL's kwargs.
@@ -95,27 +102,21 @@ class EditController(object):
     3. Update tuple into database.
     """
 
-    def __init__(self, model, filters=None):
-        self.model = model
-
     def __call__(self, request, data, **kwargs):
-        obj = get_object_or_404(self.model, **kwargs)
+        obj = get_object_or_404(self.q, **kwargs)
         obj.__dict__.update(data)
         obj.save(force_update=True)
         return obj
 
 
-class DeleteController(object):
+class DeleteController(_ModelControllerMixin):
     """Controller for deleting objects.
 
     Delete object filtered by URL's kwargs.
     """
 
-    def __init__(self, model, filters=None):
-        self.model = model
-
     def __call__(self, request, data, **kwargs):
-        obj = get_object_or_404(self.model, **kwargs)
+        obj = get_object_or_404(self.q, **kwargs)
         return obj.delete()
 
 
