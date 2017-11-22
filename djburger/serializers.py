@@ -89,8 +89,7 @@ class JSONSerializerFactory(SerializerFactory):
             content_name='data',
             flat=flat,
             safe=safe,
-            **kwargs,
-        )
+            **kwargs)
 
 
 class HTTPSerializerFactory(object):

@@ -55,7 +55,7 @@ class InfoController(object):
 
     1. Return object filtered by params from URL kwargs  (like `pk` or `slug`)
         if url-pattern have kwargs.
-    2. Return object from validated data if data have key `object` 
+    2. Return object from validated data if data have key `object`
         or data have only one key.
     3. Raise exception otherwise.
     """
@@ -101,7 +101,8 @@ class EditController(object):
     def __call__(self, request, data, **kwargs):
         obj = get_object_or_404(self.model, **kwargs)
         obj.__dict__.update(data)
-        return obj.save(force_update=True)
+        obj.save(force_update=True)
+        return obj
 
 
 class DeleteController(object):
@@ -120,7 +121,7 @@ class DeleteController(object):
 
 class ViewAsController(object):
     """Allow use any django view as controller.
-    
+
     1. For CBV with render_to_response method return context.
     2. Return rendered response otherwise.
     """

@@ -6,7 +6,7 @@ class IndexView(djburger.ViewBase):
         'get': djburger.rule(
             controller=lambda request, data, **kwargs: 'Hello, World!',
             serializers=[
-                djburger.s.TemplateSerializer(template_name='index.html'),
+                djburger.s.TemplateSerializerFactory(template_name='index.html'),
             ]
         ),
     }

@@ -21,6 +21,10 @@ os.environ.setdefault("DJANGO_SETTINGS_MODULE", "project.settings")
 django.setup()
 
 
+# import only after django.setup()
+from django.contrib.auth.models import Group  # noQA
+
+
 class TestValidators(unittest.TestCase):
 
     def test_type_validator(self):
@@ -292,6 +296,47 @@ class TestSerializers(unittest.TestCase):
         with self.subTest(src_text='AssertionError'):
             with self.assertRaises(AssertionError):
                 djburger.s.ExceptionSerializerFactory(AssertionError)(data='test')
+
+
+class TestControllers(unittest.TestCase):
+
+    def test_objects_controllers(self):
+        # PREPARE
+        name = 'TEST_IT'
+        name2 = 'TEST_IT_FIX'
+        Group.objects.filter(name=name).delete()
+        Group.objects.filter(name=name2).delete()
+        # ADD
+        with self.subTest(src_text='add'):
+            controller = djburger.c.AddController(model=Group)
+            response = controller(request=None, data={'name': name})
+            self.assertEqual(response.name, name)
+        # EDIT
+        with self.subTest(src_text='edit'):
+            controller = djburger.c.EditController(model=Group)
+            response = controller(request=None, data={'name': name2}, name=name)
+            self.assertEqual(response.name, name2)
+        # LIST
+        with self.subTest(src_text='list'):
+            controller = djburger.c.ListController(model=Group)
+            response = controller(request=None, data={})
+            names = response.values_list('name', flat=True)
+            self.assertIn(name2, names)
+        with self.subTest(src_text='list filter'):
+            controller = djburger.c.ListController(model=Group)
+            response = controller(request=None, data={'name': name2})
+            names = response.values_list('name', flat=True)
+            self.assertIn(name2, names)
+        # INFO
+        with self.subTest(src_text='info'):
+            controller = djburger.c.InfoController(queryset=Group.objects.all())
+            response = controller(request=None, data={}, name=name2)
+            self.assertEqual(response.name, name2)
+        # DELETE
+        with self.subTest(src_text='delete'):
+            controller = djburger.c.DeleteController(model=Group)
+            response = controller(request=None, data={}, name=name2)
+            self.assertEqual(response[1]['auth.Group'], 1)
 
 
 if __name__ == '__main__':
