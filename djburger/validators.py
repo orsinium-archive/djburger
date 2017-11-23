@@ -4,9 +4,26 @@
 import abc
 from collections import Iterator
 # external
-from six import with_metaclass
-# django
 from django.forms import Form, ModelForm
+from six import with_metaclass
+
+
+# marshmallow
+try:
+    from marshmallow import Schema
+except ImportError:
+    class Schema(object):
+        def __init__(self, **kwargs):
+            raise ImportError("Marshmallow not installed yet")
+
+
+# PySchemes
+try:
+    from pyschemes import Scheme
+except ImportError:
+    class Scheme(object):
+        def __init__(self, **kwargs):
+            raise ImportError("PySchemes not installed yet")
 
 
 class IValidator(with_metaclass(abc.ABCMeta)):
@@ -28,7 +45,7 @@ class IValidator(with_metaclass(abc.ABCMeta)):
 
         1. Set `cleaned_data` and return True if data is valid
         2. Set `errors` and return False otherwise.
-        
+
         Returns:
             True: data is valid
             False: data is invalid
@@ -73,6 +90,36 @@ class ModelFormValidator(ModelForm):
         """All operations into validators must be idempotency.
         """
         raise NotImplementedError('Saving object from validator not allowed')
+
+
+class MarshmallowValidator(Schema):
+
+    def __init__(self, request, data, **kwargs):
+        self.request = request
+        self.data = data
+        super(MarshmallowValidator, self).__init__(**kwargs)
+
+    def is_valid(self):
+        self.cleaned_data, self.errors = self.load(self.data)
+        return not self.errors
+
+
+class PySchemesValidator(Scheme):
+
+    def __call__(self, request, data, **kwargs):
+        self.request = request
+        self.data = data
+        return self
+
+    def is_valid(self):
+        self.cleaned_data = None
+        self.errors = None
+        try:
+            self.cleaned_data = self.validate(self.data)
+        except Exception as e:
+            self.errors = {'__all__': list(e.args)}
+            return False
+        return True
 
 
 class _ListValidatorFactory(IValidator):
@@ -260,7 +307,7 @@ class LambdaValidatorFactory(IValidator):
 class ChainValidatorFactory(IValidator):
     """Validate data by validators chain (like reduce function).
 
-    Calls the validators in order, passing in each subsequent cleaned data 
+    Calls the validators in order, passing in each subsequent cleaned data
     from the previous one.
     """
     cleaned_data = None
@@ -300,7 +347,7 @@ IsListValidator = TypeValidatorFactory((list, tuple))
 IsIterValidator = TypeValidatorFactory(Iterator)
 
 
-# wrap ListValidator & DictValidator by type validation 
+# wrap ListValidator & DictValidator by type validation
 
 def ListValidatorFactory(validator): # noQA
     return ChainValidatorFactory([
