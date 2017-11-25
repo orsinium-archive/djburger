@@ -1,5 +1,3 @@
-# -*- coding: utf-8 -*-
-
 # built-in
 from functools import partial
 # django
@@ -8,27 +6,30 @@ from django.http import HttpResponseRedirect, JsonResponse, HttpResponse
 from django.shortcuts import render
 
 
-class SerializerFactory(object):
-    """Wrapper for using any function as serializer.
+__all__ = ['Base', 'Template', 'JSON', 'HTTP', 'Redirect', 'Exception']
+
+
+class Base(object):
+    """Wrapper for using any function as renderer.
     """
 
-    def __init__(self, serializer, content_name, request_name=None, names=None,
+    def __init__(self, renderer, content_name, request_name=None, names=None,
                  content=None, flat=False, **kwargs):
         """
         Args:
-            serializer (callable): wrapped function for serializing
-            content_name (str): key of data argument for serializer
-            request_name (str): key of Request argument for serializer
-            names (dict or None): dict of names. Keys:
+            - renderer (callable): wrapped function for rendering
+            - content_name (str): key of data argument for renderer
+            - request_name (str): key of Request argument for renderer
+            - names (dict or None): dict of names. Keys:
                 * data (default: "data"): name for data into content
                 * errors (default: "errors"): name for errors into content
                 * validator (default: None): name for validator into content.
                     If not setted, validator will not be passed into content.
-            content (dict): default params for content.
-            flat (bool): if True content contains only data or errors.
-            **kwargs: some kwargs which content will be contain by default.
+            - content (dict): default params for content.
+            - flat (bool): if True content contains only data or errors.
+            - \**kwargs: some kwargs which content will be contain by default.
         """
-        self.serializer = serializer
+        self.renderer = renderer
         self.content_name = content_name
         self.request_name = request_name
         self.names = names or {}
@@ -53,19 +54,19 @@ class SerializerFactory(object):
             if validator and validator.errors:
                 content[self.names.get('errors', 'errors')] = validator.errors
 
-        # kwargs for serialization function
+        # kwargs for rendering function
         params = self.kwargs.copy()
         params[self.content_name] = content
         if self.request_name:
             params[self.request_name] = request
 
-        # serialization
-        return self.serializer(**params)
+        # rendering
+        return self.renderer(**params)
 
 
-TemplateSerializerFactory = partial(
-    SerializerFactory,
-    serializer=render,
+Template = partial(
+    Base,
+    renderer=render,
     content_name='context',
     request_name='request',
 )
@@ -73,7 +74,7 @@ TemplateSerializerFactory = partial(
 """
 
 
-class JSONSerializerFactory(SerializerFactory):
+class JSON(Base):
     """Serialize data into JSON
     """
 
@@ -84,16 +85,16 @@ class JSONSerializerFactory(SerializerFactory):
         * `flat` is True by default.
         * `safe` is False by default
         """
-        super(JSONSerializerFactory, self).__init__(
-            serializer=JsonResponse,
+        super(JSON, self).__init__(
+            renderer=JsonResponse,
             content_name='data',
             flat=flat,
             safe=safe,
             **kwargs)
 
 
-class HTTPSerializerFactory(object):
-    """Serialize data by HttpResponse.
+class HTTP(object):
+    """Render data by HttpResponse.
 
     `data` can be only `str` or `bytes` type.
     """
@@ -113,7 +114,7 @@ class HTTPSerializerFactory(object):
         return response
 
 
-class RedirectSerializerFactory(object):
+class Redirect(object):
     """Redirect to URL
 
     URL can be passed into initialization or into data (str).
@@ -127,10 +128,10 @@ class RedirectSerializerFactory(object):
         return HttpResponseRedirect(redirect_to=url)
 
 
-class ExceptionSerializerFactory(object):
+class Exception(object): # noQA
     """Raise Exception
 
-    I'm reccomend use this serializer as ResponseErrorSerializer.
+    I'm recommend use this renderer as `postr`.
     Raised exception can be handled by decorators or loggers.
     """
 

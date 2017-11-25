@@ -229,73 +229,73 @@ class TestValidators(unittest.TestCase):
             self.assertFalse(v.is_valid())
 
 
-class TestSerializers(unittest.TestCase):
+class TestRenderers(unittest.TestCase):
 
     def test_json_serializer(self):
         with self.subTest(src_text='str'):
             data = 'test'
-            content = djburger.s.JSONSerializerFactory()(data=data).content
+            content = djburger.r.JSON()(data=data).content
             self.assertEqual(content, b'"test"')
         with self.subTest(src_text='int'):
             data = -13
-            content = djburger.s.JSONSerializerFactory()(data=data).content
+            content = djburger.r.JSON()(data=data).content
             self.assertEqual(content, b'-13')
         with self.subTest(src_text='dict'):
             data = {'data': 1516}
-            content = djburger.s.JSONSerializerFactory()(data=data).content
+            content = djburger.r.JSON()(data=data).content
             self.assertEqual(content, b'{"data": 1516}')
         with self.subTest(src_text='list'):
             data = [1, 2, 3]
-            content = djburger.s.JSONSerializerFactory()(data=data).content
+            content = djburger.r.JSON()(data=data).content
             self.assertEqual(content, b'[1, 2, 3]')
         with self.subTest(src_text='mixed'):
             data = {'data': [1, 2, 3]}
-            content = djburger.s.JSONSerializerFactory()(data=data).content
+            content = djburger.r.JSON()(data=data).content
             self.assertEqual(content, b'{"data": [1, 2, 3]}')
         with self.subTest(src_text='non-flat'):
             data = 1516
-            content = djburger.s.JSONSerializerFactory(flat=False)(data=data).content
+            content = djburger.r.JSON(flat=False)(data=data).content
             self.assertEqual(content, b'{"data": 1516}')
 
     def test_http_serializer(self):
         with self.subTest(src_text='str pass'):
             data = 'test'
-            content = djburger.s.HTTPSerializerFactory()(data=data).content
+            content = djburger.r.HTTP()(data=data).content
             self.assertEqual(content, b'test')
         with self.subTest(src_text='bytes pass'):
             data = b'test'
-            content = djburger.s.HTTPSerializerFactory()(data=data).content
+            content = djburger.r.HTTP()(data=data).content
             self.assertEqual(content, b'test')
         with self.subTest(src_text='int pass'):
             data = 123
-            content = djburger.s.HTTPSerializerFactory()(data=data).content
+            content = djburger.r.HTTP()(data=data).content
             self.assertEqual(content, b'123')
         with self.subTest(src_text='list pass'):
             data = [1, 2, '3']
-            content = djburger.s.HTTPSerializerFactory()(data=data).content
+            content = djburger.r.HTTP()(data=data).content
             self.assertEqual(content, b'123')
         with self.subTest(src_text='dict not pass'):
             data = {'test': 'me'}
             with self.assertRaises(ValueError):
-                content = djburger.s.HTTPSerializerFactory()(data=data)
+                content = djburger.r.HTTP()(data=data)
 
     def test_redirect_serializer(self):
         with self.subTest(src_text='url by init: code'):
             data = '/login/'
-            code = djburger.s.RedirectSerializerFactory()(data=data).status_code
+            code = djburger.r.Redirect()(data=data).status_code
             self.assertEqual(code, 302)
         with self.subTest(src_text='url by init: url'):
             data = '/login/'
-            url = djburger.s.RedirectSerializerFactory()(data=data).url
+            url = djburger.r.Redirect()(data=data).url
             self.assertEqual(url, '/login/')
 
     def test_exception_serializer(self):
         with self.subTest(src_text='ValidationError'):
             with self.assertRaises(ValidationError):
-                djburger.s.ExceptionSerializerFactory()(data='test')
+                djburger.r.Exception()(data='test')
         with self.subTest(src_text='AssertionError'):
             with self.assertRaises(AssertionError):
-                djburger.s.ExceptionSerializerFactory(AssertionError)(data='test')
+                djburger.r.Exception(AssertionError)(data='test')
 
 
 class TestControllers(unittest.TestCase):

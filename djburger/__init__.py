@@ -1,20 +1,19 @@
-# -*- coding: utf-8 -*-
 # built-in
 from functools import partial       # noQA
 
 # django
-from django import forms            # noQA
+from django import forms
 
 # project
 from . import controllers
-from . import serializers
+from . import renderers
 from . import validators
 
-from .views import Rule, rule, ViewBase    # noQA
+from .views import rule, ViewBase    # noQA
 
 
 # shortcuts
 f = forms
 c = controllers
-s = serializers
+r = renderers
 v = validators
