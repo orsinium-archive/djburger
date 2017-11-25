@@ -25,159 +25,159 @@ django.setup()
 from django.contrib.auth.models import Group  # noQA
 
 
-class TestValidators(unittest.TestCase):
+class Tests(unittest.TestCase):
 
     def test_type_validator(self):
         # BASE
         with self.subTest(src_text='base pass'):
-            v = djburger.v.TypeValidatorFactory(int)
+            v = djburger.v.Type(int)
             v = v(3)
             self.assertTrue(v.is_valid())
         with self.subTest(src_text='base not pass'):
-            v = djburger.v.TypeValidatorFactory(int)
+            v = djburger.v.Type(int)
             v = v('3')
             self.assertFalse(v.is_valid())
 
         # BOOL
         with self.subTest(src_text='bool pass'):
-            v = djburger.v.IsBoolValidator
+            v = djburger.v.IsBool
             v = v(False)
             self.assertTrue(v.is_valid())
         with self.subTest(src_text='bool int not pass'):
-            v = djburger.v.IsBoolValidator
+            v = djburger.v.IsBool
             v = v(1)
             self.assertFalse(v.is_valid())
         with self.subTest(src_text='bool not pass'):
-            v = djburger.v.IsBoolValidator
+            v = djburger.v.IsBool
             v = v('1')
             self.assertFalse(v.is_valid())
 
         # INT
         with self.subTest(src_text='int pass'):
-            v = djburger.v.IsIntValidator
+            v = djburger.v.IsInt
             v = v(3)
             self.assertTrue(v.is_valid())
         with self.subTest(src_text='int bool not pass'):
-            v = djburger.v.IsIntValidator
+            v = djburger.v.IsInt
             v = v(True)
             self.assertFalse(v.is_valid())
         with self.subTest(src_text='int not pass'):
-            v = djburger.v.IsIntValidator
+            v = djburger.v.IsInt
             v = v('4')
             self.assertFalse(v.is_valid())
 
         # FLOAT
         with self.subTest(src_text='float pass'):
-            v = djburger.v.IsFloatValidator
+            v = djburger.v.IsFloat
             v = v(3.2)
             self.assertTrue(v.is_valid())
         with self.subTest(src_text='float bool not pass'):
-            v = djburger.v.IsFloatValidator
+            v = djburger.v.IsFloat
             v = v(True)
             self.assertFalse(v.is_valid())
         with self.subTest(src_text='float not pass'):
-            v = djburger.v.IsFloatValidator
+            v = djburger.v.IsFloat
             v = v(4)
             self.assertFalse(v.is_valid())
 
         # STR
         with self.subTest(src_text='str pass'):
-            v = djburger.v.IsStrValidator
+            v = djburger.v.IsStr
             v = v('1')
             self.assertTrue(v.is_valid())
         with self.subTest(src_text='str empty pass'):
-            v = djburger.v.IsStrValidator
+            v = djburger.v.IsStr
             v = v('')
             self.assertTrue(v.is_valid())
         with self.subTest(src_text='str not pass'):
-            v = djburger.v.IsStrValidator
+            v = djburger.v.IsStr
             v = v(1)
             self.assertFalse(v.is_valid())
 
         # DICT
         with self.subTest(src_text='dict pass'):
-            v = djburger.v.IsDictValidator
+            v = djburger.v.IsDict
             v = v({1: 2})
             self.assertTrue(v.is_valid())
         with self.subTest(src_text='dict empty pass'):
-            v = djburger.v.IsDictValidator
+            v = djburger.v.IsDict
             v = v({})
             self.assertTrue(v.is_valid())
         with self.subTest(src_text='dict not pass'):
-            v = djburger.v.IsDictValidator
+            v = djburger.v.IsDict
             v = v([1, 2, 3])
             self.assertFalse(v.is_valid())
 
         # LIST
         with self.subTest(src_text='list pass'):
-            v = djburger.v.IsListValidator
+            v = djburger.v.IsList
             v = v([1, 2])
             self.assertTrue(v.is_valid())
         with self.subTest(src_text='list empty pass'):
-            v = djburger.v.IsListValidator
+            v = djburger.v.IsList
             v = v([])
             self.assertTrue(v.is_valid())
         with self.subTest(src_text='list tuple pass'):
-            v = djburger.v.IsListValidator
+            v = djburger.v.IsList
             v = v((1, 2, 3))
             self.assertTrue(v.is_valid())
         with self.subTest(src_text='list not pass'):
-            v = djburger.v.IsListValidator
+            v = djburger.v.IsList
             v = v({})
             self.assertFalse(v.is_valid())
 
         # ITER
         with self.subTest(src_text='iter list pass'):
-            v = djburger.v.IsListValidator
+            v = djburger.v.IsList
             v = v([1, 2])
             self.assertTrue(v.is_valid())
         with self.subTest(src_text='iter tuple pass'):
-            v = djburger.v.IsListValidator
+            v = djburger.v.IsList
             v = v((1, 2))
             self.assertTrue(v.is_valid())
         with self.subTest(src_text='iter empty pass'):
-            v = djburger.v.IsListValidator
+            v = djburger.v.IsList
             v = v([])
             self.assertTrue(v.is_valid())
         with self.subTest(src_text='iter str not pass'):
-            v = djburger.v.IsListValidator
+            v = djburger.v.IsList
             v = v('123')
             self.assertFalse(v.is_valid())
         with self.subTest(src_text='iter dict not pass'):
-            v = djburger.v.IsListValidator
+            v = djburger.v.IsList
             v = v({1: 2, 3: 4})
             self.assertFalse(v.is_valid())
         with self.subTest(src_text='iter not pass'):
-            v = djburger.v.IsListValidator
+            v = djburger.v.IsList
             v = v(4)
             self.assertFalse(v.is_valid())
 
     def test_list_validator(self):
         with self.subTest(src_text='list int pass'):
-            v = djburger.v.ListValidatorFactory(djburger.v.IsIntValidator)
+            v = djburger.v.List(djburger.v.IsInt)
             v = v([1, 2, 3])
             self.assertTrue(v.is_valid())
         with self.subTest(src_text='list mixed not pass'):
-            v = djburger.v.ListValidatorFactory(djburger.v.IsIntValidator)
+            v = djburger.v.List(djburger.v.IsInt)
             v = v([1, '2', 3])
             self.assertFalse(v.is_valid())
         with self.subTest(src_text='list str pass'):
-            v = djburger.v.ListValidatorFactory(djburger.v.IsStrValidator)
+            v = djburger.v.List(djburger.v.IsStr)
             v = v(['1', '2', '3'])
             self.assertTrue(v.is_valid())
         with self.subTest(src_text='tuple str pass'):
-            v = djburger.v.ListValidatorFactory(djburger.v.IsStrValidator)
+            v = djburger.v.List(djburger.v.IsStr)
             v = v(('1', '2', '3'))
             self.assertTrue(v.is_valid())
         with self.subTest(src_text='str not pass'):
-            v = djburger.v.ListValidatorFactory(djburger.v.IsStrValidator)
+            v = djburger.v.List(djburger.v.IsStr)
             v = v('123')
             self.assertFalse(v.is_valid())
 
         with self.subTest(src_text='list list str pass'):
-            v = djburger.v.ListValidatorFactory(
-                djburger.v.ListValidatorFactory(
-                    djburger.v.IsStrValidator
+            v = djburger.v.List(
+                djburger.v.List(
+                    djburger.v.IsStr
                 )
             )
             v = v(data=[('1', '2'), ('3', '4', '5'), ('6', )])
@@ -185,9 +185,9 @@ class TestValidators(unittest.TestCase):
 
     def test_dict_mixed_validator(self):
         with self.subTest(src_text='dict int+str pass'):
-            v = djburger.v.DictMixedValidatorFactory(validators={
-                'ping': djburger.v.IsIntValidator,
-                'pong': djburger.v.IsStrValidator,
+            v = djburger.v.DictMixed(validators={
+                'ping': djburger.v.IsInt,
+                'pong': djburger.v.IsStr,
             })
             v = v(data={
                 'ping': 3,
@@ -197,33 +197,33 @@ class TestValidators(unittest.TestCase):
 
     def test_lambda_validator(self):
         with self.subTest(src_text='lambda int pass'):
-            v = djburger.v.LambdaValidatorFactory(key=lambda data: data > 0)
+            v = djburger.v.Lambda(key=lambda data: data > 0)
             v = v(4)
             self.assertTrue(v.is_valid())
         with self.subTest(src_text='lambda int not pass'):
-            v = djburger.v.LambdaValidatorFactory(key=lambda data: data > 0)
+            v = djburger.v.Lambda(key=lambda data: data > 0)
             v = v(-4)
             self.assertFalse(v.is_valid())
 
     def test_chain_validator(self):
         with self.subTest(src_text='chain int pass'):
-            v = djburger.v.ChainValidatorFactory(validators=[
-                djburger.v.IsIntValidator,
-                djburger.v.LambdaValidatorFactory(key=lambda data: data > 0),
+            v = djburger.v.Chain(validators=[
+                djburger.v.IsInt,
+                djburger.v.Lambda(key=lambda data: data > 0),
             ])
             v = v(4)
             self.assertTrue(v.is_valid())
         with self.subTest(src_text='lambda int not pass'):
-            v = djburger.v.ChainValidatorFactory(validators=[
-                djburger.v.IsIntValidator,
-                djburger.v.LambdaValidatorFactory(key=lambda data: data > 0),
+            v = djburger.v.Chain(validators=[
+                djburger.v.IsInt,
+                djburger.v.Lambda(key=lambda data: data > 0),
             ])
             v = v(-4)
             self.assertFalse(v.is_valid())
         with self.subTest(src_text='lambda str not pass'):
-            v = djburger.v.ChainValidatorFactory(validators=[
-                djburger.v.IsIntValidator,
-                djburger.v.LambdaValidatorFactory(key=lambda data: data > 0),
+            v = djburger.v.Chain(validators=[
+                djburger.v.IsInt,
+                djburger.v.Lambda(key=lambda data: data > 0),
             ])
             v = v('4')
             self.assertFalse(v.is_valid())

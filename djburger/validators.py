@@ -4,24 +4,24 @@
 import abc
 from collections import Iterator
 # external
-from django.forms import Form, ModelForm
+from django.forms import Form as _Form, ModelForm as _ModelForm
 from six import with_metaclass
 
 
 # marshmallow
 try:
-    from marshmallow import Schema
+    from marshmallow import Schema as _MarshmallowSchema
 except ImportError:
-    class Schema(object):
+    class _MarshmallowSchema(object):
         def __init__(self, **kwargs):
             raise ImportError("Marshmallow not installed yet")
 
 
 # PySchemes
 try:
-    from pyschemes import Scheme
+    from pyschemes import _PySchemesScheme
 except ImportError:
-    class Scheme(object):
+    class _PySchemesScheme(object):
         def __init__(self, **kwargs):
             raise ImportError("PySchemes not installed yet")
 
@@ -69,22 +69,22 @@ class IValidator(with_metaclass(abc.ABCMeta)):
 
 
 # Don't use IValidator here. It's raise conflict of metaclasses
-class FormValidator(Form):
+class Form(_Form):
     """Validator based on Django Forms.
     """
 
     def __init__(self, request, **kwargs):
         self.request = request
-        super(FormValidator, self).__init__(**kwargs)
+        super(_Form, self).__init__(**kwargs)
 
 
-class ModelFormValidator(ModelForm):
+class ModelForm(_ModelForm):
     """Validator based on Django Model Forms.
     """
 
     def __init__(self, request, **kwargs):
         self.request = request
-        super(ModelFormValidator, self).__init__(**kwargs)
+        super(ModelForm, self).__init__(**kwargs)
 
     def save(self, *args, **kwargs):
         """All operations into validators must be idempotency.
@@ -92,19 +92,19 @@ class ModelFormValidator(ModelForm):
         raise NotImplementedError('Saving object from validator not allowed')
 
 
-class MarshmallowValidator(Schema):
+class Marshmallow(_MarshmallowSchema):
 
     def __init__(self, request, data, **kwargs):
         self.request = request
         self.data = data
-        super(MarshmallowValidator, self).__init__(**kwargs)
+        super(Marshmallow, self).__init__(**kwargs)
 
     def is_valid(self):
         self.cleaned_data, self.errors = self.load(self.data)
         return not self.errors
 
 
-class PySchemesValidator(Scheme):
+class PySchemes(_PySchemesScheme):
 
     def __call__(self, request, data, **kwargs):
         self.request = request
@@ -122,7 +122,7 @@ class PySchemesValidator(Scheme):
         return True
 
 
-class _ListValidatorFactory(IValidator):
+class _List(IValidator):
     """Validate data list
     """
 
@@ -150,7 +150,7 @@ class _ListValidatorFactory(IValidator):
         return True
 
 
-class _DictValidatorFactory(IValidator):
+class _Dict(IValidator):
     """Validate data dict
     """
 
@@ -178,7 +178,7 @@ class _DictValidatorFactory(IValidator):
         return True
 
 
-class DictMixedValidatorFactory(IValidator):
+class DictMixed(IValidator):
     """Validate dict keys by multiple validators
     """
 
@@ -235,7 +235,7 @@ class DictMixedValidatorFactory(IValidator):
         return True
 
 
-class TypeValidatorFactory(IValidator):
+class Type(IValidator):
     """Validate data type
     """
     cleaned_data = None
@@ -276,7 +276,7 @@ class TypeValidatorFactory(IValidator):
         return False
 
 
-class LambdaValidatorFactory(IValidator):
+class Lambda(IValidator):
     """Validate data by lambda expression.
     """
     cleaned_data = None
@@ -304,7 +304,7 @@ class LambdaValidatorFactory(IValidator):
         return False
 
 
-class ChainValidatorFactory(IValidator):
+class Chain(IValidator):
     """Validate data by validators chain (like reduce function).
 
     Calls the validators in order, passing in each subsequent cleaned data
@@ -338,42 +338,42 @@ class ChainValidatorFactory(IValidator):
 
 
 # data types validation
-IsBoolValidator = TypeValidatorFactory(bool)
-IsIntValidator = TypeValidatorFactory(int)
-IsFloatValidator = TypeValidatorFactory(float)
-IsStrValidator = TypeValidatorFactory(str)
-IsDictValidator = TypeValidatorFactory(dict)
-IsListValidator = TypeValidatorFactory((list, tuple))
-IsIterValidator = TypeValidatorFactory(Iterator)
+IsBool = Type(bool)
+IsInt = Type(int)
+IsFloat = Type(float)
+IsStr = Type(str)
+IsDict = Type(dict)
+IsList = Type((list, tuple))
+IsIter = Type(Iterator)
 
 
 # wrap ListValidator & DictValidator by type validation
 
-def ListValidatorFactory(validator): # noQA
-    return ChainValidatorFactory([
-        IsListValidator,
-        _ListValidatorFactory(validator),
+def List(validator): # noQA
+    return Chain([
+        IsList,
+        _List(validator),
     ])
 
-def DictValidatorFactory(validator): # noQA
-    return ChainValidatorFactory([
-        IsListValidator,
-        _DictValidatorFactory(validator),
+def Dict(validator): # noQA
+    return Chain([
+        IsDict,
+        _Dict(validator),
     ])
 
 
-ListFormValidatorFactory = ListValidatorFactory(FormValidator)
+ListForm = List(Form)
 """Validate list elements by Django Forms
 """
 
-DictFormValidatorFactory = DictValidatorFactory(FormValidator)
+DictForm = Dict(Form)
 """Validate dict values by Django Forms
 """
 
-ListModelFormValidatorFactory = ListValidatorFactory(ModelFormValidator)
+ListModelForm = List(ModelForm)
 """Validate list elements by Django Model Forms
 """
 
-DictModelFormValidatorFactory = ListValidatorFactory(ModelFormValidator)
+DictModelForm = Dict(ModelForm)
 """Validate dict values by Django Model Forms
 """
