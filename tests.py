@@ -308,33 +308,33 @@ class TestControllers(unittest.TestCase):
         Group.objects.filter(name=name2).delete()
         # ADD
         with self.subTest(src_text='add'):
-            controller = djburger.c.AddController(model=Group)
+            controller = djburger.c.Add(model=Group)
             response = controller(request=None, data={'name': name})
             self.assertEqual(response.name, name)
         # EDIT
         with self.subTest(src_text='edit'):
-            controller = djburger.c.EditController(model=Group)
+            controller = djburger.c.Edit(model=Group)
             response = controller(request=None, data={'name': name2}, name=name)
             self.assertEqual(response.name, name2)
         # LIST
         with self.subTest(src_text='list'):
-            controller = djburger.c.ListController(model=Group)
+            controller = djburger.c.List(model=Group)
             response = controller(request=None, data={})
             names = response.values_list('name', flat=True)
             self.assertIn(name2, names)
         with self.subTest(src_text='list filter'):
-            controller = djburger.c.ListController(model=Group)
+            controller = djburger.c.List(model=Group)
             response = controller(request=None, data={'name': name2})
             names = response.values_list('name', flat=True)
             self.assertIn(name2, names)
         # INFO
         with self.subTest(src_text='info'):
-            controller = djburger.c.InfoController(model=Group)
+            controller = djburger.c.Info(model=Group)
             response = controller(request=None, data={}, name=name2)
             self.assertEqual(response.name, name2)
         # DELETE
         with self.subTest(src_text='delete'):
-            controller = djburger.c.DeleteController(model=Group)
+            controller = djburger.c.Delete(model=Group)
             response = controller(request=None, data={}, name=name2)
             self.assertEqual(response[1]['auth.Group'], 1)
 

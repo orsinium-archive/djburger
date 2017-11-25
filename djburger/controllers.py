@@ -4,11 +4,7 @@ from django.shortcuts import get_object_or_404
 from django.views.generic import ListView
 
 
-__all__ = [
-    'ListController', 'InfoController',
-    'AddController', 'EditController', 'DeleteController',
-    'ViewAsController',
-]
+__all__ = ['List', 'Info', 'Add', 'Edit', 'Delete', 'ViewAsController']
 
 
 class _ModelControllerMixin(object):
@@ -21,7 +17,7 @@ class _ModelControllerMixin(object):
             raise ValueError("Queryset or model required.")
 
 
-class ListController(ListView):
+class List(ListView):
     """Controller based on Django ListView
 
     1. Get list of objects
@@ -39,18 +35,18 @@ class ListController(ListView):
             **kwargs: all arguments of ListView.
         """
         self.only_data = only_data
-        super(ListController, self).__init__(**kwargs)
+        super(List, self).__init__(**kwargs)
 
     def __call__(self, request, data, **kwargs):
         self.data = data
         return self.get(self, request, **kwargs)
 
     def get_queryset(self):
-        q = super(ListController, self).get_queryset()
+        q = super(List, self).get_queryset()
         return q.filter(**self.data)
 
     def get_context_data(self, **kwargs):
-        context = super(ListController, self).get_context_data(**kwargs)
+        context = super(List, self).get_context_data(**kwargs)
         # return only filtered queryset
         if self.only_data:
             return context['object_list']
@@ -60,7 +56,7 @@ class ListController(ListView):
         return context
 
 
-class InfoController(_ModelControllerMixin):
+class Info(_ModelControllerMixin):
     """Return one object from queryset
 
     1. Return object filtered by params from URL kwargs  (like `pk` or `slug`)
@@ -81,7 +77,7 @@ class InfoController(_ModelControllerMixin):
             raise ValueError("Can't select object!")
 
 
-class AddController(object):
+class Add(object):
     """Controller for adding object with validated data.
     """
 
@@ -94,7 +90,7 @@ class AddController(object):
         return self.model._default_manager.create(**data)
 
 
-class EditController(_ModelControllerMixin):
+class Edit(_ModelControllerMixin):
     """Controller for editing objects.
 
     1. Get object of initialized model by URL's kwargs.
@@ -109,7 +105,7 @@ class EditController(_ModelControllerMixin):
         return obj
 
 
-class DeleteController(_ModelControllerMixin):
+class Delete(_ModelControllerMixin):
     """Controller for deleting objects.
 
     Delete object filtered by URL's kwargs.
