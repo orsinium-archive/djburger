@@ -27,7 +27,7 @@ class Base(object):
                     If not setted, validator will not be passed into content.
             - content (dict): default params for content.
             - flat (bool): if True content contains only data or errors.
-            - \**kwargs: some kwargs which content will be contain by default.
+            - \**kwargs: some kwargs which will be passed to renderer.
         """
         self.renderer = renderer
         self.content_name = content_name
@@ -143,3 +143,24 @@ class Exception(object): # noQA
             raise self.exception(validator.errors)
         else:
             raise self.exception(data)
+
+
+class RESTFramework(Base):
+    """Wrapper for renderers from Django REST Framework
+    """
+
+    def __init__(self, **kwargs):
+        self.renderer = renderer.render
+        self.content_name = 'data'
+        self.http_kwargs = {}
+        super(RESTFramework, self).__init__(**kwargs)
+
+    def set_http_kwargs(self, **kwargs):
+        """Set kwargs for HttpResponse
+        """
+        self.http_kwargs = kwargs
+        return self
+
+    def __call__(self, **kwargs):
+        content = super(RESTFramework, self).__call__(**kwargs)
+        return HttpResponse(content, **self.http_kwargs)
