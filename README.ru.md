@@ -30,9 +30,10 @@ DjBurger -- проект, направленный на более строго�
 
 Для реализации логики на каждом из этапов используются следующие типы компонентов:
 
-1. Validator. Используется в качестве PreValidator и PostValidator.
-2. Controller.
-3. Renderer. Используется в качестве PreRenderer, PostRenderer и Renderer.
+1. **Decorator**. Совершенно любой декоратор :)
+2. **Validator**. Используется в качестве PreValidator и PostValidator.
+2. **Controller**. Любой callable объект
+3. **Renderer**. Используется в качестве PreRenderer, PostRenderer и Renderer.
 
 Многие компоненты уже реализованы в DjBurger, а всё остальное необходимое Вы можете реализовать самостоятельно, используя описанные ниже интерфейсы и примеры.
 
@@ -49,7 +50,7 @@ class ExampleView(djburger.ViewBase):
             r=djburger.r.Template(template_name='index.html'),
             postv=djburger.v.c.IsStrValidator,
             postr=djburger.s.ExceptionSerializer,
-            r=djburger.к.Template(template_name='index.html'),
+            r=djburger.r.Template(template_name='index.html'),
         ),
     }
 ```
