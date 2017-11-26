@@ -1,4 +1,7 @@
-# -*- coding: utf-8 -*-
+'''Constructirs for validators
+
+Use this classes for constructing your own validators.
+'''
 
 # built-in
 import abc
@@ -6,17 +9,15 @@ from collections import Iterator
 # external
 from django.forms import Form as _Form, ModelForm as _ModelForm
 from six import with_metaclass
+# project
+from .bases import Form, IValidator, Marshmallow, ModelForm, PySchemes
 
 
 __all__ = [
     'Chain', 
     'Dict', 'DictForm', 'DictMixed', 'DictModelForm', 
-    'Form', 
-    'IValidator', 
     'IsBool', 'IsDict', 'IsFloat', 'IsInt', 'IsIter', 'IsList', 'IsStr',
     'Lambda', 'List', 'ListForm', 'ListModelForm',
-    'Marshmallow', 'ModelForm',
-    'PySchemes',
     'Type',
 ]
 

@@ -113,7 +113,11 @@ class Delete(_ModelControllerMixin):
 
     def __call__(self, request, data, **kwargs):
         obj = get_object_or_404(self.q, **kwargs)
-        return obj.delete()
+        result = obj.delete()
+        # hook for old Django versions
+        if result is None:
+            return 1
+        return result[0]
 
 
 class ViewAsController(object):
