@@ -25,11 +25,20 @@ except ImportError:
 
 # PySchemes
 try:
-    from pyschemes import _PySchemesScheme
+    from pyschemes import Scheme as _PySchemesScheme
 except ImportError:
     class _PySchemesScheme(object):
         def __init__(self, **kwargs):
             raise ImportError("PySchemes not installed yet")
+
+
+# Django REST Framework
+try:
+    from rest_framework.serializers import Serializer as _RESTFrameworkSerializer
+except ImportError:
+    class _RESTFrameworkSerializer(object):
+        def __init__(self, **kwargs):
+            raise ImportError("Django REST Framework not installed yet")
 
 
 class IValidator(with_metaclass(abc.ABCMeta)):
@@ -81,7 +90,7 @@ class Form(_Form):
 
     def __init__(self, request, **kwargs):
         self.request = request
-        super(_Form, self).__init__(**kwargs)
+        super(Form, self).__init__(**kwargs)
 
 
 class ModelForm(_ModelForm):
@@ -126,3 +135,14 @@ class PySchemes(_PySchemesScheme):
             self.errors = {'__all__': list(e.args)}
             return False
         return True
+
+
+class RESTFramework(_RESTFrameworkSerializer):
+
+    def __init__(self, request, data, **kwargs):
+        self.request = request
+        super(RESTFramework, self).__init__(queryset=data, **kwargs)
+
+    @property
+    def cleaned_data(self):
+        return self.validated_data

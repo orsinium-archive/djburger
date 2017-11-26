@@ -4,10 +4,21 @@ Use this classes as wrappers for non-djburger validators
 '''
 
 
-class Form(object):
+class _BaseWrapper(object):
 
     def __init__(self, validator):
         self.validator = validator
+
+    def __call__(self, request, data, **kwargs):
+        obj = self.validator(**kwargs)
+        obj.request = request
+        obj.data = data
+        # bound method to obj
+        obj.is_valid = self.is_valid.__get__(obj)
+        return obj
+
+
+class Form(_BaseWrapper):
 
     def __call__(self, request, **kwargs):
         obj = self.validator(**kwargs)
@@ -16,17 +27,6 @@ class Form(object):
 
 
 class Marshmallow(object):
-    def __init__(self, validator):
-        self.validator = validator
-
-    def __call__(self, request, data, **kwargs):
-        obj = self.validator(**kwargs)
-        obj.request = request
-        obj.data = data
-        # bound method to obj
-        obj.is_valid = self.is_valid.__get__(obj)
-        return obj
-
     # method binded to wrapped walidator
     @staticmethod
     def is_valid(self):
@@ -35,17 +35,7 @@ class Marshmallow(object):
 
 
 class PySchemes(object):
-    def __init__(self, validator):
-        self.validator = validator
-
-    def __call__(self, request, data, **kwargs):
-        obj = self.validator(**kwargs)
-        obj.request = request
-        obj.data = data
-        # bound method to obj
-        obj.is_valid = self.is_valid.__get__(obj)
-        return obj
-
+    # method binded to wrapped walidator
     @staticmethod
     def is_valid(self):
         self.cleaned_data = None
@@ -56,6 +46,15 @@ class PySchemes(object):
             self.errors = {'__all__': list(e.args)}
             return False
         return True
+
+
+class RESTFramework(object):
+    # method binded to wrapped walidator
+    @staticmethod
+    def is_valid(self):
+        result = super(self.__class__, self).is_valid()
+        self.cleaned_data = self.validated_data
+        return result
 
 
 ModelForm = Form
