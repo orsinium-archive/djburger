@@ -7,6 +7,7 @@ import unittest
 # external
 import marshmallow
 from pyschemes import Scheme as PySchemes
+import rest_framework
 # django
 import django
 from django.core.exceptions import ValidationError
@@ -418,6 +419,33 @@ class TestSideValidators(unittest.TestCase):
            name = marshmallow.fields.Str()
            mail = marshmallow.fields.Email()
         Wrapped = djburger.v.w.Marshmallow(Base)
+        with self.subTest(src_text='base pass'):
+            data = {'name': 'John Doe', 'mail': 'test@gmail.com'}
+            v = Wrapped(request=None, data=data)
+            self.assertTrue(v.is_valid())
+        with self.subTest(src_text='base not pass'):
+            data = {'name': 'John Doe', 'mail': 'test.gmail.com'}
+            v = Wrapped(request=None, data=data)
+            self.assertFalse(v.is_valid())
+
+    def test_rest_framework(self):
+        # BASE
+        class Base(djburger.v.b.RESTFramework):
+           name = rest_framework.serializers.CharField(max_length=20)
+           mail = rest_framework.serializers.EmailField()
+        with self.subTest(src_text='base pass'):
+            data = {'name': 'John Doe', 'mail': 'test@gmail.com'}
+            v = Base(request=None, data=data)
+            self.assertTrue(v.is_valid())
+        with self.subTest(src_text='base not pass'):
+            data = {'name': 'John Doe', 'mail': 'test.gmail.com'}
+            v = Base(request=None, data=data)
+            self.assertFalse(v.is_valid())
+        # WRAPPER
+        class Base(rest_framework.serializers.Serializer):
+           name = rest_framework.serializers.CharField(max_length=20)
+           mail = rest_framework.serializers.EmailField()
+        Wrapped = djburger.v.w.RESTFramework(Base)
         with self.subTest(src_text='base pass'):
             data = {'name': 'John Doe', 'mail': 'test@gmail.com'}
             v = Wrapped(request=None, data=data)

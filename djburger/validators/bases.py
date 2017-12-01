@@ -11,7 +11,7 @@ from django.forms import Form as _Form, ModelForm as _ModelForm
 from six import with_metaclass
 
 
-__all__ = ['Form', 'IValidator', 'Marshmallow', 'ModelForm']
+__all__ = ['Form', 'IValidator', 'Marshmallow', 'ModelForm', 'RESTFramework']
 
 
 # marshmallow
@@ -114,7 +114,7 @@ class RESTFramework(_RESTFrameworkSerializer):
 
     def __init__(self, request, data, **kwargs):
         self.request = request
-        super(RESTFramework, self).__init__(queryset=data, **kwargs)
+        super(RESTFramework, self).__init__(data=data, **kwargs)
 
     @property
     def cleaned_data(self):

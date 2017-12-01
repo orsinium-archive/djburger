@@ -3,6 +3,8 @@
 Use this classes as wrappers for non-djburger validators
 '''
 
+__all__ = ['Form', 'Marshmallow', 'ModelForm', 'PySchemes', 'RESTFramework']
+
 
 class _BaseWrapper(object):
 
@@ -34,11 +36,7 @@ class Marshmallow(_BaseWrapper):
         return not self.errors
 
 
-class PySchemes(object):
-
-    def __init__(self, validator):
-        self.validator = validator
-
+class PySchemes(_BaseWrapper):
     def __call__(self, request, data, **kwargs):
         self.request = request
         self.data = data
@@ -56,6 +54,14 @@ class PySchemes(object):
 
 
 class RESTFramework(_BaseWrapper):
+
+    def __call__(self, request, data, **kwargs):
+        obj = self.validator(data=data, **kwargs)
+        obj.request = request
+        # bound method to obj
+        obj.is_valid = self.is_valid.__get__(obj)
+        return obj
+
     # method binded to wrapped walidator
     @staticmethod
     def is_valid(self):
