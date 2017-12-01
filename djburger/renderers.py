@@ -1,9 +1,10 @@
 # built-in
 from functools import partial
 # django
-from django.core.exceptions import ValidationError
 from django.http import HttpResponseRedirect, JsonResponse, HttpResponse
 from django.shortcuts import render
+# project
+from .exceptions import ValidationError
 
 
 __all__ = ['Base', 'Template', 'JSON', 'HTTP', 'Redirect', 'Exception']
@@ -37,7 +38,7 @@ class Base(object):
         self.flat = flat
         self.kwargs = kwargs
 
-    def __call__(self, request=None, data=None, validator=None):
+    def __call__(self, request=None, data=None, validator=None, status_code=None):
         # content
         if self.flat:
             content = data or (validator and validator.errors)
@@ -61,7 +62,10 @@ class Base(object):
             params[self.request_name] = request
 
         # rendering
-        return self.renderer(**params)
+        response = self.renderer(**params)
+        if status_code:
+            response.status_code = status_code
+        return response
 
 
 Template = partial(
@@ -117,7 +121,7 @@ class HTTP(object):
 class Redirect(object):
     """Redirect to URL
 
-    URL can be passed into initialization or into data (str).
+    URL can be passed by initialization or as data (str).
     """
 
     def __init__(self, url=None):

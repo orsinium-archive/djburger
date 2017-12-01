@@ -5,6 +5,8 @@ from collections import namedtuple
 from functools import update_wrapper
 # django
 from django.views.generic import View
+# project
+from .exceptions import StatusCodeError
 
 
 __all__ = ['rule', 'ViewBase']
@@ -42,19 +44,19 @@ def rule(**kwargs):
         )
 
     Kwargs:
-        - d: list of decorators
+        - d (list): list of decorators
         - prev: pre-validator. Validate and clean user params
-        - c: controller
+        - c (callable): controller
         - postv: post-validator. Validate and clean response
-        - prer: renderer for pre-validator errors
-        - postr: renderer for post-validator errors
-        - r: renderer for successfull response
+        - prer (callable): renderer for pre-validator errors
+        - postr (callable): renderer for post-validator errors
+        - r (callable): renderer for successfull response
     """
     # check required kwargs
     if 'c' not in kwargs:
-        KeyError('Controller is required')
+        TypeError('Controller is required')
     if 'r' not in kwargs:
-        KeyError('Renderer is required')
+        TypeError('Renderer is required')
     # set 'r' as default for error-renderers
     for f in ('prer', 'postr'):
         if f not in kwargs:
@@ -128,17 +130,24 @@ class ViewBase(View):
 
         # validate
         validator = self.rule.prev(**self.get_validator_kwargs(data))
-        if validator.is_valid():
+        try:
+            validator.is_valid()
+        except StatusCodeError as e:
+            status_code = e.status_code
+        else:
+            status_code = None
+        if is_valid:
             return self.request_valid(validator.cleaned_data, **kwargs)
         else:
-            return self.request_invalid(validator)
+            return self.request_invalid(validator, status_code=status_code)
 
     # pre-validation error renderer
-    def request_invalid(self, validator):
+    def request_invalid(self, validator, status_code):
         """Return result of prer (renderer for pre-validator errors)
         
         Args:
             - validator: validator object with `errors` attr.
+            - status_cdoe: status code for HTTP-response
 
         Returns:
             - HttpResponse: django http response
@@ -146,6 +155,7 @@ class ViewBase(View):
         return self.rule.prer(
             request=self.request,
             validator=validator,
+            status_code=status_code,
         )
 
     # controller
@@ -188,17 +198,24 @@ class ViewBase(View):
         # post-validation
         params = self.get_validator_kwargs(response)
         validator = self.rule.postv(**params)
-        if validator.is_valid():
+        try:
+            validator.is_valid()
+        except StatusCodeError as e:
+            status_code = e.status_code
+        else:
+            status_code = None
+        if is_valid:
             return self.response_valid(validator)
         else:
-            return self.response_invalid(validator)
+            return self.response_invalid(validator, status_code=status_code)
 
     # post-validation error renderer
-    def response_invalid(self, validator):
+    def response_invalid(self, validator, status_code):
         """Return result of postr (renderer for post-validation errors).
         
         Args:
             - validator: post-validator object with `errors` attr.
+            - status_cdoe: status code for HTTP-response
 
         Returns:
             - HttpResponse: django http response
@@ -206,6 +223,7 @@ class ViewBase(View):
         return self.rule.postv(
             request=self.request,
             validator=validator,
+            status_code=status_code,
         )
 
     # successfull response renderer
