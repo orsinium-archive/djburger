@@ -149,11 +149,14 @@ class RESTFramework(Base):
     """Wrapper for renderers from Django REST Framework
     """
 
-    def __init__(self, renderer, **kwargs):
-        self.renderer = renderer.render
-        self.content_name = 'data'
+    def __init__(self, renderer, flat=True, **kwargs):
         self.http_kwargs = {}
-        super(RESTFramework, self).__init__(**kwargs)
+        super(RESTFramework, self).__init__(
+            renderer=renderer.render,
+            content_name='data',
+            flat=flat,
+            **kwargs
+        )
 
     def set_http_kwargs(self, **kwargs):
         """Set kwargs for HttpResponse

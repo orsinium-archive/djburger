@@ -28,6 +28,7 @@ django.setup()
 # import only after django.setup()
 from django.contrib.auth.models import Group  # noQA
 import djburger
+from rest_framework import renderers as rest_framework_renderers
 
 
 class TestValidators(unittest.TestCase):
@@ -301,6 +302,35 @@ class TestRenderers(unittest.TestCase):
         with self.subTest(src_text='AssertionError'):
             with self.assertRaises(AssertionError):
                 djburger.r.Exception(AssertionError)(data='test')
+
+    def test_rest_framework_renderer(self):
+        with self.subTest(src_text='str pass'):
+            renderer = djburger.r.RESTFramework(
+                renderer=rest_framework_renderers.StaticHTMLRenderer()
+            )
+            data = 'test'
+            content = renderer(data=data).content
+            self.assertEqual(content, b'test')
+        with self.subTest(src_text='bytes pass'):
+            renderer = djburger.r.RESTFramework(
+                renderer=rest_framework_renderers.StaticHTMLRenderer()
+            )
+            data = b'test'
+            content = renderer(data=data).content
+            self.assertEqual(content, b'test')
+        with self.subTest(src_text='int pass'):
+            renderer = djburger.r.RESTFramework(
+                renderer=rest_framework_renderers.StaticHTMLRenderer()
+            )
+            data = 123
+            content = renderer(data=data).content
+        with self.subTest(src_text='list pass'):
+            renderer = djburger.r.RESTFramework(
+                renderer=rest_framework_renderers.StaticHTMLRenderer()
+            )
+            data = [1, 2, '3']
+            content = renderer(data=data).content
+            self.assertEqual(content, b'123')
 
 
 class TestControllers(unittest.TestCase):
