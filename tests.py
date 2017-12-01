@@ -7,6 +7,8 @@ import unittest
 # external
 import django
 from django.core.exceptions import ValidationError
+from django.http import HttpResponse
+from django.test import RequestFactory
 # project
 import djburger
 
@@ -231,7 +233,7 @@ class Tests(unittest.TestCase):
 
 class TestRenderers(unittest.TestCase):
 
-    def test_json_serializer(self):
+    def test_json_renderer(self):
         with self.subTest(src_text='str'):
             data = 'test'
             content = djburger.r.JSON()(data=data).content
@@ -257,7 +259,7 @@ class TestRenderers(unittest.TestCase):
             content = djburger.r.JSON(flat=False)(data=data).content
             self.assertEqual(content, b'{"data": 1516}')
 
-    def test_http_serializer(self):
+    def test_http_renderer(self):
         with self.subTest(src_text='str pass'):
             data = 'test'
             content = djburger.r.HTTP()(data=data).content
@@ -279,7 +281,7 @@ class TestRenderers(unittest.TestCase):
             with self.assertRaises(ValueError):
                 content = djburger.r.HTTP()(data=data)
 
-    def test_redirect_serializer(self):
+    def test_redirect_renderer(self):
         with self.subTest(src_text='url by init: code'):
             data = '/login/'
             code = djburger.r.Redirect()(data=data).status_code
@@ -289,7 +291,7 @@ class TestRenderers(unittest.TestCase):
             url = djburger.r.Redirect()(data=data).url
             self.assertEqual(url, '/login/')
 
-    def test_exception_serializer(self):
+    def test_exception_renderer(self):
         with self.subTest(src_text='ValidationError'):
             with self.assertRaises(ValidationError):
                 djburger.r.Exception()(data='test')
@@ -337,6 +339,31 @@ class TestControllers(unittest.TestCase):
             controller = djburger.c.Delete(model=Group)
             response = controller(request=None, data={}, name=name2)
             self.assertEqual(response, 1)
+
+    def test_wrapper(self):
+        def base(request, **kwargs):
+            data = request.GET.copy()
+            data.update(request.POST)
+            data.update(kwargs)
+            data = list(data.items())
+            data.sort()
+            return HttpResponse(data)
+
+        factory = RequestFactory()
+        controller = djburger.c.ViewAsController(base)
+
+        with self.subTest(src_text='get'):
+            request = factory.get('/some/url/', {'test': 'me'})
+            response = controller(request=request, data=request.GET)
+            self.assertEqual(response, b"('test', 'me')")
+        with self.subTest(src_text='get'):
+            request = factory.post('/some/url/', {'test': 'me'})
+            response = controller(request=request, data=request.POST)
+            self.assertEqual(response, b"('test', 'me')")
+        with self.subTest(src_text='kwargs'):
+            request = factory.get('/some/url/')
+            response = controller(request=request, data=request.GET, test='me')
+            self.assertEqual(response, b"('test', 'me')")
 
 
 if __name__ == '__main__':
