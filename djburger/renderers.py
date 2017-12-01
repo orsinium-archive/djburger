@@ -7,7 +7,14 @@ from django.shortcuts import render
 from .exceptions import ValidationError
 
 
-__all__ = ['Base', 'Template', 'JSON', 'HTTP', 'Redirect', 'Exception']
+# PyYAML
+try:
+    import yaml as _yaml
+except:
+    _yaml = None
+
+
+__all__ = ['Base', 'Template', 'JSON', 'HTTP', 'YAML', 'Redirect', 'Exception']
 
 
 class Base(object):
@@ -168,9 +175,24 @@ class RESTFramework(Base):
         self.http_kwargs = kwargs
         return self
 
-    def __call__(self, **kwargs, status_code=None):
+    def __call__(self, status_code=None, **kwargs):
         content = super(RESTFramework, self).__call__(**kwargs)
         http_kwargs = self.http_kwargs.copy()
         if status_code:
             http_kwargs['status_code'] = status_code
-        return HttpResponse(content, **kwargs)
+        return HttpResponse(content, **http_kwargs)
+
+
+class YAML(RESTFramework):
+    """Wrapper for renderers from Django REST Framework
+    """
+
+    def __init__(self, **kwargs):
+        if not _yaml:
+            raise ImportError('PyYAML not installed yet')
+        self.http_kwargs = {}
+        super(RESTFramework, self).__init__(
+            renderer=_yaml.dump,
+            content_name='data',
+            **kwargs
+        )

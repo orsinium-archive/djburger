@@ -8,6 +8,7 @@ import unittest
 import marshmallow
 from pyschemes import Scheme as PySchemes
 import rest_framework
+import yaml
 # django
 import django
 from django.core.exceptions import ValidationError
@@ -262,6 +263,16 @@ class TestRenderers(unittest.TestCase):
             data = 1516
             content = djburger.r.JSON(flat=False)(data=data).content
             self.assertEqual(content, b'{"data": 1516}')
+
+    def test_yaml_renderer(self):
+        with self.subTest(src_text='str'):
+            data = 'test'
+            content = djburger.r.YAML()(data=data).content
+            self.assertEqual(yaml.load(content), {'data': data})
+        with self.subTest(src_text='mixed'):
+            data = [1, '2', [3, 4], {5: 6}]
+            content = djburger.r.YAML(flat=True)(data=data).content
+            self.assertEqual(yaml.load(content), data)
 
     def test_http_renderer(self):
         with self.subTest(src_text='str pass'):
