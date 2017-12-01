@@ -13,13 +13,41 @@ from six import with_metaclass
 from .bases import Form, IValidator, ModelForm
 
 
+# PySchemes
+try:
+    from pyschemes import Scheme as _PySchemesScheme
+except ImportError:
+    class _PySchemesScheme(object):
+        def __init__(self, **kwargs):
+            raise ImportError("PySchemes not installed yet")
+
+
 __all__ = [
     'Chain', 
     'Dict', 'DictForm', 'DictMixed', 'DictModelForm', 
     'IsBool', 'IsDict', 'IsFloat', 'IsInt', 'IsIter', 'IsList', 'IsStr',
     'Lambda', 'List', 'ListForm', 'ListModelForm',
+    'PySchemes',
     'Type',
 ]
+
+
+class PySchemes(_PySchemesScheme):
+
+    def __call__(self, request, data, **kwargs):
+        self.request = request
+        self.data = data
+        return self
+
+    def is_valid(self):
+        self.cleaned_data = None
+        self.errors = None
+        try:
+            self.cleaned_data = self.validate(self.data)
+        except Exception as e:
+            self.errors = {'__all__': list(e.args)}
+            return False
+        return True
 
 
 class _List(IValidator):

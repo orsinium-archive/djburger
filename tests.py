@@ -5,6 +5,7 @@ import os
 import sys
 import unittest
 # external
+import marshmallow
 from pyschemes import Scheme as PySchemes
 # django
 import django
@@ -372,15 +373,15 @@ class TestSideValidators(unittest.TestCase):
     def test_pyschemes(self):
         # BASE
         with self.subTest(src_text='base pass'):
-            v = djburger.v.b.PySchemes([str, 2, int])
+            v = djburger.v.c.PySchemes([str, 2, int])
             v = v(request=None, data=['3', 2, 4])
             self.assertTrue(v.is_valid())
         with self.subTest(src_text='base not pass'):
-            v = djburger.v.b.PySchemes([str, 2, int])
+            v = djburger.v.c.PySchemes([str, 2, int])
             v = v(request=None, data=[1, 2, 4])
             self.assertFalse(v.is_valid())
         with self.subTest(src_text='base int data'):
-            v = djburger.v.b.PySchemes(int)
+            v = djburger.v.c.PySchemes(int)
             v = v(request=None, data=3)
             v.is_valid()
             self.assertEqual(v.cleaned_data, 3)
@@ -398,6 +399,33 @@ class TestSideValidators(unittest.TestCase):
             v = v(request=None, data=3)
             v.is_valid()
             self.assertEqual(v.cleaned_data, 3)
+
+    def test_marshmallow(self):
+        # BASE
+        class Base(djburger.v.b.Marshmallow):
+           name = marshmallow.fields.Str()
+           mail = marshmallow.fields.Email()
+        with self.subTest(src_text='base pass'):
+            data = {'name': 'John Doe', 'mail': 'test@gmail.com'}
+            v = Base(request=None, data=data)
+            self.assertTrue(v.is_valid())
+        with self.subTest(src_text='base not pass'):
+            data = {'name': 'John Doe', 'mail': 'test.gmail.com'}
+            v = Base(request=None, data=data)
+            self.assertFalse(v.is_valid())
+        # WRAPPER
+        class Base(marshmallow.Schema):
+           name = marshmallow.fields.Str()
+           mail = marshmallow.fields.Email()
+        Wrapped = djburger.v.w.Marshmallow(Base)
+        with self.subTest(src_text='base pass'):
+            data = {'name': 'John Doe', 'mail': 'test@gmail.com'}
+            v = Wrapped(request=None, data=data)
+            self.assertTrue(v.is_valid())
+        with self.subTest(src_text='base not pass'):
+            data = {'name': 'John Doe', 'mail': 'test.gmail.com'}
+            v = Wrapped(request=None, data=data)
+            self.assertFalse(v.is_valid())
 
 
 if __name__ == '__main__':

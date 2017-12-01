@@ -11,7 +11,7 @@ from django.forms import Form as _Form, ModelForm as _ModelForm
 from six import with_metaclass
 
 
-__all__ = ['Form', 'IValidator', 'Marshmallow', 'ModelForm', 'PySchemes']
+__all__ = ['Form', 'IValidator', 'Marshmallow', 'ModelForm']
 
 
 # marshmallow
@@ -21,15 +21,6 @@ except ImportError:
     class _MarshmallowSchema(object):
         def __init__(self, **kwargs):
             raise ImportError("Marshmallow not installed yet")
-
-
-# PySchemes
-try:
-    from pyschemes import Scheme as _PySchemesScheme
-except ImportError:
-    class _PySchemesScheme(object):
-        def __init__(self, **kwargs):
-            raise ImportError("PySchemes not installed yet")
 
 
 # Django REST Framework
@@ -117,24 +108,6 @@ class Marshmallow(_MarshmallowSchema):
     def is_valid(self):
         self.cleaned_data, self.errors = self.load(self.data)
         return not self.errors
-
-
-class PySchemes(_PySchemesScheme):
-
-    def __call__(self, request, data, **kwargs):
-        self.request = request
-        self.data = data
-        return self
-
-    def is_valid(self):
-        self.cleaned_data = None
-        self.errors = None
-        try:
-            self.cleaned_data = self.validate(self.data)
-        except Exception as e:
-            self.errors = {'__all__': list(e.args)}
-            return False
-        return True
 
 
 class RESTFramework(_RESTFrameworkSerializer):
