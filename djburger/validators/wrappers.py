@@ -26,7 +26,7 @@ class Form(_BaseWrapper):
         return obj
 
 
-class Marshmallow(object):
+class Marshmallow(_BaseWrapper):
     # method binded to wrapped walidator
     @staticmethod
     def is_valid(self):
@@ -34,7 +34,7 @@ class Marshmallow(object):
         return not self.errors
 
 
-class PySchemes(object):
+class PySchemes(_BaseWrapper):
     # method binded to wrapped walidator
     @staticmethod
     def is_valid(self):
@@ -48,7 +48,7 @@ class PySchemes(object):
         return True
 
 
-class RESTFramework(object):
+class RESTFramework(_BaseWrapper):
     # method binded to wrapped walidator
     @staticmethod
     def is_valid(self):

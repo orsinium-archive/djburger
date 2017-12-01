@@ -9,8 +9,6 @@ import django
 from django.core.exceptions import ValidationError
 from django.http import HttpResponse
 from django.test import RequestFactory
-# project
-import djburger
 
 
 # for python2
@@ -25,6 +23,7 @@ django.setup()
 
 # import only after django.setup()
 from django.contrib.auth.models import Group  # noQA
+import djburger
 
 
 class Tests(unittest.TestCase):
