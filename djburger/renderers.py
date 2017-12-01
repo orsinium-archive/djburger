@@ -107,14 +107,14 @@ class HTTP(object):
         self.status_code = status_code
         self.kwargs = kwargs
 
-    def __call__(self, request=None, data=None, validator=None):
+    def __call__(self, request=None, data=None, validator=None, status_code=None):
         if not isinstance(data, (str, bytes, int, float, list)):
             t = type(data)
             if hasattr(t, '__name__'):
                 t = t.__name__
             raise ValueError("Bad data format: {}".format(t))
         response = HttpResponse(data, **self.kwargs)
-        response.status_code = self.status_code
+        response.status_code = status_code or self.status_code
         return response
 
 
@@ -142,7 +142,7 @@ class Exception(object): # noQA
     def __init__(self, exception=ValidationError):
         self.exception = exception
 
-    def __call__(self, request=None, data=None, validator=None):
+    def __call__(self, request=None, data=None, validator=None, status_code=None):
         if validator and validator.errors:
             raise self.exception(validator.errors)
         else:
@@ -168,6 +168,9 @@ class RESTFramework(Base):
         self.http_kwargs = kwargs
         return self
 
-    def __call__(self, **kwargs):
+    def __call__(self, **kwargs, status_code=None):
         content = super(RESTFramework, self).__call__(**kwargs)
-        return HttpResponse(content, **self.http_kwargs)
+        http_kwargs = self.http_kwargs.copy()
+        if status_code:
+            http_kwargs['status_code'] = status_code
+        return HttpResponse(content, **kwargs)

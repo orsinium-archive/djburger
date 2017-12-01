@@ -99,6 +99,8 @@ sudo pip install -e git+https://github.com/orsinium/djburger.git#egg=djburger
 2. Constructors (c). Конструкторы для быстрого создания простых валидаторов. Например, для проверки типа данных ответа.
 3. Wrappers (w). Специальные классы, которые позволяют оборачивать валидаторы из других фреймворков для их использования в DjBurger.
 
+Из любого валидатора при вызовет метода `.is_valid()` можно поднять исключение `djburger.e.StatusCodeError`, проинициализированное HTTP-кодом. Это исключение будет поймано представлением, и будет вызван renderer для ошибки валидации, для ответа которого будет установлен данный HTTP-код.
+
 ### Controller
 
 Любой callable-объект. Встроенные в фреймворк контроллеры являются callable-классами. Соответственно, перед передачей в фреймворк их необходимо инициализировать. При вызове в контроллер передаются следующие данные:
@@ -111,10 +113,28 @@ sudo pip install -e git+https://github.com/orsinium/djburger.git#egg=djburger
 
 Аналогично контроллерам, renderer'ы - любые callable-объекты. И точно так же встроенные renderer'ы требуют инициализации. В них передаются следующие данные:
 
-1. request - объект Request
-2. data - обработанный пост-валидатором ответ контроллера. Отсутствует, если при пост-валидации произошла ошибка.
-3. validator - валидатор или пост-валидатор, который не был пройден. Отсутствует, если валидация и пост-валидация прошли успешно (либо отсутствовали).
+1. `request` - объект Request
+2. `data` - обработанный пост-валидатором ответ контроллера. Отсутствует, если при пост-валидации произошла ошибка.
+3. `validator` - валидатор или пост-валидатор, который не был пройден. Отсутствует, если валидация и пост-валидация прошли успешно (либо отсутствовали).
 
+## Сторонние библиотеки
+
+На данный момент DjBurger поддерживает следующие сторонние модули:
+
+* [Django REST Framework](django-rest-framework.org)
+    * `djburger.v.b.RESTFramework`
+    * `djburger.v.w.RESTFramework`
+    * `djburger.r.RESTFramework`
+* [Marshmallow](https://github.com/marshmallow-code/marshmallow)
+    * `djburger.v.b.Marshmallow`
+    * `djburger.v.w.Marshmallow`
+* [PySchemes](https://github.com/shivylp/pyschemes)
+    * `djburger.v.c.PySchemes`
+    * `djburger.v.w.PySchemes`
+
+Также в планах поддержка [schema](https://github.com/keleshev/schema) и [schematics](https://github.com/schematics/schematics).
+
+Если Вы используете в своём проекте какой-то иной способ валидации или сериализации данных -- просто напишите к нему собственную обертку.
 
 ## Что дальше?
 

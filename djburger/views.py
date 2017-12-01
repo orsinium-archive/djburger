@@ -13,7 +13,7 @@ __all__ = ['rule', 'ViewBase']
 
 
 _fields = ['d', 'prev', 'c', 'postv', 'prer', 'postr', 'r']
-Rule = namedtuple('Rule', _fields)
+_Rule = namedtuple('Rule', _fields)
 
 
 def _get_value(v, kwargs):
@@ -24,7 +24,7 @@ def _get_value(v, kwargs):
 
 
 def rule(**kwargs):
-    """Factory for Rule objects
+    """Factory for _Rule objects
 
     * Any kwarg can contain str which point where function can get value
         for kwarg.
@@ -68,7 +68,7 @@ def rule(**kwargs):
 
     for k, v in kwargs.items():
         kwargs[k] = _get_value(v, kwargs)
-    return Rule(**kwargs)
+    return _Rule(**kwargs)
 
 
 class ViewBase(View):
