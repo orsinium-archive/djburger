@@ -34,14 +34,21 @@ class Marshmallow(_BaseWrapper):
         return not self.errors
 
 
-class PySchemes(_BaseWrapper):
-    # method binded to wrapped walidator
-    @staticmethod
+class PySchemes(object):
+
+    def __init__(self, validator):
+        self.validator = validator
+
+    def __call__(self, request, data, **kwargs):
+        self.request = request
+        self.data = data
+        return self
+
     def is_valid(self):
         self.cleaned_data = None
         self.errors = None
         try:
-            self.cleaned_data = self.validate(self.data)
+            self.cleaned_data = self.validator.validate(self.data)
         except Exception as e:
             self.errors = {'__all__': list(e.args)}
             return False

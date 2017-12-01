@@ -5,6 +5,8 @@ import os
 import sys
 import unittest
 # external
+from pyschemes import Scheme as PySchemes
+# django
 import django
 from django.core.exceptions import ValidationError
 from django.http import HttpResponse
@@ -26,7 +28,7 @@ from django.contrib.auth.models import Group  # noQA
 import djburger
 
 
-class Tests(unittest.TestCase):
+class TestValidators(unittest.TestCase):
 
     def test_type_validator(self):
         # BASE
@@ -363,6 +365,39 @@ class TestControllers(unittest.TestCase):
             request = factory.get('/some/url/')
             response = controller(request=request, data=request.GET, test='me')
             self.assertEqual(response, b"('test', 'me')")
+
+
+class TestSideValidators(unittest.TestCase):
+
+    def test_pyschemes(self):
+        # BASE
+        with self.subTest(src_text='base pass'):
+            v = djburger.v.b.PySchemes([str, 2, int])
+            v = v(request=None, data=['3', 2, 4])
+            self.assertTrue(v.is_valid())
+        with self.subTest(src_text='base not pass'):
+            v = djburger.v.b.PySchemes([str, 2, int])
+            v = v(request=None, data=[1, 2, 4])
+            self.assertFalse(v.is_valid())
+        with self.subTest(src_text='base int data'):
+            v = djburger.v.b.PySchemes(int)
+            v = v(request=None, data=3)
+            v.is_valid()
+            self.assertEqual(v.cleaned_data, 3)
+        # WRAPPER
+        with self.subTest(src_text='base pass'):
+            v = djburger.v.w.PySchemes(PySchemes([str, 2, int]))
+            v = v(request=None, data=['3', 2, 4])
+            self.assertTrue(v.is_valid())
+        with self.subTest(src_text='base not pass'):
+            v = djburger.v.w.PySchemes(PySchemes([str, 2, int]))
+            v = v(request=None, data=[1, 2, 4])
+            self.assertFalse(v.is_valid())
+        with self.subTest(src_text='base int data'):
+            v = djburger.v.w.PySchemes(PySchemes(int))
+            v = v(request=None, data=3)
+            v.is_valid()
+            self.assertEqual(v.cleaned_data, 3)
 
 
 if __name__ == '__main__':
