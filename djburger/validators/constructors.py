@@ -353,12 +353,14 @@ def PySchemes(scheme, policy='error'): # noQA
     if scheme and type(scheme) is dict:
         scheme = {k: PySchemes(v, policy) for k, v in scheme.items()}
         return Chain(
+            Type((dict, _Model)),
             _ModelInstance, # convert models to dict if possible
             _DictMixed(scheme, policy),
         )
     elif scheme and type(scheme) is list:
         scheme = [PySchemes(v) for v in scheme]
         return Chain(
+            Type((list, _QuerySet)),
             _List(_ModelInstance),
             # ^ convert querysets to list of dicts if possible
             _List(*scheme),
