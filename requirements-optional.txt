@@ -1,0 +1,6 @@
+djangorestframework
+marshmallow
+pyschemes
+PyYAML
+tablib
+
