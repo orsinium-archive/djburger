@@ -495,8 +495,8 @@ class TestSideValidators(unittest.TestCase):
     def test_rest_framework_validator(self):
         # BASE
         class Base(djburger.v.b.RESTFramework):
-           name = rest_framework.serializers.CharField(max_length=20)
-           mail = rest_framework.serializers.EmailField()
+            name = rest_framework.serializers.CharField(max_length=20)
+            mail = rest_framework.serializers.EmailField()
         with self.subTest(src_text='base pass'):
             data = {'name': 'John Doe', 'mail': 'test@gmail.com'}
             v = Base(request=None, data=data)
@@ -507,8 +507,8 @@ class TestSideValidators(unittest.TestCase):
             self.assertFalse(v.is_valid())
         # WRAPPER
         class Base(rest_framework.serializers.Serializer):
-           name = rest_framework.serializers.CharField(max_length=20)
-           mail = rest_framework.serializers.EmailField()
+            name = rest_framework.serializers.CharField(max_length=20)
+            mail = rest_framework.serializers.EmailField()
         Wrapped = djburger.v.w.RESTFramework(Base)
         with self.subTest(src_text='base pass'):
             data = {'name': 'John Doe', 'mail': 'test@gmail.com'}
@@ -527,6 +527,7 @@ class TestSideValidators(unittest.TestCase):
             )
             v = v(request=None, data=self.obj)
             self.assertTrue(v.is_valid())
+
         with self.subTest(src_text='marshmallow base'):
             class Base(djburger.v.b.Marshmallow):
                name = marshmallow.fields.Str()
@@ -536,6 +537,18 @@ class TestSideValidators(unittest.TestCase):
             class Base(marshmallow.Schema):
                name = marshmallow.fields.Str()
             Wrapped = djburger.v.w.Marshmallow(Base)
+            v = Wrapped(request=None, data=self.obj)
+            self.assertTrue(v.is_valid())
+
+        with self.subTest(src_text='rest framework base'):
+            class Base(djburger.v.b.RESTFramework):
+                name = rest_framework.serializers.CharField(max_length=20)
+            v = Base(request=None, data=self.obj)
+            self.assertTrue(v.is_valid())
+        with self.subTest(src_text='rest framework wrapper'):
+            class Base(rest_framework.serializers.Serializer):
+                name = rest_framework.serializers.CharField(max_length=20)
+            Wrapped = djburger.v.w.RESTFramework(Base)
             v = Wrapped(request=None, data=self.obj)
             self.assertTrue(v.is_valid())
 

@@ -10,7 +10,7 @@ from collections import Iterator
 from django.forms import Form as _Form, ModelForm as _ModelForm
 from six import with_metaclass
 # project
-from djburger.utils import safe_model_dict_interface, safe_model_to_dict
+from djburger.utils import safe_model_to_dict
 
 
 __all__ = ['Form', 'IValidator', 'Marshmallow', 'ModelForm', 'RESTFramework']
@@ -83,7 +83,7 @@ class Form(_Form):
 
     def __init__(self, data, request=None, **kwargs):
         self.request = request
-        data = safe_model_dict_interface(data)
+        data = safe_model_to_dict(data)
         super(Form, self).__init__(data=data, **kwargs)
 
 
@@ -93,7 +93,7 @@ class ModelForm(_ModelForm):
 
     def __init__(self, data, request=None, **kwargs):
         self.request = request
-        data = safe_model_dict_interface(data)
+        data = safe_model_to_dict(data)
         super(ModelForm, self).__init__(data=data, **kwargs)
 
     def save(self, *args, **kwargs):
@@ -118,7 +118,7 @@ class RESTFramework(_RESTFrameworkSerializer):
 
     def __init__(self, data, request=None, **kwargs):
         self.request = request
-        data = safe_model_dict_interface(data)
+        data = safe_model_to_dict(data)
         super(RESTFramework, self).__init__(data=data, **kwargs)
 
     @property
