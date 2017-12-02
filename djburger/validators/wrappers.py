@@ -4,7 +4,7 @@ Use this classes as wrappers for non-djburger validators
 '''
 
 # project
-from djburger.utils import safe_model_dict_interface
+from djburger.utils import safe_model_dict_interface, safe_model_to_dict
 
 
 __all__ = ['Form', 'Marshmallow', 'ModelForm', 'PySchemes', 'RESTFramework']
@@ -18,7 +18,7 @@ class _BaseWrapper(object):
     def __call__(self, request, data, **kwargs):
         obj = self.validator(**kwargs)
         obj.request = request
-        obj.data = safe_model_dict_interface(data)
+        obj.data = safe_model_to_dict(data)
         # bound method to obj
         obj.is_valid = self.is_valid.__get__(obj)
         return obj

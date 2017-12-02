@@ -19,16 +19,18 @@ class DictInterface(object):
         self.model = model
 
     def __getattr__(self, name):
-        return getattr(self.model, name)
+        if name is not 'model':
+            return getattr(self.model, name)
 
-    def __setattr__(self, name):
-        return setattr(self.model, name)
+    def __setattr__(self, name, value):
+        if name is not 'model':
+            return setattr(self.model, name, value)
 
     def __getitem__(self, name):
         return getattr(self.model, name)
 
-    def __setitem__(self, name):
-        return getattr(self.model, name)
+    def __setitem__(self, name, value):
+        return setattr(self.model, name, value)
 
 
 def safe_model_dict_interface(model):

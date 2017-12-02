@@ -526,7 +526,17 @@ class TestSideValidators(unittest.TestCase):
                 policy='drop'
             )
             v = v(request=None, data=self.obj)
-            v.is_valid()
+            self.assertTrue(v.is_valid())
+        with self.subTest(src_text='marshmallow base'):
+            class Base(djburger.v.b.Marshmallow):
+               name = marshmallow.fields.Str()
+            v = Base(request=None, data=self.obj)
+            self.assertTrue(v.is_valid())
+        with self.subTest(src_text='marshmallow wrapper'):
+            class Base(marshmallow.Schema):
+               name = marshmallow.fields.Str()
+            Wrapped = djburger.v.w.Marshmallow(Base)
+            v = Wrapped(request=None, data=self.obj)
             self.assertTrue(v.is_valid())
 
 

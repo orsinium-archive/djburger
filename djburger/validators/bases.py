@@ -10,7 +10,7 @@ from collections import Iterator
 from django.forms import Form as _Form, ModelForm as _ModelForm
 from six import with_metaclass
 # project
-from djburger.utils import safe_model_dict_interface
+from djburger.utils import safe_model_dict_interface, safe_model_to_dict
 
 
 __all__ = ['Form', 'IValidator', 'Marshmallow', 'ModelForm', 'RESTFramework']
@@ -106,7 +106,7 @@ class Marshmallow(_MarshmallowSchema):
 
     def __init__(self, data, request=None, **kwargs):
         self.request = request
-        self.data = safe_model_dict_interface(data)
+        self.data = safe_model_to_dict(data)
         super(Marshmallow, self).__init__(**kwargs)
 
     def is_valid(self):
