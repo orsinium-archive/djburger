@@ -6,7 +6,7 @@ from setuptools import setup
 
 setup(
     name     = 'djburger',
-    version  = '0.5.0',
+    version  = '0.6.0',
 
     author       = 'orsinium',
     author_email = 'master_fess@mail.ru',
@@ -23,7 +23,7 @@ setup(
 
     license      = 'GNU Lesser General Public License v3.0',
     classifiers  = [
-        'Development Status :: 3 - Alpha',
+        'Development Status :: 4 - Beta',
         'Environment :: Plugins',
         'Framework :: Django',
         'Intended Audience :: Developers',

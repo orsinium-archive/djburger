@@ -1,6 +1,7 @@
 __pycache__
 *.pyc
 djburger.egg-info
+dist/
 *.sqlite3
 wiki/build
 

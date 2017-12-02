@@ -63,6 +63,14 @@ class ExampleView(djburger.ViewBase):
 
 ## Installation
 
+### STABLE
+
+```bash
+pip install djburger
+```
+
+### DEV
+
 Через pip:
 
 ```bash
