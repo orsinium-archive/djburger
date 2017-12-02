@@ -38,6 +38,8 @@ __all__ = [
 
 
 class PySchemes(_PySchemesScheme):
+    """Validate data by PySchemes
+    """
 
     def __call__(self, request, data, **kwargs):
         self.request = request
@@ -111,7 +113,7 @@ class _Dict(IValidator):
         return True
 
 
-class DictMixed(IValidator):
+class _DictMixed(IValidator):
     """Validate dict keys by multiple validators
     """
 
@@ -122,8 +124,8 @@ class DictMixed(IValidator):
     def __init__(self, validators, policy='error'):
         """
         Args:
-            validators (dict): validators for data.
-            policy (str): policy if validator for data not found:
+            - validators (dict): validators for data.
+            - policy (str): policy if validator for data not found:
                 "error" - add error into `errors` attr and return False.
                 "except" - raise KeyError exception.
                 "ignore" - add source value into cleaned_data.
@@ -173,14 +175,15 @@ class Type(IValidator):
     """
     cleaned_data = None
     errors = None
-    error_msg = 'Invalid data format: {}. Required {}.'
 
-    def __init__(self, data_type):
+    def __init__(self, data_type,
+                 error_msg='Invalid data type: {}. Required {}.'):
         """
         Args:
             data_type: required type of data.
         """
         self.data_type = data_type
+        self.error_msg = error_msg
 
     def __call__(self, data, **kwargs):
         self.data = data
@@ -214,15 +217,15 @@ class Lambda(IValidator):
     """
     cleaned_data = None
     errors = None
-    error_msg = 'Custom validation not passed'
 
-    def __init__(self, key):
+    def __init__(self, key, error_msg='Custom validation is failed'):
         """
         Args:
             key (callable): lambda, function or other callable object
                 which get data and return bool result (True if valid).
         """
         self.key = key
+        self.error_msg = error_msg
 
     def __call__(self, data, **kwargs):
         self.data = data
@@ -246,11 +249,13 @@ class Chain(IValidator):
     cleaned_data = None
     errors = None
 
-    def __init__(self, validators):
+    def __init__(self, *validators):
         """
         Args:
             validators (list): list of validators
         """
+        if len(validators) == 1:
+            validators = validators[0]
         self.validators = validators
 
     def __call__(self, data, **kwargs):
@@ -286,6 +291,9 @@ class _ModelInstance(IValidator):
         return True
 
 
+# -- SUBVALIDATORS -- #
+
+
 ModelInstance = Chain([
     Type(_Model),
     _ModelInstance,
@@ -294,7 +302,7 @@ ModelInstance = Chain([
 """
 
 
-QuerySet = Chain(validators=[
+QuerySet = Chain([
     Type(_QuerySet),
     _List(ModelInstance),
 ])
@@ -324,6 +332,12 @@ def Dict(validator): # noQA
     return Chain([
         IsDict,
         _Dict(validator),
+    ])
+
+def DictMixed(validators, policy='error'): # noQA
+    return Chain([
+        IsDict,
+        _DictMixed(validators, policy=policy),
     ])
 
 

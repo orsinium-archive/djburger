@@ -215,21 +215,21 @@ class TestValidators(unittest.TestCase):
 
     def test_chain_validator(self):
         with self.subTest(src_text='chain int pass'):
-            v = djburger.v.c.Chain(validators=[
+            v = djburger.v.c.Chain([
                 djburger.v.c.IsInt,
                 djburger.v.c.Lambda(key=lambda data: data > 0),
             ])
             v = v(4)
             self.assertTrue(v.is_valid())
         with self.subTest(src_text='lambda int not pass'):
-            v = djburger.v.c.Chain(validators=[
+            v = djburger.v.c.Chain([
                 djburger.v.c.IsInt,
                 djburger.v.c.Lambda(key=lambda data: data > 0),
             ])
             v = v(-4)
             self.assertFalse(v.is_valid())
         with self.subTest(src_text='lambda str not pass'):
-            v = djburger.v.c.Chain(validators=[
+            v = djburger.v.c.Chain([
                 djburger.v.c.IsInt,
                 djburger.v.c.Lambda(key=lambda data: data > 0),
             ])
