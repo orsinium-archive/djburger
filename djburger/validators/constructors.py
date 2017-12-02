@@ -6,6 +6,7 @@ Use this classes for constructing your own validators.
 # built-in
 import abc
 from collections import Iterator
+from itertools import repeat
 # external
 from django.db.models.query import QuerySet as _QuerySet
 from django.db.models import Model as _Model
@@ -14,6 +15,7 @@ from django.forms.models import model_to_dict
 from six import with_metaclass
 # project
 from .bases import Form, IValidator, ModelForm
+from djburger.utils import safe_model_to_dict
 
 
 # PySchemes
@@ -37,13 +39,13 @@ __all__ = [
 ]
 
 
-class PySchemes(_PySchemesScheme):
+class _PySchemes(_PySchemesScheme):
     """Validate data by PySchemes
     """
 
     def __call__(self, request, data, **kwargs):
         self.request = request
-        self.data = data
+        self.data = safe_model_to_dict(data)
         return self
 
     def is_valid(self):
@@ -64,8 +66,11 @@ class _List(IValidator):
     cleaned_data = None
     errors = None
 
-    def __init__(self, validator):
-        self.validator = validator
+    def __init__(self, validator, *validators):
+        if validators:
+            self.validators = [validator] + list(validators)
+        else:
+            self.validators = repeat(validator)
 
     def __call__(self, data, **kwargs):
         self.data_list = data
@@ -74,8 +79,8 @@ class _List(IValidator):
 
     def is_valid(self):
         self.cleaned_data = []
-        for data in self.data_list:
-            validator = self.validator(data=data, **self.kwargs)
+        for data, validator in zip(self.data_list, self.validators):
+            validator = validator(data=data, **self.kwargs)
             if validator.is_valid():
                 self.cleaned_data.append(validator.cleaned_data)
             else:
@@ -287,7 +292,10 @@ class _ModelInstance(IValidator):
         self.kwargs = kwargs
 
     def is_valid(self):
-        self.cleaned_data = model_to_dict(self.data)
+        if isinstance(self.data, _Model):
+            self.cleaned_data = model_to_dict(self.data)
+        else:
+            self.cleaned_data = self.data
         return True
 
 
@@ -339,6 +347,24 @@ def DictMixed(validators, policy='error'): # noQA
         IsDict,
         _DictMixed(validators, policy=policy),
     ])
+
+
+def PySchemes(scheme, policy='error'): # noQA
+    if scheme and type(scheme) is dict:
+        scheme = {k: PySchemes(v, policy) for k, v in scheme.items()}
+        return Chain(
+            _ModelInstance, # convert models to dict if possible
+            _DictMixed(scheme, policy),
+        )
+    elif scheme and type(scheme) is list:
+        scheme = [PySchemes(v) for v in scheme]
+        return Chain(
+            _List(_ModelInstance),
+            # ^ convert querysets to list of dicts if possible
+            _List(*scheme),
+        )
+    else:
+        return _PySchemes(scheme)
 
 
 ListForm = List(Form)

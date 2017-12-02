@@ -9,6 +9,8 @@ from collections import Iterator
 # external
 from django.forms import Form as _Form, ModelForm as _ModelForm
 from six import with_metaclass
+# project
+from djburger.utils import safe_model_dict_interface
 
 
 __all__ = ['Form', 'IValidator', 'Marshmallow', 'ModelForm', 'RESTFramework']
@@ -79,18 +81,20 @@ class Form(_Form):
     """Validator based on Django Forms.
     """
 
-    def __init__(self, request, **kwargs):
+    def __init__(self, data, request=None, **kwargs):
         self.request = request
-        super(Form, self).__init__(**kwargs)
+        data = safe_model_dict_interface(data)
+        super(Form, self).__init__(data=data, **kwargs)
 
 
 class ModelForm(_ModelForm):
     """Validator based on Django Model Forms.
     """
 
-    def __init__(self, request, **kwargs):
+    def __init__(self, data, request=None, **kwargs):
         self.request = request
-        super(ModelForm, self).__init__(**kwargs)
+        data = safe_model_dict_interface(data)
+        super(ModelForm, self).__init__(data=data, **kwargs)
 
     def save(self, *args, **kwargs):
         """All operations into validators must be idempotency.
@@ -100,9 +104,9 @@ class ModelForm(_ModelForm):
 
 class Marshmallow(_MarshmallowSchema):
 
-    def __init__(self, request, data, **kwargs):
+    def __init__(self, data, request=None, **kwargs):
         self.request = request
-        self.data = data
+        self.data = safe_model_dict_interface(data)
         super(Marshmallow, self).__init__(**kwargs)
 
     def is_valid(self):
@@ -112,8 +116,9 @@ class Marshmallow(_MarshmallowSchema):
 
 class RESTFramework(_RESTFrameworkSerializer):
 
-    def __init__(self, request, data, **kwargs):
+    def __init__(self, data, request=None, **kwargs):
         self.request = request
+        data = safe_model_dict_interface(data)
         super(RESTFramework, self).__init__(data=data, **kwargs)
 
     @property

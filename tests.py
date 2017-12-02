@@ -423,11 +423,23 @@ class TestControllers(unittest.TestCase):
 
 class TestSideValidators(unittest.TestCase):
 
+    @classmethod
+    def setUpClass(cls):
+        cls.obj = Group.objects.create(name='TEST_IT')
+        Group.objects.create(name='TEST_IT_2')
+        cls.qs = Group.objects.all()
+
+    @classmethod
+    def tearDownClass(cls):
+        Group.objects.get(name='TEST_IT').delete()
+        Group.objects.get(name='TEST_IT_2').delete()
+
     def test_pyschemes_validator(self):
         # BASE
         with self.subTest(src_text='base pass'):
             v = djburger.v.c.PySchemes([str, 2, int])
             v = v(request=None, data=['3', 2, 4])
+            v.is_valid()
             self.assertTrue(v.is_valid())
         with self.subTest(src_text='base not pass'):
             v = djburger.v.c.PySchemes([str, 2, int])
@@ -506,6 +518,16 @@ class TestSideValidators(unittest.TestCase):
             data = {'name': 'John Doe', 'mail': 'test.gmail.com'}
             v = Wrapped(request=None, data=data)
             self.assertFalse(v.is_valid())
+
+    def test_model_serialization(self):
+        with self.subTest(src_text='pyschemes'):
+            v = djburger.v.c.PySchemes(
+                {'name': str, 'permissions': [], 'id': int},
+                policy='drop'
+            )
+            v = v(request=None, data=self.obj)
+            v.is_valid()
+            self.assertTrue(v.is_valid())
 
 
 if __name__ == '__main__':
