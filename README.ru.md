@@ -131,6 +131,10 @@ sudo pip install -e git+https://github.com/orsinium/djburger.git#egg=djburger
 * [PySchemes](https://github.com/shivylp/pyschemes)
     * `djburger.v.c.PySchemes`
     * `djburger.v.w.PySchemes`
+* [PyYAML](https://github.com/yaml/pyyaml)
+    * `djburger.r.YAML`
+* [Tablib](https://github.com/kennethreitz/tablib)
+    * `djburger.r.Tablib`
 
 Также в планах поддержка [schema](https://github.com/keleshev/schema) и [schematics](https://github.com/schematics/schematics).
 

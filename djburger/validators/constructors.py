@@ -7,7 +7,10 @@ Use this classes for constructing your own validators.
 import abc
 from collections import Iterator
 # external
+from django.db.models.query import QuerySet as _QuerySet
+from django.db.models import Model as _Model
 from django.forms import Form as _Form, ModelForm as _ModelForm
+from django.forms.models import model_to_dict
 from six import with_metaclass
 # project
 from .bases import Form, IValidator, ModelForm
@@ -27,8 +30,10 @@ __all__ = [
     'Dict', 'DictForm', 'DictMixed', 'DictModelForm', 
     'IsBool', 'IsDict', 'IsFloat', 'IsInt', 'IsIter', 'IsList', 'IsStr',
     'Lambda', 'List', 'ListForm', 'ListModelForm',
+    'ModelInstance',
     'PySchemes',
     'Type',
+    'QuerySet',
 ]
 
 
@@ -263,6 +268,38 @@ class Chain(IValidator):
                 return False
         self.cleaned_data = self.data
         return True
+
+
+
+class _ModelInstance(IValidator):
+    """Validate model instance and convert it to dict.
+    """
+    cleaned_data = None
+    errors = None
+
+    def __init__(self, data, **kwargs):
+        self.data = data
+        self.kwargs = kwargs
+
+    def is_valid(self):
+        self.cleaned_data = model_to_dict(self.data)
+        return True
+
+
+ModelInstance = Chain([
+    Type(_Model),
+    _ModelInstance,
+])
+"""Validate model instance and convert it to dict.
+"""
+
+
+QuerySet = Chain(validators=[
+    Type(_QuerySet),
+    _List(ModelInstance),
+])
+"""Validate queryset and convert each object in it to dict.
+"""
 
 
 # data types validation
