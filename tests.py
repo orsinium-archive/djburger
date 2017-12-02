@@ -425,6 +425,9 @@ class TestSideValidators(unittest.TestCase):
 
     @classmethod
     def setUpClass(cls):
+        Group.objects.filter(name='TEST_IT').delete()
+        Group.objects.filter(name='TEST_IT_2').delete()
+
         cls.obj = Group.objects.create(name='TEST_IT')
         Group.objects.create(name='TEST_IT_2')
         cls.qs = Group.objects.all()
