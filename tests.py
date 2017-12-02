@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 
 # built-in
+import json
 import os
 import sys
 import unittest
@@ -343,6 +344,16 @@ class TestRenderers(unittest.TestCase):
             content = renderer(data=data).content
             self.assertEqual(content, b'123')
 
+    def test_tablib_renderer(self):
+        with self.subTest(src_text='table csv'):
+            data = [[1,2,3], [4,5,6]]
+            content = djburger.r.Tablib('csv')(data=data).content
+            self.assertEqual(content.split(), [b'1,2,3', b'4,5,6'])
+        with self.subTest(src_text='table json'):
+            data = [[1,2,3], [4,5,6]]
+            content = djburger.r.Tablib('json')(data=data).content
+            self.assertEqual(json.loads(content.decode('utf-8')), data)
+
 
 class TestControllers(unittest.TestCase):
 
@@ -412,7 +423,7 @@ class TestControllers(unittest.TestCase):
 
 class TestSideValidators(unittest.TestCase):
 
-    def test_pyschemes(self):
+    def test_pyschemes_validator(self):
         # BASE
         with self.subTest(src_text='base pass'):
             v = djburger.v.c.PySchemes([str, 2, int])
@@ -442,7 +453,7 @@ class TestSideValidators(unittest.TestCase):
             v.is_valid()
             self.assertEqual(v.cleaned_data, 3)
 
-    def test_marshmallow(self):
+    def test_marshmallow_validator(self):
         # BASE
         class Base(djburger.v.b.Marshmallow):
            name = marshmallow.fields.Str()
@@ -469,7 +480,7 @@ class TestSideValidators(unittest.TestCase):
             v = Wrapped(request=None, data=data)
             self.assertFalse(v.is_valid())
 
-    def test_rest_framework(self):
+    def test_rest_framework_validator(self):
         # BASE
         class Base(djburger.v.b.RESTFramework):
            name = rest_framework.serializers.CharField(max_length=20)

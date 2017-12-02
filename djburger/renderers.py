@@ -14,7 +14,19 @@ except:
     _yaml = None
 
 
-__all__ = ['Base', 'Template', 'JSON', 'HTTP', 'YAML', 'Redirect', 'Exception']
+# tablib
+try:
+    from tablib import Dataset as _Tablib
+except:
+    _Tablib = None # noQA
+
+
+__all__ = [
+    'Base', 
+    'Template', 'HTTP', 
+    'JSON', 'YAML', 'Tablib'
+    'Redirect', 'Exception',
+    ]
 
 
 class Base(object):
@@ -73,6 +85,24 @@ class Base(object):
         if status_code:
             response.status_code = status_code
         return response
+
+
+class BaseWithHTTP(Base):
+    """Base class wrapped by HttpResponse
+    """
+
+    def set_http_kwargs(self, **kwargs):
+        """Set kwargs for HttpResponse
+        """
+        self.http_kwargs = kwargs
+        return self
+
+    def __call__(self, status_code=None, **kwargs):
+        http_kwargs = self.http_kwargs.copy()
+        if status_code:
+            http_kwargs['status_code'] = status_code
+        content = super(BaseWithHTTP, self).__call__(**kwargs)
+        return HttpResponse(content, **http_kwargs)
 
 
 Template = partial(
@@ -156,11 +186,14 @@ class Exception(object): # noQA
             raise self.exception(data)
 
 
-class RESTFramework(Base):
+class RESTFramework(BaseWithHTTP):
     """Wrapper for renderers from Django REST Framework
     """
 
     def __init__(self, renderer, flat=True, **kwargs):
+        # initialize renderer
+        if type(renderer) is type:
+            renderer = renderer()
         self.http_kwargs = {}
         super(RESTFramework, self).__init__(
             renderer=renderer.render,
@@ -169,30 +202,39 @@ class RESTFramework(Base):
             **kwargs
         )
 
-    def set_http_kwargs(self, **kwargs):
-        """Set kwargs for HttpResponse
-        """
-        self.http_kwargs = kwargs
-        return self
 
-    def __call__(self, status_code=None, **kwargs):
-        content = super(RESTFramework, self).__call__(**kwargs)
-        http_kwargs = self.http_kwargs.copy()
-        if status_code:
-            http_kwargs['status_code'] = status_code
-        return HttpResponse(content, **http_kwargs)
-
-
-class YAML(RESTFramework):
-    """Wrapper for renderers from Django REST Framework
+class YAML(BaseWithHTTP):
+    """Render into YAML format by PyYAML
     """
 
     def __init__(self, **kwargs):
         if not _yaml:
-            raise ImportError('PyYAML not installed yet')
+            raise ImportError('PyYAML is not installed yet')
         self.http_kwargs = {}
-        super(RESTFramework, self).__init__(
+        super(YAML, self).__init__(
             renderer=_yaml.dump,
             content_name='data',
             **kwargs
         )
+
+
+class Tablib(BaseWithHTTP):
+    """Render into multiple formats by tablib
+    """
+
+    def __init__(self, ext, headers=None, **kwargs):
+        if not _Tablib:
+            raise ImportError('Tablib is not installed yet')
+        self.http_kwargs = {}
+        self.ext = ext
+        self.headers = headers
+        super(Tablib, self).__init__(
+            renderer=self.render,
+            content_name='data',
+            flat=True,
+            **kwargs
+        )
+    
+    def render(self, data):
+        dataset = _Tablib(*data, headers=self.headers)
+        return dataset.export(self.ext)
