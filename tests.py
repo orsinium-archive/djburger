@@ -522,6 +522,33 @@ class TestSideValidators(unittest.TestCase):
             v = Wrapped(request=None, data=data)
             self.assertFalse(v.is_valid())
 
+    def test_form_validator(self):
+        # BASE
+        class Base(djburger.v.b.Form):
+            name = djburger.f.CharField(max_length=20)
+            mail = djburger.f.EmailField()
+        with self.subTest(src_text='base pass'):
+            data = {'name': 'John Doe', 'mail': 'test@gmail.com'}
+            v = Base(request=None, data=data)
+            self.assertTrue(v.is_valid())
+        with self.subTest(src_text='base not pass'):
+            data = {'name': 'John Doe', 'mail': 'test.gmail.com'}
+            v = Base(request=None, data=data)
+            self.assertFalse(v.is_valid())
+        # WRAPPER
+        class Base(djburger.f.Form):
+            name = djburger.f.CharField(max_length=20)
+            mail = djburger.f.EmailField()
+        Wrapped = djburger.v.w.Form(Base)
+        with self.subTest(src_text='base pass'):
+            data = {'name': 'John Doe', 'mail': 'test@gmail.com'}
+            v = Wrapped(request=None, data=data)
+            self.assertTrue(v.is_valid())
+        with self.subTest(src_text='base not pass'):
+            data = {'name': 'John Doe', 'mail': 'test.gmail.com'}
+            v = Wrapped(request=None, data=data)
+            self.assertFalse(v.is_valid())
+
     def test_model_serialization(self):
         with self.subTest(src_text='pyschemes'):
             v = djburger.v.c.PySchemes(
