@@ -12,6 +12,7 @@ from django.db.models.query import QuerySet as _QuerySet
 from django.db.models import Model as _Model
 from django.forms import Form as _Form, ModelForm as _ModelForm
 from django.forms.models import model_to_dict
+from django.http.request import QueryDict as _QueryDict
 from six import with_metaclass
 # project
 from .bases import Form, IValidator, ModelForm
@@ -323,7 +324,7 @@ IsBool = Type(bool)
 IsInt = Type(int)
 IsFloat = Type(float)
 IsStr = Type(str)
-IsDict = Type(dict)
+IsDict = Type((dict, _QueryDict))
 IsList = Type((list, tuple))
 IsIter = Type(Iterator)
 

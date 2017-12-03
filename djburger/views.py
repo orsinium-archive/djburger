@@ -76,6 +76,7 @@ class ViewBase(View):
     """
     rules = None
     rule = None
+    default_rule = None
 
     def dispatch(self, request, **kwargs):
         """Entrypoint for view
@@ -91,10 +92,12 @@ class ViewBase(View):
         Returns:
             - HttpResponse: django http response
         """
-        method = request.method.lower()
-        if method in self.rules:
+        self.method = request.method.lower()
+        if self.rules and self.method in self.rules:
             self.rule = self.rules[method]
-        elif not self.rule:
+        elif self.default_rule:
+            self.rule = self.default_rule
+        else:
             raise NotImplementedError('Please, set rule or rules attr')
 
         base = self.validate_request
@@ -107,6 +110,13 @@ class ViewBase(View):
             base = update_wrapper(base, self.validate, assigned=())
 
         return base(request, **kwargs)
+
+    def get_data(self, request):
+        query_dict = request.GET if self.method == 'get' else request.POST
+        data = {}
+        for k, v in query_dict.lists():
+            data[k] = v[0] if len(v) == 1 else v
+        return data
 
     # pre-validator
     def validate_request(self, request, **kwargs):
@@ -122,7 +132,7 @@ class ViewBase(View):
             - HttpResponse: django http response
         """
         # data
-        data = request.GET if self.request.method == 'get' else request.POST
+        data = self.get_data(request)
 
         # no validator
         if not self.rule.prev:
@@ -131,7 +141,7 @@ class ViewBase(View):
         # validate
         validator = self.rule.prev(**self.get_validator_kwargs(data))
         try:
-            validator.is_valid()
+            is_valid = validator.is_valid()
         except StatusCodeError as e:
             status_code = e.status_code
         else:
@@ -199,7 +209,7 @@ class ViewBase(View):
         params = self.get_validator_kwargs(response)
         validator = self.rule.postv(**params)
         try:
-            validator.is_valid()
+            is_valid = validator.is_valid()
         except StatusCodeError as e:
             status_code = e.status_code
         else:
@@ -261,7 +271,10 @@ class ViewBase(View):
         Returns:
             - dict: kwargs for (post)validator
         """
-        kwargs = super(ViewBase, self).get_form_kwargs()
+        try:
+            kwargs = super(ViewBase, self).get_form_kwargs()
+        except AttributeError:
+            kwargs = {}
         kwargs['request'] = self.request
         kwargs['data'] = data
         return kwargs

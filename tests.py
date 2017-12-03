@@ -583,5 +583,48 @@ class TestSideValidators(unittest.TestCase):
             self.assertTrue(v.is_valid())
 
 
+class TestViews(unittest.TestCase):
+
+    def test_controller(self):
+        class Base(djburger.ViewBase):
+            default_rule = djburger.rule(
+                c=lambda request, data, **kwargs: data,
+                r=lambda data, **kwargs: data,
+            )
+        view = Base.as_view()
+        factory = RequestFactory()
+        data = {'test': 'me', 'list': ['1', '2', '3']}
+        request = factory.get('/some/url/', data)
+        response = view(request)
+        self.assertEqual(response, data)
+
+    def test_validator(self):
+        class Validator(djburger.v.b.Form):
+            name = djburger.f.CharField(max_length=20)
+            mail = djburger.f.EmailField()
+            themes = djburger.f.MultipleChoiceField(choices=(
+                (1, 'one'),
+                (2, 'two'),
+                (3, 'three'),
+            ))
+        class Base(djburger.ViewBase):
+            default_rule = djburger.rule(
+                prev=Validator,
+                c=lambda request, data, **kwargs: data,
+                r=lambda data, **kwargs: data,
+            )
+        view = Base.as_view()
+        factory = RequestFactory()
+        data = {
+            'name': 'John Doe',
+            'mail': 'example@gmail.com',
+            'themes': ['1', '2'],
+        }
+        request = factory.get('/some/url/', data)
+        response = view(request)
+        self.assertEqual(response, data)
+
+
+
 if __name__ == '__main__':
     unittest.main()
