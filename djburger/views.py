@@ -230,7 +230,7 @@ class ViewBase(View):
         Returns:
             - HttpResponse: django http response
         """
-        return self.rule.postv(
+        return self.rule.postr(
             request=self.request,
             validator=validator,
             status_code=status_code,

@@ -611,18 +611,66 @@ class TestViews(unittest.TestCase):
             default_rule = djburger.rule(
                 prev=Validator,
                 c=lambda request, data, **kwargs: data,
-                r=lambda data, **kwargs: data,
+                r=lambda **kwargs: kwargs,
             )
         view = Base.as_view()
         factory = RequestFactory()
-        data = {
-            'name': 'John Doe',
-            'mail': 'example@gmail.com',
-            'themes': ['1', '2'],
-        }
-        request = factory.get('/some/url/', data)
-        response = view(request)
-        self.assertEqual(response, data)
+        with self.subTest(src_text='form pass'):
+            data = {
+                'name': 'John Doe',
+                'mail': 'example@gmail.com',
+                'themes': ['1', '2'],
+            }
+            request = factory.get('/some/url/', data)
+            response = view(request)
+            self.assertEqual(response['data'], data)
+        with self.subTest(src_text='form not pass'):
+            data = {
+                'name': 'John Doe',
+                'mail': 'example.gmail.com',
+                'themes': ['1', '2', '4'],
+            }
+            request = factory.get('/some/url/', data)
+            response = view(request)
+            errors = set(response['validator'].errors.keys())
+            self.assertEqual(errors, {'themes', 'mail'})
+
+    def test_postvalidator(self):
+        class Validator(djburger.v.b.Form):
+            name = djburger.f.CharField(max_length=20)
+            mail = djburger.f.EmailField()
+            themes = djburger.f.MultipleChoiceField(choices=(
+                (1, 'one'),
+                (2, 'two'),
+                (3, 'three'),
+            ))
+        class Base(djburger.ViewBase):
+            default_rule = djburger.rule(
+                c=lambda request, data, **kwargs: data,
+                postv=Validator,
+                r=lambda **kwargs: kwargs,
+            )
+        view = Base.as_view()
+        factory = RequestFactory()
+        with self.subTest(src_text='form pass'):
+            data = {
+                'name': 'John Doe',
+                'mail': 'example@gmail.com',
+                'themes': ['1', '2'],
+            }
+            request = factory.get('/some/url/', data)
+            response = view(request)
+            self.assertEqual(response['data'], data)
+        with self.subTest(src_text='form not pass'):
+            data = {
+                'name': 'John Doe',
+                'mail': 'example.gmail.com',
+                'themes': ['1', '2', '4'],
+            }
+            request = factory.get('/some/url/', data)
+            response = view(request)
+            errors = set(response['validator'].errors.keys())
+            self.assertEqual(errors, {'themes', 'mail'})
 
 
 
