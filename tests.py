@@ -29,8 +29,8 @@ django.setup()
 
 # import only after django.setup()
 from django.contrib.auth.models import Group  # noQA
-import djburger
-from rest_framework import renderers as rest_framework_renderers
+import djburger # noQA
+from rest_framework import renderers as rest_framework_renderers # noQA
 
 
 class TestValidators(unittest.TestCase):
@@ -346,11 +346,11 @@ class TestRenderers(unittest.TestCase):
 
     def test_tablib_renderer(self):
         with self.subTest(src_text='table csv'):
-            data = [[1,2,3], [4,5,6]]
+            data = [[1, 2, 3], [4, 5, 6]]
             content = djburger.r.Tablib('csv')(data=data).content
             self.assertEqual(content.split(), [b'1,2,3', b'4,5,6'])
         with self.subTest(src_text='table json'):
-            data = [[1,2,3], [4,5,6]]
+            data = [[1, 2, 3], [4, 5, 6]]
             content = djburger.r.Tablib('json')(data=data).content
             self.assertEqual(json.loads(content.decode('utf-8')), data)
 
@@ -471,8 +471,8 @@ class TestSideValidators(unittest.TestCase):
     def test_marshmallow_validator(self):
         # BASE
         class Base(djburger.v.b.Marshmallow):
-           name = marshmallow.fields.Str()
-           mail = marshmallow.fields.Email()
+            name = marshmallow.fields.Str()
+            mail = marshmallow.fields.Email()
         with self.subTest(src_text='base pass'):
             data = {'name': 'John Doe', 'mail': 'test@gmail.com'}
             v = Base(request=None, data=data)
@@ -481,11 +481,13 @@ class TestSideValidators(unittest.TestCase):
             data = {'name': 'John Doe', 'mail': 'test.gmail.com'}
             v = Base(request=None, data=data)
             self.assertFalse(v.is_valid())
+
         # WRAPPER
         class Base(marshmallow.Schema):
-           name = marshmallow.fields.Str()
-           mail = marshmallow.fields.Email()
-        Wrapped = djburger.v.w.Marshmallow(Base)
+            name = marshmallow.fields.Str()
+            mail = marshmallow.fields.Email()
+
+        Wrapped = djburger.v.w.Marshmallow(Base) # noQA
         with self.subTest(src_text='base pass'):
             data = {'name': 'John Doe', 'mail': 'test@gmail.com'}
             v = Wrapped(request=None, data=data)
@@ -508,11 +510,12 @@ class TestSideValidators(unittest.TestCase):
             data = {'name': 'John Doe', 'mail': 'test.gmail.com'}
             v = Base(request=None, data=data)
             self.assertFalse(v.is_valid())
+
         # WRAPPER
         class Base(rest_framework.serializers.Serializer):
             name = rest_framework.serializers.CharField(max_length=20)
             mail = rest_framework.serializers.EmailField()
-        Wrapped = djburger.v.w.RESTFramework(Base)
+        Wrapped = djburger.v.w.RESTFramework(Base) # noQA
         with self.subTest(src_text='base pass'):
             data = {'name': 'John Doe', 'mail': 'test@gmail.com'}
             v = Wrapped(request=None, data=data)
@@ -535,11 +538,12 @@ class TestSideValidators(unittest.TestCase):
             data = {'name': 'John Doe', 'mail': 'test.gmail.com'}
             v = Base(request=None, data=data)
             self.assertFalse(v.is_valid())
+
         # WRAPPER
         class Base(djburger.f.Form):
             name = djburger.f.CharField(max_length=20)
             mail = djburger.f.EmailField()
-        Wrapped = djburger.v.w.Form(Base)
+        Wrapped = djburger.v.w.Form(Base) # noQA
         with self.subTest(src_text='base pass'):
             data = {'name': 'John Doe', 'mail': 'test@gmail.com'}
             v = Wrapped(request=None, data=data)
@@ -560,13 +564,13 @@ class TestSideValidators(unittest.TestCase):
 
         with self.subTest(src_text='marshmallow base'):
             class Base(djburger.v.b.Marshmallow):
-               name = marshmallow.fields.Str()
+                name = marshmallow.fields.Str()
             v = Base(request=None, data=self.obj)
             self.assertTrue(v.is_valid())
         with self.subTest(src_text='marshmallow wrapper'):
             class Base(marshmallow.Schema):
-               name = marshmallow.fields.Str()
-            Wrapped = djburger.v.w.Marshmallow(Base)
+                name = marshmallow.fields.Str()
+            Wrapped = djburger.v.w.Marshmallow(Base) # noQA
             v = Wrapped(request=None, data=self.obj)
             self.assertTrue(v.is_valid())
 
@@ -578,7 +582,7 @@ class TestSideValidators(unittest.TestCase):
         with self.subTest(src_text='rest framework wrapper'):
             class Base(rest_framework.serializers.Serializer):
                 name = rest_framework.serializers.CharField(max_length=20)
-            Wrapped = djburger.v.w.RESTFramework(Base)
+            Wrapped = djburger.v.w.RESTFramework(Base) # noQA
             v = Wrapped(request=None, data=self.obj)
             self.assertTrue(v.is_valid())
 
@@ -591,6 +595,7 @@ class TestViews(unittest.TestCase):
                 c=lambda request, data, **kwargs: data,
                 r=lambda data, **kwargs: data,
             )
+
         view = Base.as_view()
         factory = RequestFactory()
         data = {'test': 'me', 'list': ['1', '2', '3']}
@@ -607,12 +612,14 @@ class TestViews(unittest.TestCase):
                 (2, 'two'),
                 (3, 'three'),
             ))
+
         class Base(djburger.ViewBase):
             default_rule = djburger.rule(
                 prev=Validator,
                 c=lambda request, data, **kwargs: data,
                 r=lambda **kwargs: kwargs,
             )
+
         view = Base.as_view()
         factory = RequestFactory()
         with self.subTest(src_text='form pass'):
@@ -644,12 +651,14 @@ class TestViews(unittest.TestCase):
                 (2, 'two'),
                 (3, 'three'),
             ))
+
         class Base(djburger.ViewBase):
             default_rule = djburger.rule(
                 c=lambda request, data, **kwargs: data,
                 postv=Validator,
                 r=lambda **kwargs: kwargs,
             )
+
         view = Base.as_view()
         factory = RequestFactory()
         with self.subTest(src_text='form pass'):
@@ -672,6 +681,36 @@ class TestViews(unittest.TestCase):
             errors = set(response['validator'].errors.keys())
             self.assertEqual(errors, {'themes', 'mail'})
 
+
+class TestParsers(unittest.TestCase):
+
+    def test_objects_controllers(self):
+        factory = RequestFactory()
+        # default
+        with self.subTest(src_text='default'):
+            data = {
+                'name': 'John Doe',
+                'mail': 'example.gmail.com',
+                'themes': ['1', '2', '4'],
+            }
+            request = factory.get('/some/url/', data)
+            p = djburger.p.Default()
+            parsed_data = p(request)
+            self.assertEqual(parsed_data, data)
+        with self.subTest(src_text='json'):
+            data = {
+                'name': 'John Doe',
+                'mail': 'example.gmail.com',
+                'themes': ['1', '2', '4'],
+            }
+            request = factory.post(
+                    '/some/url/',
+                    data=json.dumps(data),
+                    content_type='application/json',
+                )
+            p = djburger.p.JSON()
+            parsed_data = p(request)
+            self.assertEqual(parsed_data, data)
 
 
 if __name__ == '__main__':

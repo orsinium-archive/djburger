@@ -23,8 +23,9 @@ class Default(object):
 
 
 class JSON(object):
-    def __init__(self, **kwargs):
+    def __init__(self, encoding='utf-8', **kwargs):
+        self.encoding = encoding
         self.kwargs = kwargs
 
     def __call__(self, request):
-        return _json(request.body, **self.kwargs)
+        return _json(request.body.decode(self.encoding), **self.kwargs)
