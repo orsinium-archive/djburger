@@ -6,6 +6,7 @@ import os
 import sys
 import unittest
 # external
+import bson
 import marshmallow
 from pyschemes import Scheme as PySchemes
 import rest_framework
@@ -288,10 +289,36 @@ class TestRenderers(unittest.TestCase):
             content = djburger.r.JSON(flat=False)(data=data).content
             self.assertEqual(content, b'{"data": 1516}')
 
+    def test_bson_renderer(self):
+        with self.subTest(src_text='str'):
+            data = 'test'
+            content = djburger.r.BSON(flat=False)(data=data).content
+            self.assertEqual(bson.loads(content), {'data': data})
+        with self.subTest(src_text='int'):
+            data = -13
+            content = djburger.r.BSON(flat=False)(data=data).content
+            self.assertEqual(bson.loads(content), {'data': data})
+        with self.subTest(src_text='dict'):
+            data = {'lol': 1516}
+            content = djburger.r.BSON(flat=False)(data=data).content
+            self.assertEqual(bson.loads(content), {'data': data})
+        with self.subTest(src_text='list'):
+            data = [1, 2, 3]
+            content = djburger.r.BSON(flat=False)(data=data).content
+            self.assertEqual(bson.loads(content), {'data': data})
+        with self.subTest(src_text='mixed'):
+            data = {'data': [1, 2, 3]}
+            content = djburger.r.BSON(flat=False)(data=data).content
+            self.assertEqual(bson.loads(content), {'data': data})
+        with self.subTest(src_text='flat'):
+            data = {'lol': 1516}
+            content = djburger.r.BSON(flat=True)(data=data).content
+            self.assertEqual(bson.loads(content), data)
+
     def test_yaml_renderer(self):
         with self.subTest(src_text='str'):
             data = 'test'
-            content = djburger.r.YAML()(data=data).content
+            content = djburger.r.YAML(flat=False)(data=data).content
             self.assertEqual(yaml.load(content), {'data': data})
         with self.subTest(src_text='mixed'):
             data = [1, '2', [3, 4], {5: 6}]

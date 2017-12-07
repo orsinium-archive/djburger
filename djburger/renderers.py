@@ -14,6 +14,13 @@ except:
     _yaml = None
 
 
+# PyYAML
+try:
+    import bson as _bson
+except:
+    _bson = None
+
+
 # tablib
 try:
     from tablib import Dataset as _Tablib
@@ -207,13 +214,30 @@ class YAML(BaseWithHTTP):
     """Render into YAML format by PyYAML
     """
 
-    def __init__(self, **kwargs):
+    def __init__(self, flat=True, **kwargs):
         if not _yaml:
             raise ImportError('PyYAML is not installed yet')
         self.http_kwargs = {}
         super(YAML, self).__init__(
             renderer=_yaml.dump,
             content_name='data',
+            flat=flat,
+            **kwargs
+        )
+
+
+class BSON(BaseWithHTTP):
+    """Render into BSON format by BSON package
+    """
+
+    def __init__(self, flat=True, **kwargs):
+        if not _yaml:
+            raise ImportError('BSON is not installed yet')
+        self.http_kwargs = {}
+        super(BSON, self).__init__(
+            renderer=_bson.dumps,
+            content_name='obj',
+            flat=flat,
             **kwargs
         )
 
