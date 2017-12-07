@@ -7,12 +7,13 @@ from functools import update_wrapper
 from django.views.generic import View
 # project
 from .exceptions import StatusCodeError
+from .parsers import Default as _DefaultParser
 
 
 __all__ = ['rule', 'ViewBase']
 
 
-_fields = ['d', 'prev', 'c', 'postv', 'prer', 'postr', 'r']
+_fields = ['d', 'p', 'prev', 'c', 'postv', 'prer', 'postr', 'r']
 _Rule = namedtuple('Rule', _fields)
 
 
@@ -45,6 +46,8 @@ def rule(**kwargs):
 
     Kwargs:
         - d (list): list of decorators
+        - p (callable): parser. Parse request body.
+            `djburger.p.Default` by default.
         - prev: pre-validator. Validate and clean user params
         - c (callable): controller
         - postv: post-validator. Validate and clean response
@@ -57,6 +60,9 @@ def rule(**kwargs):
         TypeError('Controller is required')
     if 'r' not in kwargs:
         TypeError('Renderer is required')
+    # set default parser
+    if 'p' not in kwargs:
+        kwargs['p'] = _DefaultParser()
     # set 'r' as default for error-renderers
     for f in ('prer', 'postr'):
         if f not in kwargs:
@@ -112,18 +118,14 @@ class ViewBase(View):
         return base(request, **kwargs)
 
     def get_data(self, request):
-        query_dict = request.GET if self.method == 'get' else request.POST
-        data = {}
-        for k, v in query_dict.lists():
-            data[k] = v[0] if len(v) == 1 else v
-        return data
+        return self.rule.p(request)
 
     # pre-validator
     def validate_request(self, request, **kwargs):
         """
         1. Call `request_valid` method if validation is successfull or missed.
         2. Call `request_invalid` method otherwise.
-        
+
         Args:
             - request (Request): Request object
             - \**kwargs: kwargs from urls.py.
