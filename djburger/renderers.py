@@ -22,9 +22,9 @@ except:
 
 
 __all__ = [
-    'Base', 
-    'Template', 'HTTP', 
-    'JSON', 'YAML', 'Tablib'
+    'Base',
+    'Template', 'HTTP',
+    'JSON', 'YAML', 'Tablib',
     'Redirect', 'Exception',
     ]
 
@@ -234,7 +234,7 @@ class Tablib(BaseWithHTTP):
             flat=True,
             **kwargs
         )
-    
+
     def render(self, data):
         dataset = _Tablib(*data, headers=self.headers)
         return dataset.export(self.ext)

@@ -5,7 +5,6 @@ Use this classes as base class for your own validators.
 
 # built-in
 import abc
-from collections import Iterator
 # external
 from django.forms import Form as _Form, ModelForm as _ModelForm
 from six import with_metaclass

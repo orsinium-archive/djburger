@@ -84,7 +84,7 @@ class ViewBase(View):
         1. Select rule from rules.
         2. Decorate view
         3. Call `validate` method.
-        
+
         Args:
             - request (Request): Request object.
             - \**kwargs: kwargs from urls.py.
@@ -94,7 +94,7 @@ class ViewBase(View):
         """
         self.method = request.method.lower()
         if self.rules and self.method in self.rules:
-            self.rule = self.rules[method]
+            self.rule = self.rules[self.method]
         elif self.default_rule:
             self.rule = self.default_rule
         else:
@@ -154,7 +154,7 @@ class ViewBase(View):
     # pre-validation error renderer
     def request_invalid(self, validator, status_code):
         """Return result of prer (renderer for pre-validator errors)
-        
+
         Args:
             - validator: validator object with `errors` attr.
             - status_cdoe: status code for HTTP-response
@@ -174,7 +174,7 @@ class ViewBase(View):
 
         Get response from controller and return result of validate_response
         method.
-        
+
         Args:
             - data: cleaned and validated data from user.
             - \**kwargs: kwargs from urls.py.
@@ -194,7 +194,7 @@ class ViewBase(View):
         2. Validate data by post-validator otherwise and call...
             * response_valid if validation is passed
             * or response_invalid otherwise.
-        
+
         Args:
             - response: data from controller
 
@@ -222,7 +222,7 @@ class ViewBase(View):
     # post-validation error renderer
     def response_invalid(self, validator, status_code):
         """Return result of postr (renderer for post-validation errors).
-        
+
         Args:
             - validator: post-validator object with `errors` attr.
             - status_cdoe: status code for HTTP-response
@@ -252,7 +252,7 @@ class ViewBase(View):
 
     def make_response(self, data):
         """Make response by renderer
-        
+
         Args:
             - data: validated and cleaned data from controller
 
@@ -264,7 +264,7 @@ class ViewBase(View):
     # send request and data into validator
     def get_validator_kwargs(self, data):
         """Get kwargs for validators
-        
+
         Args:
             - data: source data from user.
 

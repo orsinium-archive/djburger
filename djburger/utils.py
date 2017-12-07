@@ -11,7 +11,7 @@ def safe_model_to_dict(model):
 
 class DictInterface(object):
     """Wrapper for adding dict interface to object.
-    
+
     Useful for models validation with standart validators
     """
 

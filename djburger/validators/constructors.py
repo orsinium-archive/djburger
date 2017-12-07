@@ -4,16 +4,13 @@ Use this classes for constructing your own validators.
 '''
 
 # built-in
-import abc
 from collections import Iterator
 from itertools import repeat
 # external
 from django.db.models.query import QuerySet as _QuerySet
 from django.db.models import Model as _Model
-from django.forms import Form as _Form, ModelForm as _ModelForm
 from django.forms.models import model_to_dict
 from django.http.request import QueryDict as _QueryDict
-from six import with_metaclass
 # project
 from .bases import Form, IValidator, ModelForm
 from djburger.utils import safe_model_to_dict
@@ -29,8 +26,8 @@ except ImportError:
 
 
 __all__ = [
-    'Chain', 
-    'Dict', 'DictForm', 'DictMixed', 'DictModelForm', 
+    'Chain',
+    'Dict', 'DictForm', 'DictMixed', 'DictModelForm',
     'IsBool', 'IsDict', 'IsFloat', 'IsInt', 'IsIter', 'IsList', 'IsStr',
     'Lambda', 'List', 'ListForm', 'ListModelForm',
     'ModelInstance',
@@ -281,7 +278,6 @@ class Chain(IValidator):
         return True
 
 
-
 class _ModelInstance(IValidator):
     """Validate model instance and convert it to dict.
     """
@@ -355,7 +351,7 @@ def PySchemes(scheme, policy='error'): # noQA
         scheme = {k: PySchemes(v, policy) for k, v in scheme.items()}
         return Chain(
             Type((dict, _Model)),
-            _ModelInstance, # convert models to dict if possible
+            _ModelInstance,  # convert models to dict if possible
             _DictMixed(scheme, policy),
         )
     elif scheme and type(scheme) is list:
