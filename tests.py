@@ -236,6 +236,29 @@ class TestValidators(unittest.TestCase):
             v = v('4')
             self.assertFalse(v.is_valid())
 
+    def test_or_validator(self):
+        with self.subTest(src_text='or int pass'):
+            v = djburger.v.c.Or([
+                djburger.v.c.IsInt,
+                djburger.v.c.IsStr,
+            ])
+            v = v(4)
+            self.assertTrue(v.is_valid())
+        with self.subTest(src_text='or str pass'):
+            v = djburger.v.c.Or([
+                djburger.v.c.IsInt,
+                djburger.v.c.IsStr,
+            ])
+            v = v('lol')
+            self.assertTrue(v.is_valid())
+        with self.subTest(src_text='or list not pass'):
+            v = djburger.v.c.Or([
+                djburger.v.c.IsInt,
+                djburger.v.c.IsStr,
+            ])
+            v = v([4, 5])
+            self.assertFalse(v.is_valid())
+
 
 class TestRenderers(unittest.TestCase):
 

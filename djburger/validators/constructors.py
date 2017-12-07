@@ -278,6 +278,41 @@ class Chain(IValidator):
         return True
 
 
+class Or(IValidator):
+    """Validate data by validators (like `any` function).
+
+    Calls the validators in order,
+    return cleaned_data from first successfull validation
+    or errors from last validator
+    """
+    cleaned_data = None
+    errors = None
+
+    def __init__(self, *validators):
+        """
+        Args:
+            validators (list): list of validators
+        """
+        if len(validators) == 1:
+            validators = validators[0]
+        self.validators = validators
+
+    def __call__(self, data, **kwargs):
+        self.data = data
+        self.kwargs = kwargs
+        return self
+
+    def is_valid(self):
+        for validator in self.validators:
+            validator = validator(data=self.data, **self.kwargs)
+            if validator.is_valid():
+                self.cleaned_data = validator.cleaned_data
+                return True
+            else:
+                self.errors = validator.errors
+        return False
+
+
 class _ModelInstance(IValidator):
     """Validate model instance and convert it to dict.
     """
@@ -381,3 +416,8 @@ ListModelForm = List(ModelForm)
 DictModelForm = Dict(ModelForm)
 """Validate dict values by Django Model Forms
 """
+
+
+# aliases
+Any = OR = Or
+All = Chain
