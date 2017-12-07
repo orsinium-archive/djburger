@@ -18,12 +18,15 @@ Key principes:
 Dataflow:
 
 1. **Decorators** (`d`).
-2. **PreValidator** (`prev`). Validate and clear request.
-3. **PreRenderer** (`prer`). Render and return PreValidation errors.
-4. **Controller** (`c`). Main logic: do some things.
-5. **PostValidator** (`postv`). Validate and clear response.
-6. **PostRenderer** (`postr`). Render and return PostValidation errors.
-7. **Renderer** (`r`). Render successfull response.
+2. **Parser** (`p`). Parse request body.
+3. **PreValidator** (`prev`). Validate and clear request.
+4. **PreRenderer** (`prer`). Render and return PreValidation errors.
+5. **Controller** (`c`). Main logic: do some things.
+6. **PostValidator** (`postv`). Validate and clear response.
+7. **PostRenderer** (`postr`). Render and return PostValidation errors.
+8. **Renderer** (`r`). Render successfull response.
+
+![Scheme](scheme.png)
 
 Required only Controller and Renderer.
 
@@ -124,4 +127,3 @@ class ExampleView(djburger.ViewBase):
     * `djburger.r.YAML`
 * [Tablib](https://github.com/kennethreitz/tablib)
     * `djburger.r.Tablib`
-

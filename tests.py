@@ -704,10 +704,10 @@ class TestParsers(unittest.TestCase):
                 'themes': ['1', '2', '4'],
             }
             request = factory.post(
-                    '/some/url/',
-                    data=json.dumps(data),
-                    content_type='application/json',
-                )
+                '/some/url/',
+                data=json.dumps(data),
+                content_type='application/json',
+            )
             p = djburger.p.JSON()
             parsed_data = p(request)
             self.assertEqual(parsed_data, data)
