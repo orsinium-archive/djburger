@@ -6,7 +6,7 @@ from functools import update_wrapper
 # django
 from django.views.generic import View
 # project
-from .exceptions import StatusCodeError
+from .exceptions import StatusCodeError, SubValidationError
 from .parsers import Default as _DefaultParser
 
 
@@ -145,6 +145,7 @@ class ViewBase(View):
         try:
             is_valid = validator.is_valid()
         except StatusCodeError as e:
+            is_valid = False
             status_code = e.status_code
         else:
             status_code = None
@@ -185,7 +186,11 @@ class ViewBase(View):
             - HttpResponse: django http response
         """
         # get response from controller
-        response = self.rule.c(self.request, data, **kwargs)
+        try:
+            response = self.rule.c(self.request, data, **kwargs)
+        except SubValidationError as e:
+            validator = e.args[0]
+            return self.subvalidation_invalid(validator)
         return self.validate_response(response)
 
     # post-validator
@@ -213,6 +218,7 @@ class ViewBase(View):
         try:
             is_valid = validator.is_valid()
         except StatusCodeError as e:
+            is_valid = False
             status_code = e.status_code
         else:
             status_code = None
@@ -220,6 +226,10 @@ class ViewBase(View):
             return self.response_valid(validator)
         else:
             return self.response_invalid(validator, status_code=status_code)
+
+    # renderer for errors in subcontroller's validator
+    def subvalidation_invalid(self, validator, status_code=200):
+        return self.response_invalid(validator, status_code)
 
     # post-validation error renderer
     def response_invalid(self, validator, status_code):

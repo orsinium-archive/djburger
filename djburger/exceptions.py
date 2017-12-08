@@ -7,3 +7,7 @@ class StatusCodeError(ValidationError):
         self.status_code = status_code
         self.msg = msg
         super(StatusCodeError, self).__init__(msg, **kwargs)
+
+
+class SubValidationError(ValidationError):
+    pass

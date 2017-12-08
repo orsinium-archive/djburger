@@ -470,6 +470,32 @@ class TestControllers(unittest.TestCase):
             response = controller(request=request, data=request.GET, test='me')
             self.assertEqual(response, b"('test', 'me')")
 
+    def test_subcontroller(self):
+        with self.subTest(src_text='pre pass'):
+            c = djburger.c.subcontroller(
+                prev=djburger.v.c.IsStr,
+                c=lambda data, request, **kwargs: data,
+            )
+            data = 'lol'
+            result = c(data=data)
+            self.assertEqual(result, data)
+        with self.subTest(src_text='post pass'):
+            c = djburger.c.subcontroller(
+                c=lambda data, request, **kwargs: data,
+                postv=djburger.v.c.IsStr,
+            )
+            data = 'lol'
+            result = c(data=data)
+            self.assertEqual(result, data)
+        with self.subTest(src_text='pre not pass'):
+            c = djburger.c.subcontroller(
+                prev=djburger.v.c.IsStr,
+                c=lambda data, request, **kwargs: data,
+            )
+            data = 123
+            with self.assertRaises(djburger.e.SubValidationError):
+                result = c(data=data)
+
 
 class TestSideValidators(unittest.TestCase):
 

@@ -2,9 +2,15 @@
 # django
 from django.shortcuts import get_object_or_404
 from django.views.generic import ListView
+# project
+from .exceptions import SubValidationError
 
 
-__all__ = ['List', 'Info', 'Add', 'Edit', 'Delete', 'ViewAsController']
+__all__ = [
+    'List', 'Info', 'Add', 'Edit', 'Delete',
+    'ViewAsController',
+    'pre', 'post', 'subcontroller',
+]
 
 
 class _ModelControllerMixin(object):
@@ -153,3 +159,64 @@ class ViewAsController(object):
             return response.content
         else:
             return response
+
+
+class pre(object): # noQA
+    """Decorator for input data validation before subcontroller calling
+    """
+    def __init__(self, validator, **kwargs):
+        self.validator = validator
+        self.validator_kwargs = kwargs
+
+    def __call__(self, controller):
+        self.controller = controller
+        return self._wrapper
+
+    def _wrapper(self, data, request=None, **kwargs):
+        validator = self.validator(
+            data=data,
+            request=request,
+            **self.validator_kwargs,
+        )
+        if not validator.is_valid():
+            raise SubValidationError(validator)
+        return self.controller(
+            data=validator.cleaned_data,
+            request=request,
+            **kwargs,
+        )
+
+
+class post(pre): # noQA
+    """Decorator for output data validation before subcontroller calling
+    """
+    def _wrapper(self, data, request=None, **kwargs):
+        result = self.controller(
+            data=data,
+            request=request,
+            **kwargs,
+        )
+        validator = self.validator(
+            data=result,
+            request=request,
+            **self.validator_kwargs,
+        )
+        if not validator.is_valid():
+            raise SubValidationError(validator)
+        return validator.cleaned_data
+
+
+def subcontroller(c, prev=None, postv=None):
+    """Constructor for subcontrollers
+    If any validation failed, immediately raise SubValidationError.
+
+    Kwargs:
+        - prev (callable): validator
+        - c (callable): controller
+        - postv (callable): post-validator
+    """
+    if prev:
+        c = pre(prev)(c)
+    if postv:
+        c = post(postv)(c)
+    return c

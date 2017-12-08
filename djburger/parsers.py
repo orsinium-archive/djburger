@@ -11,7 +11,12 @@ except:
     _bson = None
 
 
+__all__ = ['Default', 'Base', 'JSON', 'BSON']
+
+
 class Default(object):
+    """Parse standart GET/POST query to dict
+    """
     def __init__(self, method=None):
         self.method = method
 
@@ -31,6 +36,8 @@ class Default(object):
 
 
 class Base(object):
+    """Allow use any callable object as parser
+    """
     def __init__(self, parser, encoding='utf-8', **kwargs):
         if not parser:
             raise ImportError('Selected parser is not installed yet')
