@@ -734,10 +734,9 @@ class TestViews(unittest.TestCase):
 
 class TestParsers(unittest.TestCase):
 
-    def test_objects_controllers(self):
+    def test_default_parser(self):
         factory = RequestFactory()
-        # default
-        with self.subTest(src_text='default'):
+        with self.subTest(src_text='mixed'):
             data = {
                 'name': 'John Doe',
                 'mail': 'example.gmail.com',
@@ -747,7 +746,10 @@ class TestParsers(unittest.TestCase):
             p = djburger.p.Default()
             parsed_data = p(request)
             self.assertEqual(parsed_data, data)
-        with self.subTest(src_text='json'):
+
+    def test_json_parser(self):
+        factory = RequestFactory()
+        with self.subTest(src_text='mixed'):
             data = {
                 'name': 'John Doe',
                 'mail': 'example.gmail.com',
@@ -759,6 +761,23 @@ class TestParsers(unittest.TestCase):
                 content_type='application/json',
             )
             p = djburger.p.JSON()
+            parsed_data = p(request)
+            self.assertEqual(parsed_data, data)
+
+    def test_bson_parser(self):
+        factory = RequestFactory()
+        with self.subTest(src_text='mixed'):
+            data = {
+                'name': 'John Doe',
+                'mail': 'example.gmail.com',
+                'themes': ['1', '2', '4'],
+            }
+            request = factory.post(
+                '/some/url/',
+                data=bson.dumps(data),
+                content_type='application/json',
+            )
+            p = djburger.p.BSON()
             parsed_data = p(request)
             self.assertEqual(parsed_data, data)
 

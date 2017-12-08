@@ -1,6 +1,14 @@
 
 # built-in
+from functools import partial
 from json import loads as _json
+
+
+# BSON
+try:
+    from bson import loads as _bson
+except:
+    _bson = None
 
 
 class Default(object):
@@ -22,10 +30,19 @@ class Default(object):
             return self._to_dict(request.POST)
 
 
-class JSON(object):
-    def __init__(self, encoding='utf-8', **kwargs):
+class Base(object):
+    def __init__(self, parser, encoding='utf-8', **kwargs):
+        if not parser:
+            raise ImportError('Selected parser is not installed yet')
+        self.parser = parser
         self.encoding = encoding
         self.kwargs = kwargs
 
     def __call__(self, request):
-        return _json(request.body.decode(self.encoding), **self.kwargs)
+        body = request.body
+        body = body.decode(self.encoding) if self.encoding else body
+        return self.parser(body, **self.kwargs)
+
+
+JSON = partial(Base, parser=_json)
+BSON = partial(Base, parser=_bson, encoding=None)

@@ -14,7 +14,7 @@ except:
     _yaml = None
 
 
-# PyYAML
+# BSON
 try:
     import bson as _bson
 except:
