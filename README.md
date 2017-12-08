@@ -127,3 +127,6 @@ class ExampleView(djburger.ViewBase):
     * `djburger.r.YAML`
 * [Tablib](https://github.com/kennethreitz/tablib)
     * `djburger.r.Tablib`
+* [BSON](https://github.com/py-bson/bson)
+    * `djburger.p.BSON`
+    * `djburger.r.BSON`

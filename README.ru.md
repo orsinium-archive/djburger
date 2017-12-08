@@ -194,7 +194,6 @@ DjBurger всего лишь разбивает представление на 
 
 ## TODO
 
-* SubControllers
 * REST Framework exceptions
 * Example project
 * More tests
