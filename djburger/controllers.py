@@ -155,7 +155,9 @@ class ViewAsController(object):
 
         # get response
         response = self.view(request=request, **kwargs)
-        if hasattr(response, 'content'):
+        if hasattr(response, 'context'):
+            return response.context
+        elif hasattr(response, 'content'):
             return response.content
         else:
             return response
