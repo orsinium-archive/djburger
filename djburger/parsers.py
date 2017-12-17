@@ -16,7 +16,13 @@ __all__ = ['Default', 'Base', 'JSON', 'BSON']
 
 class Default(object):
     """Parse standart GET/POST query to dict
+
+    :param str method: optional method which will be forced for request
+
+    :return: parsed data.
+    :rtype: dict
     """
+
     def __init__(self, method=None):
         self.method = method
 
@@ -37,7 +43,14 @@ class Default(object):
 
 class Base(object):
     """Allow use any callable object as parser
+
+    :param callable parser: callable object for parsing request body.
+    :param str encoding: if not None body will be decoded from byte to str.
+    :param \**kwargs: kwargs for parser.
+
+    :return: parsed data.
     """
+
     def __init__(self, parser, encoding='utf-8', **kwargs):
         if not parser:
             raise ImportError('Selected parser is not installed yet')
@@ -52,4 +65,14 @@ class Base(object):
 
 
 JSON = partial(Base, parser=_json)
+"""Parse JSON body.
+
+:param str encoding: body encoding. UTF-8 by default.
+:param \**kwargs: kwargs for `json.loads`.
+"""
+
 BSON = partial(Base, parser=_bson, encoding=None)
+"""Parse BSON body.
+
+:param \**kwargs: kwargs for `bson.loads`.
+"""
