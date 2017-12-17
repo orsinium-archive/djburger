@@ -103,16 +103,56 @@ class ExampleView(djburger.ViewBase):
     rules = {
         'get': djburger.rule(
             c=lambda request, data, **kwargs: 'Hello, World!',
-            postv=djburger.v.c.IsStrValidator,
-            postr=djburger.s.ExceptionSerializer,
+            postv=djburger.v.c.IsStr,
+            postr=djburger.r.Exception(),
             r=djburger.r.Template(template_name='index.html'),
         ),
     }
 ```
 
+Minimum info:
+
+```python
+class ExampleView(djburger.ViewBase):
+    default_rule = djburger.rule(
+        c=lambda request, data, **kwargs: 'Hello, World!',
+        r=djburger.r.Template(template_name='index.html'),
+    ),
+```
+
+Rule from `default_rule` will be used as rule for all requests, which method not definited in `rules`.
+
+Big example:
+
+```python
+class UsersView(djburger.ViewBase):
+    rules = {
+        'get': djburger.rule(
+            prev=SomeValidator,
+            c=djburger.c.List(model=User),
+            postv=djburger.v.c.QuerySet,
+            postr=djburger.r.Exception(),
+            r=djburger.r.JSON(),
+        ),
+        'put': djburger.rule(
+            p=djburger.p.JSON(),
+            prev=SomeOtherValidator,
+            c=djburger.c.Add(model=User),
+            postv=djburger.v.c.IsBool,
+            postr=djburger.r.Exception(),
+            r=djburger.r.JSON(),
+        ),
+    }
+```
+
+For more info view docstrings.
+
 
 ## External libraries support
 
+* [BSON](https://github.com/py-bson/bson)
+    * `djburger.p.BSON`
+    * `djburger.r.BSON`
 * [Django REST Framework](django-rest-framework.org)
     * `djburger.v.b.RESTFramework`
     * `djburger.v.w.RESTFramework`
@@ -127,6 +167,4 @@ class ExampleView(djburger.ViewBase):
     * `djburger.r.YAML`
 * [Tablib](https://github.com/kennethreitz/tablib)
     * `djburger.r.Tablib`
-* [BSON](https://github.com/py-bson/bson)
-    * `djburger.p.BSON`
-    * `djburger.r.BSON`
+
