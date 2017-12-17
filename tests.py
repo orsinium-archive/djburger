@@ -214,6 +214,13 @@ class TestValidators(unittest.TestCase):
             v = v(-4)
             self.assertFalse(v.is_valid())
 
+    def test_clean_validator(self):
+        with self.subTest(src_text='lambda int pass'):
+            v = djburger.v.c.Clean(key=lambda data: int(data))
+            v = v('4')
+            v.is_valid()
+            self.assertEqual(v.cleaned_data, 4)
+
     def test_chain_validator(self):
         with self.subTest(src_text='chain int pass'):
             v = djburger.v.c.Chain([

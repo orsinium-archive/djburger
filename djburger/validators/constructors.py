@@ -243,6 +243,31 @@ class Lambda(IValidator):
         return False
 
 
+class Clean(IValidator):
+    """Clean data by lambda expression.
+    
+    Doesn't catch any exceptions. Always use validation before.
+    """
+    cleaned_data = None
+    errors = None
+
+    def __init__(self, key):
+        """
+        Args:
+            key (callable): lambda, function or other callable object
+                which get data and return cleaned result.
+        """
+        self.key = key
+
+    def __call__(self, data, **kwargs):
+        self.data = data
+        return self
+
+    def is_valid(self):
+        self.cleaned_data = self.key(self.data)
+        return True
+
+
 class Chain(IValidator):
     """Validate data by validators chain (like reduce function).
 
