@@ -38,24 +38,25 @@ __all__ = [
 
 class Base(object):
     """Wrapper for using any function as renderer.
+
+    :param callable renderer: function for rendering.
+    :param str content_name: keyword of data argument for renderer.
+    :param str request_name: keyword of Request argument for renderer.
+    :param dict names: dict of names. Keys:
+        * data (default: "data"): name for data into content.
+        * errors (default: "errors"): name for errors into content.
+        * validator (default: None): name for validator into content. \
+            If not setted, validator will not be passed into content.
+    :param dict content: default params for content.
+    :param bool flat: if True content contains only data or errors.
+    :param \**kwargs: some kwargs which will be passed to renderer.
+
+    :return: rendered response.
+    :rtype: django.http.HttpResponse
     """
 
     def __init__(self, renderer, content_name, request_name=None, names=None,
                  content=None, flat=False, **kwargs):
-        """
-        Args:
-            - renderer (callable): wrapped function for rendering
-            - content_name (str): key of data argument for renderer
-            - request_name (str): key of Request argument for renderer
-            - names (dict or None): dict of names. Keys:
-                * data (default: "data"): name for data into content
-                * errors (default: "errors"): name for errors into content
-                * validator (default: None): name for validator into content.
-                    If not setted, validator will not be passed into content.
-            - content (dict): default params for content.
-            - flat (bool): if True content contains only data or errors.
-            - \**kwargs: some kwargs which will be passed to renderer.
-        """
         self.renderer = renderer
         self.content_name = content_name
         self.request_name = request_name
@@ -96,10 +97,17 @@ class Base(object):
 
 class BaseWithHTTP(Base):
     """Base class wrapped by HttpResponse
+
+    :param \**kwargs: all kwargs of djburger.r.Base.
     """
 
     def set_http_kwargs(self, **kwargs):
         """Set kwargs for HttpResponse
+
+        :param \**kwargs: all kwargs of HttpResponse.
+
+        :return: self. Allow use chain.
+        :rtype: BaseWithHTTP
         """
         self.http_kwargs = kwargs
         return self
@@ -166,6 +174,11 @@ class Redirect(object):
     """Redirect to URL
 
     URL can be passed by initialization or as data (str).
+
+    :param url: url for redirect.
+
+    :return: rendered redirect response.
+    :rtype: django.http.HttpResponseRedirect
     """
 
     def __init__(self, url=None):
@@ -181,6 +194,8 @@ class Exception(object): # noQA
 
     I'm recommend use this renderer as `postr`.
     Raised exception can be handled by decorators or loggers.
+
+    :param exception: exception for raising.
     """
 
     def __init__(self, exception=ValidationError):
@@ -212,6 +227,9 @@ class RESTFramework(BaseWithHTTP):
 
 class YAML(BaseWithHTTP):
     """Render into YAML format by PyYAML
+
+    :return: rendered response.
+    :rtype: django.http.HttpResponse
     """
 
     def __init__(self, flat=True, **kwargs):
@@ -228,6 +246,9 @@ class YAML(BaseWithHTTP):
 
 class BSON(BaseWithHTTP):
     """Render into BSON format by BSON package
+
+    :return: rendered response.
+    :rtype: django.http.HttpResponse
     """
 
     def __init__(self, flat=True, **kwargs):
@@ -244,6 +265,12 @@ class BSON(BaseWithHTTP):
 
 class Tablib(BaseWithHTTP):
     """Render into multiple formats by tablib
+
+    :param ext: extension for rendering by Tablib.
+    :param headers: table headers.
+
+    :return: rendered response.
+    :rtype: django.http.HttpResponse
     """
 
     def __init__(self, ext, headers=None, **kwargs):

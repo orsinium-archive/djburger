@@ -10,6 +10,7 @@ sys.path.append(
 )
 
 
+'''
 def skip(app, what, name, obj, skip, options):
     if name == "__init__":
         return False
@@ -17,7 +18,7 @@ def skip(app, what, name, obj, skip, options):
 
 def setup(app):
     app.connect("autodoc-skip-member", skip)
-
+'''
 
 
 #
