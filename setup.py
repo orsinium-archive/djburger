@@ -6,13 +6,13 @@ from setuptools import setup
 
 setup(
     name     = 'djburger',
-    version  = '0.6.2',
+    version  = '0.7.1',
 
     author       = 'orsinium',
     author_email = 'master_fess@mail.ru',
 
     description  = 'Framework for views in big projects on Django.',
-    long_description = open('README.md').read(),
+    long_description = open('README.rst').read(),
     keywords     = 'djburger framework django contracts pre post validation',
 
     packages = ['djburger'],
