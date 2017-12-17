@@ -103,6 +103,8 @@ class ModelForm(_ModelForm):
 
 
 class Marshmallow(_MarshmallowSchema):
+    """Validator based on marshmallow schema.
+    """
 
     def __init__(self, data, request=None, **kwargs):
         self.request = request
@@ -115,6 +117,8 @@ class Marshmallow(_MarshmallowSchema):
 
 
 class RESTFramework(_RESTFrameworkSerializer):
+    """Validator based on Django REST Framework serializers.
+    """
 
     def __init__(self, data, request=None, **kwargs):
         self.request = request

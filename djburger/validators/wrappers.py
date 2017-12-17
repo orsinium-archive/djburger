@@ -25,6 +25,8 @@ class _BaseWrapper(object):
 
 
 class Form(_BaseWrapper):
+    """Wrapper for use Django Form (or ModelForm) as validator.
+    """
 
     def __call__(self, request, **kwargs):
         obj = self.validator(**kwargs)
@@ -33,6 +35,9 @@ class Form(_BaseWrapper):
 
 
 class Marshmallow(_BaseWrapper):
+    """Wrapper for use marshmallow scheme as validator.
+    """
+
     # method binded to wrapped walidator
     @staticmethod
     def is_valid(self):
@@ -41,6 +46,9 @@ class Marshmallow(_BaseWrapper):
 
 
 class PySchemes(_BaseWrapper):
+    """Wrapper for use PySchemes as validator.
+    """
+
     def __call__(self, request, data, **kwargs):
         self.request = request
         self.data = data
@@ -58,6 +66,8 @@ class PySchemes(_BaseWrapper):
 
 
 class RESTFramework(_BaseWrapper):
+    """Wrapper for use Django REST Framework serializer as validator.
+    """
 
     def __call__(self, request, data, **kwargs):
         data = safe_model_to_dict(data)

@@ -21,3 +21,7 @@ f = forms
 p = parsers
 r = renderers
 v = validators
+
+
+# aliases
+View = ViewBase
