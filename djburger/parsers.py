@@ -69,10 +69,17 @@ JSON = partial(Base, parser=_json)
 
 :param str encoding: body encoding. UTF-8 by default.
 :param \**kwargs: kwargs for `json.loads`.
+
+:return: parsed data.
 """
 
 BSON = partial(Base, parser=_bson, encoding=None)
 """Parse BSON body.
 
 :param \**kwargs: kwargs for `bson.loads`.
+
+:return: parsed data.
+:rtype: dict
+
+:raises ImportError: if `bson` module not installed yet.
 """
