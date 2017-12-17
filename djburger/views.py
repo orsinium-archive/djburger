@@ -27,33 +27,35 @@ def _get_value(v, kwargs):
 def rule(**kwargs):
     """Factory for _Rule objects
 
-    * Any kwarg can contain str which point where function can get value
-        for kwarg.
+    * Any kwarg can contain str which point where function can get value for kwarg.
     * Some kwargs can contain None.
 
-    Example:
-        rule(
-            d=[login_required, csrf_exempt],    # decorators
-            prev=SomeDjangoForm,    # pre-validator
-            c=some_controller,      # controller
-            postv=None,             # post-validator
-            # ^ here post-validator is missed
-            prer='postr',           # renderer for pre-validator errors
-            # ^ here `prer` point to `postr`
-            postr='r',              # renderer for post-validator errors
-            r=djburger.r.JSON(),    # renderer
-        )
+    Example::
+        >>> rule(
+        ...     d=[login_required, csrf_exempt],    # decorators
+        ...     prev=SomeDjangoForm,    # pre-validator
+        ...     c=some_controller,      # controller
+        ...     postv=None,             # post-validator
+        ...     # ^ here post-validator is missed
+        ...     prer='postr',           # renderer for pre-validator errors
+        ...     # ^ here `prer` point to `postr`
+        ...     postr='r',              # renderer for post-validator errors
+        ...     r=djburger.r.JSON(),    # renderer
+        ... )
 
-    Kwargs:
-        - d (list): list of decorators
-        - p (callable): parser. Parse request body.
-            `djburger.p.Default` by default.
-        - prev: pre-validator. Validate and clean user params
-        - c (callable): controller
-        - postv: post-validator. Validate and clean response
-        - prer (callable): renderer for pre-validator errors
-        - postr (callable): renderer for post-validator errors
-        - r (callable): renderer for successfull response
+    :param list d: list of decorators.
+    :param callable p: parser. Parse request body. `djburger.p.Default` by default.
+    :param djburger.v.b.IValidator prev: Validate and clean user params.
+    :param callable prer: renderer for pre-validation errors.
+    :param callable c: controller.
+    :param djburger.v.b.IValidator postv: post-validator. Validate and clean response.
+    :param callable postr: renderer for post-validation errors.
+    :param callable r: renderer for successfull response.
+
+    :return: rule.
+    :rtype: djburger._Rule
+
+    :raises TypeError: if missed `c` or `r`.
     """
     # check required kwargs
     if 'c' not in kwargs:
@@ -79,6 +81,12 @@ def rule(**kwargs):
 
 class ViewBase(View):
     """Base views for DjBurger usage
+
+    :param django.http.request.HttpRequest request: user request object.
+    :param \**kwargs: kwargs from urls.py.
+
+    :return: django response.
+    :rtype: django.http.HttpResponse
     """
     rules = None
     rule = None
@@ -91,12 +99,11 @@ class ViewBase(View):
         2. Decorate view
         3. Call `validate` method.
 
-        Args:
-            - request (Request): Request object.
-            - \**kwargs: kwargs from urls.py.
+        :param django.http.request.HttpRequest request: user request object.
+        :param \**kwargs: kwargs from urls.py.
 
-        Returns:
-            - HttpResponse: django http response
+        :return: django response.
+        :rtype: django.http.HttpResponse
         """
         self.method = request.method.lower()
         if self.rules and self.method in self.rules:
@@ -118,6 +125,12 @@ class ViewBase(View):
         return base(request, **kwargs)
 
     def get_data(self, request):
+        """Extract data from request by parser.
+
+        :param django.http.request.HttpRequest request: user request object.
+
+        :return: parsed data.
+        """
         return self.rule.p(request)
 
     # pre-validator
@@ -126,12 +139,11 @@ class ViewBase(View):
         1. Call `request_valid` method if validation is successfull or missed.
         2. Call `request_invalid` method otherwise.
 
-        Args:
-            - request (Request): Request object
-            - \**kwargs: kwargs from urls.py.
+        :param django.http.request.HttpRequest request: user request object.
+        :param \**kwargs: kwargs from urls.py.
 
-        Returns:
-            - HttpResponse: django http response
+        :return: django response.
+        :rtype: django.http.HttpResponse
         """
         # data
         data = self.get_data(request)
@@ -158,12 +170,11 @@ class ViewBase(View):
     def request_invalid(self, validator, status_code):
         """Return result of prer (renderer for pre-validator errors)
 
-        Args:
-            - validator: validator object with `errors` attr.
-            - status_cdoe: status code for HTTP-response
+        :param djburger.v.b.IValidator validator: validator object with `errors` attr.
+        :param int status_code: status code for HTTP-response.
 
-        Returns:
-            - HttpResponse: django http response
+        :return: django response.
+        :rtype: django.http.HttpResponse
         """
         return self.rule.prer(
             request=self.request,
@@ -178,12 +189,11 @@ class ViewBase(View):
         Get response from controller and return result of validate_response
         method.
 
-        Args:
-            - data: cleaned and validated data from user.
-            - \**kwargs: kwargs from urls.py.
+        :param data: cleaned and validated data from user.
+        :param \**kwargs: kwargs from urls.py.
 
-        Returns:
-            - HttpResponse: django http response
+        :return: django response.
+        :rtype: django.http.HttpResponse
         """
         # get response from controller
         try:
@@ -202,11 +212,10 @@ class ViewBase(View):
             * response_valid if validation is passed
             * or response_invalid otherwise.
 
-        Args:
-            - response: data from controller
+        :param response: unvalidated data from controller.
 
-        Returns:
-            - HttpResponse: django http response
+        :return: django response.
+        :rtype: django.http.HttpResponse
         """
         # no post-validator
         if not self.rule.postv:
@@ -229,18 +238,25 @@ class ViewBase(View):
 
     # renderer for errors in subcontroller's validator
     def subvalidation_invalid(self, validator, status_code=200):
+        """Return result of postr (renderer for post-validation errors).
+
+        :param djburger.v.b.IValidator validator: validator object with `errors` attr.
+        :param int status_code: status code for HTTP-response.
+
+        :return: django response.
+        :rtype: django.http.HttpResponse
+        """
         return self.response_invalid(validator, status_code)
 
     # post-validation error renderer
     def response_invalid(self, validator, status_code):
         """Return result of postr (renderer for post-validation errors).
 
-        Args:
-            - validator: post-validator object with `errors` attr.
-            - status_cdoe: status code for HTTP-response
+        :param djburger.v.b.IValidator validator: validator object with `errors` attr.
+        :param int status_code: status code for HTTP-response.
 
-        Returns:
-            - HttpResponse: django http response
+        :return: django response.
+        :rtype: django.http.HttpResponse
         """
         return self.rule.postr(
             request=self.request,
@@ -251,25 +267,22 @@ class ViewBase(View):
     # successfull response renderer
     def response_valid(self, validator):
         """Return result of make_response.
-
         This method calls only if postv is not None.
 
-        Args:
-            - validator: validator object with `cleaned_data` attr.
+        :param djburger.v.b.IValidator validator: validator object with `cleaned_data` attr.
 
-        Returns:
-            - HttpResponse: django http response
+        :return: django response.
+        :rtype: django.http.HttpResponse
         """
         return self.make_response(validator.cleaned_data)
 
     def make_response(self, data):
         """Make response by renderer
 
-        Args:
-            - data: validated and cleaned data from controller
+        :param data: cleaned and validated data from controller.
 
-        Returns:
-            - HttpResponse: django http response
+        :return: django response.
+        :rtype: django.http.HttpResponse
         """
         return self.rule.r(request=self.request, data=data)
 
@@ -277,11 +290,10 @@ class ViewBase(View):
     def get_validator_kwargs(self, data):
         """Get kwargs for validators
 
-        Args:
-            - data: source data from user.
+        :param data: data which will be validated.
 
-        Returns:
-            - dict: kwargs for (post)validator
+        :return: kwargs for (post)validator.
+        :rtype: dict
         """
         try:
             kwargs = super(ViewBase, self).get_form_kwargs()

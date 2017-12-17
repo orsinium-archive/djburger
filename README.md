@@ -128,6 +128,7 @@ Big example:
 class UsersView(djburger.ViewBase):
     rules = {
         'get': djburger.rule(
+            d=[login_required, csrf_exempt],
             prev=SomeValidator,
             c=djburger.c.List(model=User),
             postv=djburger.v.c.QuerySet,
@@ -135,6 +136,7 @@ class UsersView(djburger.ViewBase):
             r=djburger.r.JSON(),
         ),
         'put': djburger.rule(
+            d=[csrf_exempt],
             p=djburger.p.JSON(),
             prev=SomeOtherValidator,
             c=djburger.c.Add(model=User),
