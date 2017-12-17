@@ -7,6 +7,7 @@ Use this classes as base class for your own validators.
 import abc
 # external
 from django.forms import Form as _Form, ModelForm as _ModelForm
+from django.core.exceptions import ImproperlyConfigured
 from six import with_metaclass
 # project
 from djburger.utils import safe_model_to_dict
@@ -27,7 +28,7 @@ except ImportError:
 # Django REST Framework
 try:
     from rest_framework.serializers import Serializer as _RESTFrameworkSerializer
-except ImportError:
+except (ImportError, ImproperlyConfigured):
     class _RESTFrameworkSerializer(object):
         def __init__(self, **kwargs):
             raise ImportError("Django REST Framework not installed yet")

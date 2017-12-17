@@ -138,8 +138,6 @@ class UsersView(djburger.ViewBase):
             p=djburger.p.JSON(),
             prev=SomeOtherValidator,
             c=djburger.c.Add(model=User),
-            postv=djburger.v.c.IsBool,
-            postr=djburger.r.Exception(),
             r=djburger.r.JSON(),
         ),
     }

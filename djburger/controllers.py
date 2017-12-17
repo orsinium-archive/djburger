@@ -29,16 +29,18 @@ class List(ListView):
     1. Get list of objects
     2. Filter list by validated data from user
     3. Optional pagination
+
+    :param bool only_data: return only filtered queryset if True,
+                all context data otherwise. Use `only_data=False` with
+                TemplateSerializerFactory.
+    :param \**kwargs: all arguments of ListView.
+
+    :return: filtered queryset.
+    :rtype: django.db.models.query.QuerySet
     """
 
     def __init__(self, only_data=True, **kwargs):
         """Initialize controller in rule.
-
-        Args:
-            only_data (bool): return only filtered queryset if True,
-                all context data otherwise. Use `only_data=False` with
-                TemplateSerializerFactory.
-            **kwargs: all arguments of ListView.
         """
         self.only_data = only_data
         super(List, self).__init__(**kwargs)
@@ -70,6 +72,15 @@ class Info(_ModelControllerMixin):
     2. Return object from validated data if data have key `object`
         or data have only one key.
     3. Raise exception otherwise.
+
+    :param django.db.models.query.QuerySet queryset: QuerySet for retrieving object.
+    :param django.db.models.Model model: Model for retrieving object.
+
+    :return: one object from queryset or model.
+    :rtype: django.db.models.Model
+
+    :raises ValueError: if can't select params for queryset filtering.
+    :raises django.http.Http404: if object does not exist or multiple objects returned
     """
 
     def __call__(self, request, data, **kwargs):
@@ -85,11 +96,14 @@ class Info(_ModelControllerMixin):
 
 class Add(object):
     """Controller for adding object with validated data.
+
+    :param django.db.models.Model model: Model for adding object.
+
+    :return: created object.
+    :rtype: django.db.models.Model
     """
 
     def __init__(self, model):
-        """Initialize controller with passed model.
-        """
         self.model = model
 
     def __call__(self, request, data, **kwargs):
@@ -102,6 +116,14 @@ class Edit(_ModelControllerMixin):
     1. Get object of initialized model by URL's kwargs.
     2. Set params from validated data.
     3. Update tuple into database.
+
+    :param django.db.models.query.QuerySet queryset: QuerySet for editing object.
+    :param django.db.models.Model model: Model for editing object.
+
+    :return: edited object.
+    :rtype: django.db.models.Model
+
+    :raises django.http.Http404: if object does not exist or multiple objects returned
     """
 
     def __call__(self, request, data, **kwargs):
@@ -115,6 +137,14 @@ class Delete(_ModelControllerMixin):
     """Controller for deleting objects.
 
     Delete object filtered by URL's kwargs.
+
+    :param django.db.models.query.QuerySet queryset: QuerySet for deleting object.
+    :param django.db.models.Model model: Model for deleting object.
+    
+    :return: count of deleted objects.
+    :rtype: int
+
+    :raises django.http.Http404: if object does not exist or multiple objects returned
     """
 
     def __call__(self, request, data, **kwargs):
@@ -131,6 +161,11 @@ class ViewAsController(object):
 
     1. For CBV with render_to_response method return context.
     2. Return rendered response otherwise.
+
+    :param callable view: view.
+    :param str method: optional method which will be forced for request
+
+    :return: if possible response context or content, response object otherwise.
     """
 
     def __init__(self, view, method=None):
@@ -165,6 +200,11 @@ class ViewAsController(object):
 
 class pre(object): # noQA
     """Decorator for input data validation before subcontroller calling
+
+    :param djburger.v.b.IValidator validator: validator for pre-validation.
+    :param \**kwargs: kwargs for validator.
+
+    :raises djburger.e.SubValidationError: if pre-validation not passed
     """
     def __init__(self, validator, **kwargs):
         self.validator = validator
@@ -191,6 +231,11 @@ class pre(object): # noQA
 
 class post(pre): # noQA
     """Decorator for output data validation before subcontroller calling
+
+    :param djburger.v.b.IValidator validator: validator for post-validation.
+    :param \**kwargs: kwargs for validator.
+
+    :raises djburger.e.SubValidationError: if post-validation not passed
     """
     def _wrapper(self, data, request=None, **kwargs):
         result = self.controller(
@@ -212,10 +257,11 @@ def subcontroller(c, prev=None, postv=None):
     """Constructor for subcontrollers
     If any validation failed, immediately raise SubValidationError.
 
-    Kwargs:
-        - prev (callable): validator
-        - c (callable): controller
-        - postv (callable): post-validator
+    :param djburger.v.b.IValidator prev: validator for pre-validation.
+    :param callable c: controller.
+    :param djburger.v.b.IValidator postv: validator for post-validation.
+
+    :raises djburger.e.SubValidationError: if any validation not passed
     """
     if prev:
         c = pre(prev)(c)

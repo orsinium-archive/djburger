@@ -28,6 +28,12 @@ Views
 .. automodule:: djburger.views
     :members:
 
+Parsers
+=======
+
+.. automodule:: djburger.parsers
+    :members:
+
 Validators
 ==========
 
@@ -40,10 +46,10 @@ Controllers
 .. automodule:: djburger.controllers
     :members:
 
-Serializers
-===========
+Renderers
+=========
 
-.. automodule:: djburger.serializers
+.. automodule:: djburger.renderers
     :members:
 
 
