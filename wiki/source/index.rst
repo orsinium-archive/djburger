@@ -6,9 +6,17 @@
 Welcome to DjBurger's documentation!
 ====================================
 
+SubModules:
+-----------
+
 .. toctree::
-   :maxdepth: 2
-   :caption: Contents:
+    :maxdepth: 2
+
+    views
+    parsers
+    validators
+    controllers
+    renderers
 
 
 Indices and tables
@@ -17,39 +25,3 @@ Indices and tables
 * :ref:`genindex`
 * :ref:`modindex`
 * :ref:`search`
-
-
-
-
-
-Views
-=====
-
-.. automodule:: djburger.views
-    :members:
-
-Parsers
-=======
-
-.. automodule:: djburger.parsers
-    :members:
-
-Validators
-==========
-
-.. automodule:: djburger.validators
-    :members:
-
-Controllers
-===========
-
-.. automodule:: djburger.controllers
-    :members:
-
-Renderers
-=========
-
-.. automodule:: djburger.renderers
-    :members:
-
-
