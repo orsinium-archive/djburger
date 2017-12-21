@@ -5,6 +5,7 @@ Use this classes for constructing your own validators.
 
 # built-in
 from collections import Iterator
+from functools import update_wrapper
 from itertools import repeat
 # external
 from django.db.models.query import QuerySet as _QuerySet
@@ -12,7 +13,8 @@ from django.db.models import Model as _Model
 from django.forms.models import model_to_dict
 from django.http.request import QueryDict as _QueryDict
 # project
-from .bases import Form, IValidator, ModelForm
+from .bases import IValidator
+from .wrappers import Form, ModelForm
 from djburger.utils import safe_model_to_dict
 
 
@@ -38,7 +40,9 @@ __all__ = [
 
 
 class _PySchemes(_PySchemesScheme):
-    """Validate data by PySchemes
+    """Validate data by PySchemes.
+
+    :param scheme: validation scheme for pyschemes.
     """
 
     def __call__(self, request, data, **kwargs):
@@ -58,7 +62,10 @@ class _PySchemes(_PySchemesScheme):
 
 
 class _List(IValidator):
-    """Validate data list
+    """Validate data list.
+
+    :param validators: if passed only one validator it's be applied to each list element.
+        One validator will be applyed to one element sequentionaly otherwise.
     """
 
     cleaned_data = None
@@ -90,6 +97,8 @@ class _List(IValidator):
 
 class _Dict(IValidator):
     """Validate data dict
+
+    :param validator: walidator which be applyed to all values of dict.
     """
 
     cleaned_data = None
@@ -118,6 +127,13 @@ class _Dict(IValidator):
 
 class _DictMixed(IValidator):
     """Validate dict keys by multiple validators
+
+    :param dict validators: walidator which be applyed to all values of dict.
+    :param str policy: policy if validator for data not found:
+        "error" - add error into `errors` attr and return False.
+        "except" - raise KeyError exception.
+        "ignore" - add source value into cleaned_data.
+        "drop" - drop this value and continue.
     """
 
     cleaned_data = None
@@ -125,15 +141,6 @@ class _DictMixed(IValidator):
     error_msg = 'No validator for {}'
 
     def __init__(self, validators, policy='error'):
-        """
-        Args:
-            - validators (dict): validators for data.
-            - policy (str): policy if validator for data not found:
-                "error" - add error into `errors` attr and return False.
-                "except" - raise KeyError exception.
-                "ignore" - add source value into cleaned_data.
-                "drop" - drop this value and continue.
-        """
         self.validators = validators
         if policy not in ('error', 'except', 'ignore', 'drop'):
             raise KeyError(
@@ -175,16 +182,15 @@ class _DictMixed(IValidator):
 
 class Type(IValidator):
     """Validate data type
+
+    :param type data_type: required type of data.
+    :param str error_msg: template for error message.
     """
     cleaned_data = None
     errors = None
 
     def __init__(self, data_type,
                  error_msg='Invalid data type: {}. Required {}.'):
-        """
-        Args:
-            data_type: required type of data.
-        """
         self.data_type = data_type
         self.error_msg = error_msg
 
@@ -217,16 +223,14 @@ class Type(IValidator):
 
 class Lambda(IValidator):
     """Validate data by lambda expression.
+
+    :param callable key: lambda, function or other callable object
+        which get data and return bool result (True if valid).
     """
     cleaned_data = None
     errors = None
 
     def __init__(self, key, error_msg='Custom validation is failed'):
-        """
-        Args:
-            key (callable): lambda, function or other callable object
-                which get data and return bool result (True if valid).
-        """
         self.key = key
         self.error_msg = error_msg
 
@@ -245,18 +249,16 @@ class Lambda(IValidator):
 
 class Clean(IValidator):
     """Clean data by lambda expression.
-    
+
     Doesn't catch any exceptions. Always use validation before.
+
+    :param callable key: lambda, function or other callable object
+        which get data and return cleaned result.
     """
     cleaned_data = None
     errors = None
 
     def __init__(self, key):
-        """
-        Args:
-            key (callable): lambda, function or other callable object
-                which get data and return cleaned result.
-        """
         self.key = key
 
     def __call__(self, data, **kwargs):
@@ -273,15 +275,13 @@ class Chain(IValidator):
 
     Calls the validators in order, passing in each subsequent cleaned data
     from the previous one.
+
+    :param list validators: list of validators.
     """
     cleaned_data = None
     errors = None
 
     def __init__(self, *validators):
-        """
-        Args:
-            validators (list): list of validators
-        """
         if len(validators) == 1:
             validators = validators[0]
         self.validators = validators
@@ -309,15 +309,13 @@ class Or(IValidator):
     Calls the validators in order,
     return cleaned_data from first successfull validation
     or errors from last validator
+
+    :param list validators: list of validators.
     """
     cleaned_data = None
     errors = None
 
     def __init__(self, *validators):
-        """
-        Args:
-            validators (list): list of validators
-        """
         if len(validators) == 1:
             validators = validators[0]
         self.validators = validators
@@ -340,6 +338,8 @@ class Or(IValidator):
 
 class _ModelInstance(IValidator):
     """Validate model instance and convert it to dict.
+
+    Doesn't require initialization.
     """
     cleaned_data = None
     errors = None
@@ -364,6 +364,8 @@ ModelInstance = Chain([
     _ModelInstance,
 ])
 """Validate model instance and convert it to dict.
+
+Doesn't require initialization.
 """
 
 
@@ -372,6 +374,8 @@ QuerySet = Chain([
     _List(ModelInstance),
 ])
 """Validate queryset and convert each object in it to dict.
+
+Doesn't require initialization.
 """
 
 
@@ -426,23 +430,35 @@ def PySchemes(scheme, policy='error'): # noQA
         return _PySchemes(scheme)
 
 
-ListForm = List(Form)
-"""Validate list elements by Django Forms
-"""
+def ListForm(form): # noQA
+    """Validate list elements by Django Forms
+    """
+    return List(Form(form))
 
-DictForm = Dict(Form)
-"""Validate dict values by Django Forms
-"""
 
-ListModelForm = List(ModelForm)
-"""Validate list elements by Django Model Forms
-"""
+def DictForm(form): # noQA
+    """Validate dict values by Django Forms
+    """
+    return Dict(Form(form))
 
-DictModelForm = Dict(ModelForm)
-"""Validate dict values by Django Model Forms
-"""
+def ListModelForm(form): # noQA
+    """Validate list elements by Django Model Forms
+    """
+    return List(ModelForm(form))
+
+def DictModelForm(form): # noQA
+    """Validate dict values by Django Model Forms
+    """
+    return Dict(ModelForm(form))
 
 
 # aliases
 Any = OR = Or
 All = Chain
+
+
+# copy docstrings
+List = update_wrapper(List, _List)
+Dict = update_wrapper(Dict, _Dict)
+DictMixed = update_wrapper(DictMixed, _DictMixed)
+PySchemes = update_wrapper(PySchemes, _PySchemes)

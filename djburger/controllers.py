@@ -140,7 +140,7 @@ class Delete(_ModelControllerMixin):
 
     :param django.db.models.query.QuerySet queryset: QuerySet for deleting object.
     :param django.db.models.Model model: Model for deleting object.
-    
+
     :return: count of deleted objects.
     :rtype: int
 
