@@ -24,4 +24,4 @@ v = validators
 
 
 # aliases
-View = ViewBase
+View = BaseView = ViewBase
