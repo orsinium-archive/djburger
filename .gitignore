@@ -4,4 +4,4 @@ djburger.egg-info
 dist/
 *.sqlite3
 wiki/build
-
+.tox
