@@ -468,15 +468,15 @@ class TestControllers(unittest.TestCase):
         with self.subTest(src_text='get'):
             request = factory.get('/some/url/', {'test': 'me'})
             response = controller(request=request, data=request.GET)
-            self.assertEqual(response, b"('test', 'me')")
+            self.assertEqual(response.replace(b"u'", b"'"), b"('test', 'me')")
         with self.subTest(src_text='get'):
             request = factory.post('/some/url/', {'test': 'me'})
             response = controller(request=request, data=request.POST)
-            self.assertEqual(response, b"('test', 'me')")
+            self.assertEqual(response.replace(b"u'", b"'"), b"('test', 'me')")
         with self.subTest(src_text='kwargs'):
             request = factory.get('/some/url/')
             response = controller(request=request, data=request.GET, test='me')
-            self.assertEqual(response, b"('test', 'me')")
+            self.assertEqual(response.replace(b"u'", b"'"), b"('test', 'me')")
 
     def test_subcontroller(self):
         with self.subTest(src_text='pre pass'):
@@ -640,7 +640,7 @@ class TestSideValidators(unittest.TestCase):
     def test_model_serialization(self):
         with self.subTest(src_text='pyschemes'):
             v = djburger.v.c.PySchemes(
-                {'name': str, 'permissions': [], 'id': int},
+                {'name': str, 'id': int},
                 policy='drop'
             )
             v = v(request=None, data=self.obj)

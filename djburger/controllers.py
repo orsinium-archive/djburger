@@ -218,14 +218,14 @@ class pre(object): # noQA
         validator = self.validator(
             data=data,
             request=request,
-            **self.validator_kwargs,
+            **self.validator_kwargs
         )
         if not validator.is_valid():
             raise SubValidationError(validator)
         return self.controller(
             data=validator.cleaned_data,
             request=request,
-            **kwargs,
+            **kwargs
         )
 
 
@@ -241,12 +241,12 @@ class post(pre): # noQA
         result = self.controller(
             data=data,
             request=request,
-            **kwargs,
+            **kwargs
         )
         validator = self.validator(
             data=result,
             request=request,
-            **self.validator_kwargs,
+            **self.validator_kwargs
         )
         if not validator.is_valid():
             raise SubValidationError(validator)
