@@ -1,10 +1,17 @@
 # built-in
 from functools import partial
-# django
-from django.http import HttpResponseRedirect, JsonResponse, HttpResponse
-from django.shortcuts import render
 # project
 from .exceptions import ValidationError
+from .utils import is_django_installed
+
+
+# Django
+if is_django_installed:
+    from django.http import HttpResponseRedirect, JsonResponse, HttpResponse
+    from django.shortcuts import render
+else:
+    from .mocks import model_to_dict as render
+    HttpResponseRedirect = JsonResponse = HttpResponse = render
 
 
 # PyYAML

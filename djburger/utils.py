@@ -1,6 +1,25 @@
 
-from django.db.models import Model
-from django.forms.models import model_to_dict
+try:
+    from django.core.exceptions import ImproperlyConfigured
+except ImportError:
+    is_django_active = False
+    is_django_installed = False
+else:
+    is_django_installed = True
+    try:
+        from django.conf import settings
+    except ImproperlyConfigured:
+        is_django_active = False
+    else:
+        is_django_active = True
+
+
+if is_django_installed:
+    from django.db.models import Model
+    from django.forms.models import model_to_dict
+else:
+    Model = dict
+    from djburger.mocks import model_to_dict
 
 
 def safe_model_to_dict(model):

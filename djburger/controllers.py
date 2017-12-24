@@ -1,9 +1,15 @@
 # -*- coding: utf-8 -*-
-# django
-from django.shortcuts import get_object_or_404
-from django.views.generic import ListView
 # project
 from .exceptions import SubValidationError
+from .utils import is_django_installed
+
+
+# Django
+if is_django_installed:
+    from django.shortcuts import get_object_or_404
+    from django.views.generic import ListView
+else:
+    from .mocks import DjangoListView as ListView, model_to_dict as get_object_or_404
 
 
 __all__ = [

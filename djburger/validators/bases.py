@@ -6,32 +6,35 @@ Use this classes as base class for your own validators.
 # built-in
 import abc
 # external
-from django.forms import Form as _Form, ModelForm as _ModelForm
-from django.core.exceptions import ImproperlyConfigured
 from six import with_metaclass
 # project
-from djburger.utils import safe_model_to_dict
+from djburger.utils import safe_model_to_dict, is_django_installed, is_django_active
 
 
 __all__ = ['Form', 'IValidator', 'Marshmallow', 'ModelForm', 'RESTFramework']
+
+
+# Django
+if is_django_installed:
+    from django.forms import Form as _Form, ModelForm as _ModelForm
+else:
+    from djburger.mocks import DjangoFormBase as _Form
+    _ModelForm = _Form
 
 
 # marshmallow
 try:
     from marshmallow import Schema as _MarshmallowSchema
 except ImportError:
-    class _MarshmallowSchema(object):
-        def __init__(self, **kwargs):
-            raise ImportError("Marshmallow not installed yet")
+    from djburger.mocks import MarshmallowBase as _MarshmallowSchema
 
 
 # Django REST Framework
-try:
-    from rest_framework.serializers import Serializer as _RESTFrameworkSerializer
-except (ImportError, ImproperlyConfigured):
-    class _RESTFrameworkSerializer(object):
-        def __init__(self, **kwargs):
-            raise ImportError("Django REST Framework not installed yet")
+if is_django_active:
+    try:
+        from rest_framework.serializers import Serializer as _RESTFrameworkSerializer
+    except ImportError:
+        from djburger.mocks import RESTFrameworkBase as _RESTFrameworkSerializer
 
 
 class IValidator(with_metaclass(abc.ABCMeta)):

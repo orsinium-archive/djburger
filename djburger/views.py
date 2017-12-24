@@ -3,11 +3,17 @@
 # built-in
 from collections import namedtuple
 from functools import update_wrapper
-# django
-from django.views.generic import View
 # project
 from .exceptions import StatusCodeError, SubValidationError
 from .parsers import Default as _DefaultParser
+from .utils import is_django_installed
+
+
+# Django
+if is_django_installed:
+    from django.views.generic import View
+else:
+    from .mocks import DjangoView as View
 
 
 __all__ = ['rule', 'ViewBase']

@@ -7,24 +7,27 @@ Use this classes for constructing your own validators.
 from collections import Iterator
 from functools import update_wrapper
 from itertools import repeat
-# external
-from django.db.models.query import QuerySet as _QuerySet
-from django.db.models import Model as _Model
-from django.forms.models import model_to_dict
-from django.http.request import QueryDict as _QueryDict
 # project
 from .bases import IValidator
 from .wrappers import Form, ModelForm
-from djburger.utils import safe_model_to_dict
+from djburger.utils import safe_model_to_dict, is_django_installed, is_django_active
+
+# Django
+if is_django_installed:
+    from django.db.models.query import QuerySet as _QuerySet
+    from django.db.models import Model as _Model
+    from django.forms.models import model_to_dict
+    from django.http.request import QueryDict as _QueryDict
+else:
+    _QuerySet = _Model = _QueryDict = dict
+    from djburger.mocks import model_to_dict
 
 
 # PySchemes
 try:
     from pyschemes import Scheme as _PySchemesScheme
 except ImportError:
-    class _PySchemesScheme(object):
-        def __init__(self, **kwargs):
-            raise ImportError("PySchemes not installed yet")
+    from djburger.mocks import PySchemes as _PySchemesScheme
 
 
 __all__ = [

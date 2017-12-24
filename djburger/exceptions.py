@@ -1,5 +1,12 @@
 
-from django.core.exceptions import ValidationError
+from .utils import is_django_installed
+
+
+# Django
+if is_django_installed:
+    from django.core.exceptions import ValidationError
+else:
+    from .mocks import ValidationError
 
 
 class StatusCodeError(ValidationError):
