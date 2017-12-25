@@ -10,7 +10,7 @@ from itertools import repeat
 # project
 from .bases import IValidator
 from .wrappers import Form, ModelForm
-from djburger.utils import safe_model_to_dict, is_django_installed, is_django_active
+from djburger.utils import safe_model_to_dict, is_django_installed
 
 # Django
 if is_django_installed:
@@ -19,8 +19,9 @@ if is_django_installed:
     from django.forms.models import model_to_dict
     from django.http.request import QueryDict as _QueryDict
 else:
-    _QuerySet = _Model = _QueryDict = dict
-    from djburger.mocks import model_to_dict
+    from djburger.mocks import model_to_dict, QuerySet as _QuerySet
+    _Model = _QuerySet
+    _QueryDict = dict
 
 
 # PySchemes

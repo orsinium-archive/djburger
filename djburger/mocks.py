@@ -43,3 +43,7 @@ class DjangoView(object):
 
     def __call__(self, *args, **kwargs):
         return self.dispatch(*args, **kwargs)
+
+
+class QuerySet:
+    pass
