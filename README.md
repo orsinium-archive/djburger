@@ -7,7 +7,7 @@ Documentation on other languages:
 **DjBurger** -- patched views format for big projects on Django.
 
 
-Key principes:
+Key principles:
 
 1. Validation only before main logic.
 2. Reusable logic for many views.
@@ -145,8 +145,6 @@ class UsersView(djburger.ViewBase):
     }
 ```
 
-For more info view docstrings.
-
 
 ## External libraries support
 
@@ -168,3 +166,11 @@ For more info view docstrings.
 * [Tablib](https://github.com/kennethreitz/tablib)
     * `djburger.r.Tablib`
 
+
+## What's next?
+
+1. Read [documentation](https://djburger.readthedocs.io/en/latest/), source code docstrings or just inspect djburger from python console (for example, `help('djburger.views')`).
+2. See [example](example/) project.
+3. If you have some questions then [view issues](https://github.com/orsinium/djburger/issues) or [create new](https://github.com/orsinium/djburger/issues/new).
+4. If you found some mistakes then fix it and [create Pull Request](https://github.com/orsinium/djburger/compare). Contributors are welcome.
+5. [Star this project on github](https://github.com/orsinium/djburger) :)

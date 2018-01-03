@@ -7,7 +7,7 @@ Documentation on other languages:
 
 **DjBurger** -- patched views format for big projects on Django.
 
-Key principes:
+Key principles:
 
 1. Validation only before main logic.
 2. Reusable logic for many views.
@@ -123,14 +123,55 @@ View definition:
         rules = {
             'get': djburger.rule(
                 c=lambda request, data, **kwargs: 'Hello, World!',
-                postv=djburger.v.c.IsStrValidator,
-                postr=djburger.s.ExceptionSerializer,
+                postv=djburger.v.c.IsStr,
+                postr=djburger.r.Exception(),
                 r=djburger.r.Template(template_name='index.html'),
+            ),
+        }
+
+Minimum info:
+
+.. code:: python
+
+    class ExampleView(djburger.ViewBase):
+        default_rule = djburger.rule(
+            c=lambda request, data, **kwargs: 'Hello, World!',
+            r=djburger.r.Template(template_name='index.html'),
+        ),
+
+Rule from ``default_rule`` will be used as rule for all requests, which
+method not definited in ``rules``.
+
+Big example:
+
+.. code:: python
+
+    class UsersView(djburger.ViewBase):
+        rules = {
+            'get': djburger.rule(
+                d=[login_required, csrf_exempt],
+                prev=SomeValidator,
+                c=djburger.c.List(model=User),
+                postv=djburger.v.c.QuerySet,
+                postr=djburger.r.Exception(),
+                r=djburger.r.JSON(),
+            ),
+            'put': djburger.rule(
+                d=[csrf_exempt],
+                p=djburger.p.JSON(),
+                prev=SomeOtherValidator,
+                c=djburger.c.Add(model=User),
+                r=djburger.r.JSON(),
             ),
         }
 
 External libraries support
 --------------------------
+
+-  `BSON <https://github.com/py-bson/bson>`__
+
+   -  ``djburger.p.BSON``
+   -  ``djburger.r.BSON``
 
 -  `Django REST Framework <django-rest-framework.org>`__
 
@@ -156,7 +197,18 @@ External libraries support
 
    -  ``djburger.r.Tablib``
 
--  `BSON <https://github.com/py-bson/bson>`__
+What's next?
+------------
 
-   -  ``djburger.p.BSON``
-   -  ``djburger.r.BSON``
+1. Read `documentation <https://djburger.readthedocs.io/en/latest/>`__,
+   source code docstrings or just inspect djburger from python console
+   (for example, ``help('djburger.views')``).
+2. See `example <example/>`__ project.
+3. If you have some questions then `view
+   issues <https://github.com/orsinium/djburger/issues>`__ or `create
+   new <https://github.com/orsinium/djburger/issues/new>`__.
+4. If you found some mistakes then fix it and `create Pull
+   Request <https://github.com/orsinium/djburger/compare>`__.
+   Contributors are welcome.
+5. `Star this project on
+   github <https://github.com/orsinium/djburger>`__ :)
