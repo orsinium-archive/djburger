@@ -7,7 +7,7 @@ except ImportError:
 else:
     is_django_installed = True
     try:
-        from django.conf import settings
+        from django.conf import settings  # noQA
     except ImproperlyConfigured:
         is_django_active = False
     else:

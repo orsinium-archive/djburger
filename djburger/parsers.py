@@ -16,7 +16,7 @@ else:
 # BSON
 try:
     from bson import loads as _bson
-except:
+except ImportError:
     _bson = None
 
 

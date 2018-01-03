@@ -17,21 +17,21 @@ else:
 # PyYAML
 try:
     import yaml as _yaml
-except:
+except ImportError:
     _yaml = None
 
 
 # BSON
 try:
     import bson as _bson
-except:
+except ImportError:
     _bson = None
 
 
 # tablib
 try:
     from tablib import Dataset as _Tablib
-except:
+except ImportError:
     _Tablib = None # noQA
 
 

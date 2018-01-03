@@ -1,6 +1,4 @@
 
-
-
 class DjangoFormBase(object):
     def __init__(self, **kwargs):
         raise ImportError("Django is not installed yet")

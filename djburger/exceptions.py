@@ -19,10 +19,10 @@ class StatusCodeError(ValidationError):
     :param \**kwargs: kwargs for ValidationError.
     """
 
-    def __init__(self, status_code, **kwargs):
+    def __init__(self, status_code, msg, **kwargs):
         self.status_code = status_code
         self.msg = msg
-        super(StatusCodeError, self).__init__(**kwargs)
+        super(StatusCodeError, self).__init__(msg, **kwargs)
 
 
 class SubValidationError(ValidationError):
