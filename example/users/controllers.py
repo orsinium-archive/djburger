@@ -18,19 +18,7 @@ class UserController:
 
 class GroupController:
     list = staticmethod(djburger.c.List(model=Group))
-
-    @classmethod
-    def info(self, request, data, pk):
-        pass
-
-    @classmethod
-    def add(self, request, data):
-        pass
-
-    @classmethod
-    def edit(self, request, data, pk):
-        pass
-
-    @classmethod
-    def delete(self, request, data, pk):
-        pass
+    info = staticmethod(djburger.c.Info(model=Group))
+    add = staticmethod(djburger.c.Add(model=Group))
+    edit = staticmethod(djburger.c.Edit(model=Group))
+    delete = staticmethod(djburger.c.Delete(model=Group))

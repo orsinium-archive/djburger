@@ -18,7 +18,36 @@ Set-Cookie:  sessionid=cakahlvj97a12hsk5f5s8fxpts05iz1f; expires=Wed, 17-Jan-201
 true
 
 
+$ curl localhost:8000/users/groups/ -d ''
+{"name": ["This field is required."]}
 
 
+$ curl localhost:8000/users/groups/ -d 'name=test'
+{"id": 420, "name": "test", "permissions": []}
+
+
+$ curl localhost:8000/users/groups/
+[{"id": 102, "name": "lol", "permissions": []}, {"id": 420, "name": "test", "permissions": []}]
+
+
+$ curl localhost:8000/users/group/420
+{"name": "test", "id": 420, "permissions": []}
+
+
+$ curl localhost:8000/users/group/420 -X PATCH
+{"name": ["This field is required."]}
+
+
+$ curl localhost:8000/users/group/420 --request PATCH -d 'name=TESTME'
+{"id": 420, "permissions": [], "name": "TESTME"}
+
+
+$ curl localhost:8000/users/group/420 --request DELETE
+1
+
+
+$ curl localhost:8000/users/group/420 -D - -so /dev/null
+HTTP/1.0 404 Not Found
+...
 ```
 
