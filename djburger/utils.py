@@ -23,6 +23,8 @@ else:
 
 
 def safe_model_to_dict(model):
+    if not is_django_installed:
+        return model
     if isinstance(model, Model):
         return model_to_dict(model)
     return model

@@ -9,11 +9,14 @@ if not hasattr(unittest.TestCase, 'subTest'):
     import unittest2 as unittest
 
 
-testing_type = sys.argv[1] if len(sys.argv) > 1 else ''
+testing_type = ' '.join(sys.argv) if len(sys.argv) > 1 else ''
 
 
-if not testing_type or testing_type in ('django', 'djside'):
+try:
     import django
+except ImportError:
+    pass
+else:
     sys.path.append(os.path.dirname(os.path.abspath(__file__)) + '/example')
     os.environ.setdefault("DJANGO_SETTINGS_MODULE", "project.settings")
     django.setup()
@@ -22,17 +25,23 @@ if not testing_type or testing_type in ('django', 'djside'):
 import djburger  # noQA
 
 
-from tests import main
-if not testing_type or testing_type == 'django':
-    from tests import django
-if not testing_type or testing_type == 'djside':
-    from tests import djside
-if not testing_type or testing_type == 'rest':
-    from tests import rest
-if not testing_type or testing_type == 'marshmallow':
-    from tests import marshmallow
-if not testing_type or testing_type == 'pyschemes':
-    from tests import pyschemes
+if not testing_type:
+    from tests.main_tests import *
+    from tests.django_tests import *
+    from tests.djside_tests import *
+    from tests.rest_tests import *
+    from tests.side_tests import *
+else:
+    if 'main_tests' in testing_type:
+        from tests import main_tests
+    if 'django_tests' in testing_type:
+        from tests import django_tests
+    if 'djside_tests' in testing_type:
+        from tests import djside_tests
+    if 'rest_tests' in testing_type:
+        from tests import rest_tests
+    if ' side_tests' in testing_type or testing_type.startswith('side_tests'):
+        from tests import side_tests
 
 
 if __name__ == '__main__':
