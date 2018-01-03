@@ -11,9 +11,11 @@ from .utils import is_django_installed
 
 # Django
 if is_django_installed:
+    from django.utils.decorators import classonlymethod
     from django.views.generic import View
 else:
     from .mocks import DjangoView as View
+    classonlymethod = classmethod
 
 
 __all__ = ['rule', 'ViewBase']
@@ -98,6 +100,21 @@ class ViewBase(View):
     rule = None
     default_rule = None
 
+    @classonlymethod
+    def as_view(cls, **initkwargs):
+        if not cls.rules and not cls.default_rule:
+            raise NotImplementedError('Please, set default_rule or rules attr')
+        view = super(ViewBase, cls).as_view(**initkwargs)
+        if getattr(cls, 'csrf_exempt', False):
+            view.csrf_exempt = cls.csrf_exempt
+        return view
+
+    def get_rule(self, method, **kwargs):
+        if self.rules and method in self.rules:
+            return self.rules[method]
+        if self.default_rule:
+            return self.default_rule
+
     def dispatch(self, request, **kwargs):
         """Entrypoint for view
 
@@ -112,21 +129,16 @@ class ViewBase(View):
         :rtype: django.http.HttpResponse
         """
         self.method = request.method.lower()
-        if self.rules and self.method in self.rules:
-            self.rule = self.rules[self.method]
-        elif self.default_rule:
-            self.rule = self.default_rule
-        else:
-            raise NotImplementedError('Please, set rule or rules attr')
-
-        base = self.validate_request
+        self.rule = self.get_rule(self.method, **kwargs)
+        if self.rule is None:
+            # not allowed method
+            return self.http_method_not_allowed(request)
 
         # decorators
+        base = self.validate_request
         if self.rule.d:
             for decorator in self.rule.d:
                 base = decorator(base)
-            # take possible attributes set by decorators like csrf_exempt
-            base = update_wrapper(base, self.validate, assigned=())
 
         return base(request, **kwargs)
 

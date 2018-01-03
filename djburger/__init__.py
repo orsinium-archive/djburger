@@ -1,8 +1,6 @@
 # built-in
 from functools import partial       # noQA
 
-# django
-from django import forms
 
 # project
 from . import controllers
@@ -14,10 +12,16 @@ from . import validators
 from .views import rule, ViewBase    # noQA
 
 
+from .utils import is_django_active
+# django
+if is_django_active:
+    from django import forms
+    f = forms
+
+
 # shortcuts
 c = controllers
 e = exceptions
-f = forms
 p = parsers
 r = renderers
 v = validators
