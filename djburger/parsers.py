@@ -2,6 +2,15 @@
 # built-in
 from functools import partial
 from json import loads as _json
+# project
+from djburger.utils import is_django_installed
+
+
+# Django
+if is_django_installed:
+    from django.http.request import QueryDict
+else:
+    QueryDict = None
 
 
 # BSON
@@ -34,11 +43,15 @@ class Default(object):
         return data
 
     def __call__(self, request):
-        method = self.method or request.method.lower()
-        if method == 'get':
-            return self._to_dict(request.GET)
-        else:
-            return self._to_dict(request.POST)
+        method = (self.method or request.method).upper()
+        # get parsed request body
+        if method in ('GET', 'POST'):
+            return self._to_dict(getattr(request, method))
+        # parse request body if exists
+        if request.body and QueryDict is not None:
+            return self._to_dict(QueryDict(request.body))
+        # return GET params
+        return self._to_dict(request.GET)
 
 
 class Base(object):

@@ -35,6 +35,8 @@ if is_django_active:
         from rest_framework.serializers import Serializer as _RESTFrameworkSerializer
     except ImportError:
         from djburger.mocks import RESTFrameworkBase as _RESTFrameworkSerializer
+else:
+    from djburger.mocks import RESTFrameworkBase as _RESTFrameworkSerializer
 
 
 class IValidator(with_metaclass(abc.ABCMeta)):
