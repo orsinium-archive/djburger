@@ -57,12 +57,13 @@ In `requirements.txt`:
 
 Main components:
 
-1. **Validators** (`djburger.v`). Can be used as `prev` and `postv`.
+1. **Parsers** (`djburger.p`).
+2. **Validators** (`djburger.v`). Can be used as `prev` and `postv`.
     1. **Bases** (`djburger.v.b`).
     2. **Constructors** (`djburger.v.c`).
     3. **Wrappers** (`djburger.v.w`)
-2. **Controllers** (`djburger.c`). Can be used as `c`.
-3. **Renderer** (`djburger.r`). Can be used as `prer`, `postr` and `r`.
+3. **Controllers** (`djburger.c`). Can be used as `c`.
+4. **Renderers** (`djburger.r`). Can be used as `prer`, `postr` and `r`.
 
 
 Some additional components:
@@ -73,7 +74,8 @@ Some additional components:
 ## Interfaces
 
 1. **Decorator**. Any decorator which can wrap Django view
-2. **Validator**. Have same interfaces as Django Forms, but get `request` by initialization:
+2. **Parser**. Any callable object which get request object and return parsed data.
+3. **Validator**. Have same interfaces as Django Forms, but get `request` by initialization:
     1. `.__init__()`
         * `request` -- Request object
         * `data` -- data from user (prev) or controller (postv)
@@ -81,11 +83,11 @@ Some additional components:
     2. `.is_valid()` -- return True if data is valid False otherwise.
     3. `.errors` -- errors if data is invalid.
     4. `.cleaned_data` -- cleaned data if input data is valid.
-3. **Controller**. Any callable object. Kwargs:
+4. **Controller**. Any callable object. Kwargs:
     1. `request` -- Request object.
     2. `data` -- validated request data.
     3 `**kwargs` -- kwargs from url.
-4. **Renderer**. Any callable object. Kwargs:
+5. **Renderer**. Any callable object. Kwargs:
     1. `request` -- Request object.
     2. `data` -- validated controller data (only for `r`).
     3. `validator` -- validator which not be passed (only for `prer` and `postr`).
