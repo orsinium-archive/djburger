@@ -1,19 +1,17 @@
 # built-in
 import json
-from __main__ import unittest
+from __main__ import unittest, djburger
 # external
 import bson
 from django.core.exceptions import ValidationError
 import yaml
-# project
-import djburger
 
 
 # import only after django.setup()
 from rest_framework import renderers as rest_framework_renderers # noQA
 
 
-class TestRenderers(unittest.TestCase):
+class DjangoRenderersTest(unittest.TestCase):
 
     def test_json_renderer(self):
         with self.subTest(src_text='str'):

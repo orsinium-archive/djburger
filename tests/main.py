@@ -1,8 +1,7 @@
-from __main__ import unittest
-import djburger
+from __main__ import unittest, djburger
 
 
-class TestValidators(unittest.TestCase):
+class MainValidatorsTest(unittest.TestCase):
 
     def test_type_validator(self):
         # BASE

@@ -15,13 +15,15 @@ os.environ.setdefault("DJANGO_SETTINGS_MODULE", "project.settings")
 django.setup()
 
 
+import djburger  # noQA
 
-from tests.controllers import * # noQA
-from tests.parsers import * # noQA
-from tests.renderers import * # noQA
-from tests.side_validators import * # noQA
-from tests.validators import * # noQA
-from tests.views import * # noQA
+
+from tests.django import * # noQA
+from tests.django_and_other import * # noQA
+from tests.main import * # noQA
+from tests.marshmallow import * # noQA
+from tests.pyschemes import * # noQA
+from tests.rest import * # noQA
 
 
 if __name__ == '__main__':

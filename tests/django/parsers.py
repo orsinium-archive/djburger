@@ -1,14 +1,12 @@
 # built-in
 import json
-from __main__ import unittest
+from __main__ import unittest, djburger
 # external
 import bson
 from django.test import RequestFactory
-# project
-import djburger
 
 
-class TestParsers(unittest.TestCase):
+class DjangoParsersTest(unittest.TestCase):
 
     def test_default_parser(self):
         factory = RequestFactory()

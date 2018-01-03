@@ -1,14 +1,12 @@
 # built-in
-from __main__ import unittest
+from __main__ import unittest, djburger
 # external
 from django.contrib.auth.models import Group
 from django.http import HttpResponse
 from django.test import RequestFactory
-# project
-import djburger
 
 
-class TestControllers(unittest.TestCase):
+class DjangoControllersTest(unittest.TestCase):
 
     def test_objects_controllers(self):
         # PREPARE

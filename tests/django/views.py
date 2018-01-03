@@ -6,7 +6,7 @@ from django.test import RequestFactory
 import djburger # noQA
 
 
-class TestViews(unittest.TestCase):
+class DjangoViewsTest(unittest.TestCase):
 
     def test_controller(self):
         class Base(djburger.ViewBase):
