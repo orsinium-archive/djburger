@@ -2,4 +2,6 @@ bson
 marshmallow
 pyschemes
 PyYAML
+six
 tablib
+
