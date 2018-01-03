@@ -6,7 +6,7 @@ from pyschemes import Scheme as PySchemes
 
 class PySchemesValidatorsTest(unittest.TestCase):
 
-    def base_validator(self):
+    def test_base_validator(self):
         # BASE
         with self.subTest(src_text='base pass'):
             v = djburger.v.c.PySchemes([str, 2, int])
@@ -23,7 +23,7 @@ class PySchemesValidatorsTest(unittest.TestCase):
             v.is_valid()
             self.assertEqual(v.cleaned_data, 3)
 
-    def wrapper_validator(self):
+    def test_wrapper_validator(self):
         with self.subTest(src_text='base pass'):
             v = djburger.v.w.PySchemes(PySchemes([str, 2, int]))
             v = v(request=None, data=['3', 2, 4])

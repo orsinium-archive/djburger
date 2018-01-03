@@ -5,7 +5,7 @@ import rest_framework
 
 
 class RestValidatorsTest(unittest.TestCase):
-    def base_validator(self):
+    def test_base_validator(self):
         # BASE
         class Base(djburger.v.b.RESTFramework):
             name = rest_framework.serializers.CharField(max_length=20)
@@ -19,7 +19,7 @@ class RestValidatorsTest(unittest.TestCase):
             v = Base(request=None, data=data)
             self.assertFalse(v.is_valid())
 
-    def wrapper_validator(self):
+    def test_wrapper_validator(self):
         class Base(rest_framework.serializers.Serializer):
             name = rest_framework.serializers.CharField(max_length=20)
             mail = rest_framework.serializers.EmailField()

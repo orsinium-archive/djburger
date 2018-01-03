@@ -6,7 +6,7 @@ import marshmallow
 
 class MarshmallowValidatorsTest(unittest.TestCase):
 
-    def base_validator(self):
+    def test_base_validator(self):
         # BASE
         class Base(djburger.v.b.Marshmallow):
             name = marshmallow.fields.Str()
@@ -20,7 +20,7 @@ class MarshmallowValidatorsTest(unittest.TestCase):
             v = Base(request=None, data=data)
             self.assertFalse(v.is_valid())
 
-    def wrapper_validator(self):
+    def test_wrapper_validator(self):
         class Base(marshmallow.Schema):
             name = marshmallow.fields.Str()
             mail = marshmallow.fields.Email()

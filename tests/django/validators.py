@@ -20,7 +20,7 @@ class DjangoFormValidatorsTest(unittest.TestCase):
         Group.objects.get(name='TEST_IT').delete()
         Group.objects.get(name='TEST_IT_2').delete()
 
-    def base_validator(self):
+    def test_base_validator(self):
         class Base(djburger.v.b.Form):
             name = djburger.f.CharField(max_length=20)
             mail = djburger.f.EmailField()
@@ -33,7 +33,7 @@ class DjangoFormValidatorsTest(unittest.TestCase):
             v = Base(request=None, data=data)
             self.assertFalse(v.is_valid())
 
-    def wrapper_validator(self):
+    def test_wrapper_validator(self):
         class Base(djburger.f.Form):
             name = djburger.f.CharField(max_length=20)
             mail = djburger.f.EmailField()

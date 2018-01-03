@@ -23,7 +23,7 @@ class DjangoOtherValidatorsTest(unittest.TestCase):
         Group.objects.get(name='TEST_IT').delete()
         Group.objects.get(name='TEST_IT_2').delete()
 
-    def pyschemes(self):
+    def test_pyschemes(self):
         with self.subTest(src_text='pyschemes'):
             v = djburger.v.c.PySchemes(
                 {'name': str, 'id': int},
@@ -32,7 +32,7 @@ class DjangoOtherValidatorsTest(unittest.TestCase):
             v = v(request=None, data=self.obj)
             self.assertTrue(v.is_valid())
 
-    def marshmallow(self):
+    def test_marshmallow(self):
         with self.subTest(src_text='marshmallow base'):
             class Base(djburger.v.b.Marshmallow):
                 name = marshmallow.fields.Str()
@@ -45,7 +45,7 @@ class DjangoOtherValidatorsTest(unittest.TestCase):
             v = Wrapped(request=None, data=self.obj)
             self.assertTrue(v.is_valid())
 
-    def rest(self):
+    def test_rest(self):
         with self.subTest(src_text='rest framework base'):
             class Base(djburger.v.b.RESTFramework):
                 name = rest_framework.serializers.CharField(max_length=20)
