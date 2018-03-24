@@ -8,6 +8,7 @@ else:
     is_django_installed = True
     try:
         from django.conf import settings  # noQA
+        getattr(settings, 'SECRET_KEY', None)
     except ImproperlyConfigured:
         is_django_active = False
     else:
