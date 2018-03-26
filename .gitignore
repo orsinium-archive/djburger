@@ -5,3 +5,4 @@ dist/
 *.sqlite3
 wiki/build
 .tox
+src
