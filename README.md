@@ -1,5 +1,9 @@
 # DjBurger
 
+![DjBurger logo](logo.png)
+
+[![Build Status](https://travis-ci.org/orsinium/djburger.svg?branch=master)](https://travis-ci.org/orsinium/djburger) [![PyPI version](https://img.shields.io/pypi/v/djburger.svg)](https://pypi.python.org/pypi/djburger) [![Status](https://img.shields.io/pypi/status/djburger.svg)](https://pypi.python.org/pypi/djburger) [![Code size](https://img.shields.io/github/languages/code-size/orsinium/djburger.svg)](https://github.com/orsinium/djburger) [![License](https://img.shields.io/pypi/l/djburger.svg)](LICENSE)
+
 Documentation on other languages:
 
 * [Russian](README.ru.md)
