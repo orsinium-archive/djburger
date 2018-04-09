@@ -14,6 +14,7 @@ Welcome to DjBurger's documentation!
     philosophy
     usage
     examples
+    interfaces
     external
 
 .. toctree::
