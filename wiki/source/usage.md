@@ -1,20 +1,30 @@
 # Usage
 
-## Components
+## Components structure
 
-Main components:
+Use everywhere short notation from [dataflow](philosophy.html#dataflow).
 
-1. **Parsers** (`djburger.p`).
-2. **Validators** (`djburger.v`). Can be used as `prev` and `postv`.
-    1. **Bases** (`djburger.v.b`).
-    2. **Constructors** (`djburger.v.c`).
-    3. **Wrappers** (`djburger.v.w`)
-3. **Controllers** (`djburger.c`). Can be used as `c`.
-4. **Renderers** (`djburger.r`). Can be used as `prer`, `postr` and `r`.
+DjBurger modules:
 
-Some additional useful components:
+1. `djburger.p`. Parsers. Can be used as `p`.
+1. `djburger.v`. Validators. Can be used as `prev` and `postv`.
+  1. `djburger.v.b`. Validators which can be used as **base** class for your own validators.
+  1. `djburger.v.c`. Validators which can be used as **constructors** for simple validators.
+  1. `djburger.v.w`. Validators which can be used as **wrappers** for external validators.
+1. `djburger.c`. Controllers. Can be used as `c`.
+1. `djburger.r`. Renderers. Can be used as `prer`, `postr` and `r`.
+1. `djburger.e`. Exceptions.
 
-1. `djburger.exceptions` -- useful exceptions.
+Keyword arguments for `djburger.rule`:
+
+1. `d` -- decorators list.
+1. `p` -- parser.
+1. `prev` -- pre-validator.
+1. `prer` -- renderer for pre-validator.
+1. `c` -- controller.
+1. `postv` -- post-validator.
+1. `postr` -- renderer for post-validator.
+1. `r` -- renderer for success response.
 
 
 ## View
@@ -44,33 +54,6 @@ More info:
 1. [Dataflow](philosophy.html#dataflow)
 1. [View usage examples](examples.html#view)
 1. [example project](https://github.com/orsinium/djburger/tree/master/example) for more information.
-
-
-## Components structure
-
-Use everywhere short notation from [dataflow](philosophy.html#dataflow).
-
-DjBurger modules:
-
-1. `djburger.p`. Parsers.
-1. `djburger.v`. Validators:
-  1. `djburger.v.b`. Validators which can used as **base** class for your own validators.
-  1. `djburger.v.c`. Validators which can used as **constructors** for simple validators.
-  1. `djburger.v.w`. Validators which can used as **wrappers** for external validators.
-1. `djburger.c`. Controllers.
-1. `djburger.r`. Renderers.
-1. `djburger.e`. Exceptions.
-
-Keyword arguments for `djburger.rule`:
-
-1. `d` -- decorators list.
-1. `p` -- parser.
-1. `prev` -- pre-validator.
-1. `prer` -- renderer for pre-validator.
-1. `c` -- controller.
-1. `postv` -- post-validator.
-1. `postr` -- renderer for post-validator.
-1. `r` -- renderer for success response.
 
 
 ## Decorators
