@@ -63,6 +63,7 @@ DjBurger modules:
 
 Keyword arguments for `djburger.rule`:
 
+1. `d` -- decorators list.
 1. `p` -- parser.
 1. `prev` -- pre-validator.
 1. `prer` -- renderer for pre-validator.
@@ -70,3 +71,28 @@ Keyword arguments for `djburger.rule`:
 1. `postv` -- post-validator.
 1. `postr` -- renderer for post-validator.
 1. `r` -- renderer for success response.
+
+
+## Decorators
+
+TODO
+
+## Parsers
+
+TODO
+
+## Validators
+
+TODO
+
+## Controllers
+
+TODO
+
+## Renderers
+
+TODO
+
+## Exceptions
+
+TODO
