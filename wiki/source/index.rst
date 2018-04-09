@@ -6,22 +6,22 @@
 Welcome to DjBurger's documentation!
 ====================================
 
-SubModules:
------------
+.. toctree::
+    :maxdepth: 1
+    :caption: Main Info
+
+    installation
+    philosophy
+    usage
+    examples
+    external
 
 .. toctree::
     :maxdepth: 2
+    :caption: API
 
     views
     parsers
     validators
     controllers
     renderers
-
-
-Indices and tables
-==================
-
-* :ref:`genindex`
-* :ref:`modindex`
-* :ref:`search`

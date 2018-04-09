@@ -117,6 +117,11 @@ todo_include_todos = True
 #
 html_theme = 'sphinx_rtd_theme'
 html_theme_path = [sphinx_rtd_theme.get_html_theme_path()]
+html_logo = 'imgs/logo.png'
+html_theme_options = {
+    'logo_only': True,
+    'display_version': False,
+}
 
 
 # -- Options for HTMLHelp output ------------------------------------------
