@@ -1,6 +1,6 @@
 # Examples
 
-## View
+## Views
 
 ```python
 import djburger
@@ -50,3 +50,29 @@ class UsersView(djburger.ViewBase):
         ),
     }
 ```
+
+
+## Validators
+
+Simple base validator:
+
+```python
+class GroupInputValidator(djburger.v.b.Form):
+    name = djburger.f.CharField(label='Name', max_length=80)
+```
+
+`djburger.f` is just alias for `django.forms`.
+
+Simple wrapper:
+
+```python
+import djburger
+from django import forms
+
+class GroupInputForm(forms.Form):
+    name = forms.CharField(label='Name', max_length=80)
+
+Validator = djburger.v.w.Form(GroupInputForm)
+```
+
+See [usage](usage.html) for more examples and explore [example project](https://github.com/orsinium/djburger/tree/master/example).
