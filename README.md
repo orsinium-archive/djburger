@@ -9,7 +9,7 @@
 
 Key principles:
 
-1. Validation only before main logic.
+1. Validation logic is separate from the main logic.
 2. Reusable logic for many views.
 3. Reusable input and output data formats.
 4. More clear views.

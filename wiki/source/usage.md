@@ -8,9 +8,9 @@ DjBurger modules:
 
 + `djburger.p`. Parsers. Can be used as `p`.
 + `djburger.v`. Validators. Can be used as `prev` and `postv`.
-  + `djburger.v.b`. Validators which can be used as **base** class for your own validators.
-  + `djburger.v.c`. Validators which can be used as **constructors** for simple validators.
-  + `djburger.v.w`. Validators which can be used as **wrappers** for external validators.
+  + `djburger.v.b`. Validators that can be used as **base** class for your own validators.
+  + `djburger.v.c`. Validators that can be used as **constructors** for simple validators.
+  + `djburger.v.w`. Validators that can be used as **wrappers** for external validators.
 + `djburger.c`. Controllers. Can be used as `c`.
 + `djburger.r`. Renderers. Can be used as `prer`, `postr` and `r`.
 + `djburger.e`. Exceptions.
@@ -54,12 +54,12 @@ More info:
 1. [Dataflow](philosophy.html#dataflow)
 1. [View usage examples](examples.html#view)
 1. [Example project](https://github.com/orsinium/djburger/tree/master/example)
-1. Additional you can see [views API](views.html) but usually `rules` attribute enough and methods redefinition doesn't needed.
+1. In addition, you can check [views API](views.html), but `rules` attribute are sufficient and redefinition of methods is not required.
 
 
 ## Decorators
 
-You can use any Django decorators like `csrf_exempt`. `djburger.ViewBase` wraps into decorators view's `validate_request` method which get `request` object, `**kwargs` from URL resolver and returns renderer's result (usually Django HttpResponse).
+You can use any Django decorators like `csrf_exempt`. `djburger.ViewBase` wraps into decorators view's `validate_request` method that get `request` object, `**kwargs` from URL resolver and returns renderer's result (usually Django HttpResponse).
 
 ```python
 d=[csrf_exempt]
