@@ -6,14 +6,14 @@ Use everywhere short notation from [dataflow](philosophy.html#dataflow).
 
 DjBurger modules:
 
-1. `djburger.p`. Parsers. Can be used as `p`.
-1. `djburger.v`. Validators. Can be used as `prev` and `postv`.
-  1. `djburger.v.b`. Validators which can be used as **base** class for your own validators.
-  1. `djburger.v.c`. Validators which can be used as **constructors** for simple validators.
-  1. `djburger.v.w`. Validators which can be used as **wrappers** for external validators.
-1. `djburger.c`. Controllers. Can be used as `c`.
-1. `djburger.r`. Renderers. Can be used as `prer`, `postr` and `r`.
-1. `djburger.e`. Exceptions.
++ `djburger.p`. Parsers. Can be used as `p`.
++ `djburger.v`. Validators. Can be used as `prev` and `postv`.
+  + `djburger.v.b`. Validators which can be used as **base** class for your own validators.
+  + `djburger.v.c`. Validators which can be used as **constructors** for simple validators.
+  + `djburger.v.w`. Validators which can be used as **wrappers** for external validators.
++ `djburger.c`. Controllers. Can be used as `c`.
++ `djburger.r`. Renderers. Can be used as `prer`, `postr` and `r`.
++ `djburger.e`. Exceptions.
 
 Keyword arguments for `djburger.rule`:
 
