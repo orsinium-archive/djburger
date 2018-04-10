@@ -39,3 +39,19 @@ high cohesion and low coupling. This is main idea how DjBurger help you make goo
 + [REST](https://en.wikipedia.org/wiki/Representational_state_transfer) by support [state codes](usage.html#exceptions), any external [decorators](usage.html#decorators) and [Django REST Framework](external.html). You can effective use DjBurger for building REST API. But DjBurger doesn't force this conception, and you can use it for any views as user interface rendering.
 + [MVC](https://en.wikipedia.org/wiki/Model%E2%80%93view%E2%80%93controller). Django use [MTV](https://djangobook.com/model-view-controller-design-pattern/) conception, and views manipulates models and render templates. This is simple but dirty. DjBurger split view to parser, validator and renderer (this is all view from MVC) and controller for low coupling and clean code. And DjBurger render template only from renderer.
 + [The Clean Architecture](https://8thlight.com/blog/uncle-bob/2012/08/13/the-clean-architecture.html). DjBurger hard isolate UI from Presenters. This is main clean architecture conception.
+
+
+## Solved problems
+
+1. [Mixins chaos and wrong usage](https://reactjs.org/blog/2016/07/13/mixins-considered-harmful.html). Mixins is good but dangerous conception. Use it carefully.
+1. You can decorate Django view in so many places: urls, view, dispatch method, get/post method, form_valid mrthod etc. DjhBurger have [special place for all decorators](usage.html#decorators)
+1. Validation and main logic mixing. In bad code you can validate and apply some data in one loop, and if you found and return validation error operation will be applied partially. Example:
+  ```python
+  for user in users:
+      if user.is_anonymous():
+          raise ValueError("Can't send SMS to anonimous user!")
+      send_sms(user)
+  ```
+  This is bad code! When error will be raised on 5th user we already sent SMS to 4 previous users. DjBurger force input validation only before main logic.
+1. Big and implicit views. This code is unsupported and non-expandable. DjBurger split view by steps.
+1. One logic duplication in many view require more work for made changes and increases the probability of mistakes. With DjBurger you can use one controller into many views.
