@@ -26,7 +26,7 @@ class ExampleView(djburger.ViewBase):
     ),
 ```
 
-Rule from `default_rule` will be used as rule for all requests, which method not definited in `rules`.
+All requests without the method defined in the ``rules`` will use the rule from ``default_rule``.
 
 Big example:
 
