@@ -1,4 +1,4 @@
-'''Constructirs for validators
+'''Constructors for validators
 
 Use this classes for constructing your own validators.
 '''

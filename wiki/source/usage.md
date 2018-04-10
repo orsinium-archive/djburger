@@ -53,20 +53,72 @@ More info:
 
 1. [Dataflow](philosophy.html#dataflow)
 1. [View usage examples](examples.html#view)
-1. [example project](https://github.com/orsinium/djburger/tree/master/example) for more information.
+1. [Example project](https://github.com/orsinium/djburger/tree/master/example)
+1. Additional you can see [views API](views.html) but usually `rules` attribute enough and methods redefinition doesn't needed.
 
 
 ## Decorators
 
-TODO
+You can use any Django decorators like `csrf_exempt`. `djburger.ViewBase` wraps into decorators view's `validate_request` method which get `request` object, `**kwargs` from URL resolver and returns renderer's result (usually Django HttpResponse).
+
+```python3
+d=[csrf_exempt]
+```
+
 
 ## Parsers
 
-TODO
+Parser get `request` and return `data` which will be passed as is into pre-validator. Usually `data` has `dict` or [QueryDict](https://docs.djangoproject.com/en/2.0/ref/request-response/#django.http.QueryDict) interface. DjBurger use `djburger.p.Default` as default parser. See list of built-in parsers into [parsers API](parsers.html).
+
+```python3
+p=djburger.p.JSON()
+```
+
 
 ## Validators
 
-TODO
+Validators get data and validate it. It's have Django Forms like interface. See [interfaces](interfaces.html) and [interface API](validators.html#djburger.validators.bases.IValidator) for more details.
+
+[Base validators](validators.html#module-djburger.validators.bases) can be used as base class for your schemes:
+
+```python
+from django import forms
+
+class Validator(djburger.v.b.Form):
+    name = forms.CharField(max_length=20)
+
+...
+prev=Validator
+...
+```
+
+[Wrappers](validators.html#module-djburger.validators.wrappers) can be used for wrapping external validators for DjBurger usage:
+
+```python
+from django import forms
+
+class DjangoValidator(forms.Form):
+    name = forms.CharField(max_length=20)
+
+...
+prev=djburger.v.w.Form(DjangoValidator)
+...
+```
+
+And [constructors](validators.html#module-djburger.validators.constructors) can be used for quick constructing simple validators. You can validate anything with constructors, but we recommend use it only for one-line validators.
+
+
+```python
+prev=djburger.v.c.IsDict
+```
+
+
+How to choose validator type:
+
+1. `djburger.v.c` -- for one-line simple validation.
+1. `djburger.v.w` -- for using validators which also used into non-DjBurger components.
+1. `djburger.v.b` -- for any other cases.
+
 
 ## Controllers
 
