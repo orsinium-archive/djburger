@@ -22,9 +22,9 @@ In `requirements.txt`:
 
 ## Dependencies
 
-DjBurger has no dependencies except [six](https://github.com/benjaminp/six). Yeah, DjBurger is Django independed and can be used in any python projects. For example, you can use DjBurger with [deal](https://github.com/orsinium/deal) for design by contract with side schemes usage. More info into [deal docs](https://github.com/orsinium/deal#validators).
+DjBurger only dependency is [six](https://github.com/benjaminp/six). DjBurger doen't depend on Django.
 
-But DjBurger doesn't support `Django<1.7` and `DjangoRESTFramework<3.5`. You can pass constraints from DjBurger to pip:
+But DjBurger doesn't support `Django<1.7` and `DjangoRESTFramework<3.5`. You can pass constraints from DjBurger in pip:
 
 ```python
 pip install -c constraints.txt ...
