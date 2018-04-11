@@ -22,7 +22,7 @@ In `requirements.txt`:
 
 ## Dependencies
 
-DjBurger only dependency is [six](https://github.com/benjaminp/six). DjBurger doen't depend on Django.
+DjBurger only dependency is [six](https://github.com/benjaminp/six). DjBurger doesn't depend on Django.
 
 But DjBurger doesn't support `Django<1.7` and `DjangoRESTFramework<3.5`. You can pass constraints from DjBurger in pip:
 
