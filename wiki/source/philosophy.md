@@ -48,7 +48,7 @@ Required only Controller and Renderer.
   ```python
   for user in users:
       if user.is_anonymous():
-          raise ValueError("Can't send SMS to anonimous user!")
+          raise ValueError("Can't send SMS to anonymous user!")
       send_sms(user)
   ```
   This is bad code! We will send some SMS before error raising. DjBurger force input validation only before main logic.
