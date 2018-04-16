@@ -100,7 +100,7 @@ class ViewBase(View):
     default_rule = None
 
     @classonlymethod
-    def as_view(cls, **initkwargs):
+    def as_view(cls, **initkwargs):  # noQA
         if not cls.rules and not cls.default_rule:
             raise NotImplementedError('Please, set default_rule or rules attr')
         view = super(ViewBase, cls).as_view(**initkwargs)

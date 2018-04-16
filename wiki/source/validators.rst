@@ -21,4 +21,3 @@ Constructors
 
 .. automodule:: djburger.validators.constructors
     :members:
-

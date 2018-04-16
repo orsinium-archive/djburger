@@ -1,4 +1,4 @@
-'''Constructirs for validators
+'''Constructors for validators
 
 Use this classes for constructing your own validators.
 '''
@@ -32,11 +32,13 @@ except ImportError:
 
 
 __all__ = [
+    'Any', 'All',
     'Chain',
     'Dict', 'DictForm', 'DictMixed', 'DictModelForm',
     'IsBool', 'IsDict', 'IsFloat', 'IsInt', 'IsIter', 'IsList', 'IsStr',
     'Lambda', 'List', 'ListForm', 'ListModelForm',
     'ModelInstance',
+    'Or', 'OR',
     'PySchemes',
     'Type',
     'QuerySet',
@@ -102,7 +104,7 @@ class _List(IValidator):
 class _Dict(IValidator):
     """Validate data dict
 
-    :param validator: walidator which be applyed to all values of dict.
+    :param validator: validator which be applyed to all values of dict.
     """
 
     cleaned_data = None
@@ -132,7 +134,7 @@ class _Dict(IValidator):
 class _DictMixed(IValidator):
     """Validate dict keys by multiple validators
 
-    :param dict validators: walidator which be applyed to all values of dict.
+    :param dict validators: validator which be applyed to all values of dict.
     :param str policy: policy if validator for data not found:
         "error" - add error into `errors` attr and return False.
         "except" - raise KeyError exception.
@@ -275,7 +277,7 @@ class Clean(IValidator):
 
 
 class Chain(IValidator):
-    """Validate data by validators chain (like reduce function).
+    """Validate data by validators chain (like `reduce` function).
 
     Calls the validators in order, passing in each subsequent cleaned data
     from the previous one.
@@ -384,13 +386,13 @@ Doesn't require initialization.
 
 
 # data types validation
-IsBool = Type(bool)
-IsInt = Type(int)
-IsFloat = Type(float)
-IsStr = Type(str)
-IsDict = Type((dict, _QueryDict))
-IsList = Type((list, tuple))
-IsIter = Type(Iterator)
+IsBool = Type(bool)                 #: Data type is bool
+IsInt = Type(int)                   #: Data type is int
+IsFloat = Type(float)               #: Data type is float
+IsStr = Type(str)                   #: Data type is str
+IsDict = Type((dict, _QueryDict))   #: Data type is dict
+IsList = Type((list, tuple))        #: Data type is list
+IsIter = Type(Iterator)             #: Data type is iterable
 
 
 # wrap ListValidator & DictValidator by type validation

@@ -1,4 +1,4 @@
-'''Constructirs for validators
+'''Wrappers for validators
 
 Use this classes as wrappers for non-djburger validators
 '''
