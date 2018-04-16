@@ -6,7 +6,7 @@
 
 **DjBurger** -- framework for big Django projects.
 
-What this framework do?
+What DjBurger do?
 
 * Split Django views into steps for secure and clean code.
 * Provide built-in objects for all steps.
