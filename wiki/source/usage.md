@@ -2,7 +2,7 @@
 
 ## Components structure
 
-Use everywhere short notation from [dataflow](philosophy.html#dataflow).
+Use short notation from [dataflow](philosophy.html#dataflow).
 
 DjBurger modules:
 
@@ -54,7 +54,7 @@ More info:
 1. [Dataflow](philosophy.html#dataflow)
 1. [View usage examples](examples.html#view)
 1. [Example project](https://github.com/orsinium/djburger/tree/master/example)
-1. In addition, you can check [views API](views.html), but `rules` attribute are sufficient and redefinition of methods is not required.
+1. Сheck [views API](views.html), but `rules` attribute are sufficient and redefinition of methods is not required.
 
 
 ## Decorators
@@ -77,9 +77,9 @@ p=djburger.p.JSON()
 
 ## Validators
 
-Validators get data and validate it. It's have Django Forms like interface. See [interfaces](interfaces.html) and [interface API](validators.html#djburger.validators.bases.IValidator) for more details.
+Validators get data and validate it. They have Django Forms-like interface. See [interfaces](interfaces.html) and [interface API](validators.html#djburger.validators.bases.IValidator) for details.
 
-[Base validators](validators.html#module-djburger.validators.bases) can be used as base class for your schemes:
+[Base validators](validators.html#module-djburger.validators.bases) - base class for your schemes:
 
 ```python
 from django import forms
@@ -92,7 +92,7 @@ prev=Validator
 ...
 ```
 
-[Wrappers](validators.html#module-djburger.validators.wrappers) can be used for wrapping external validators for DjBurger usage:
+[Wrappers](validators.html#module-djburger.validators.wrappers) wrap external validators for DjBurger usage:
 
 ```python
 from django import forms
@@ -105,7 +105,7 @@ prev=djburger.v.w.Form(DjangoValidator)
 ...
 ```
 
-And [constructors](validators.html#module-djburger.validators.constructors) can be used for quick constructing simple validators. You can validate anything with constructors, but we recommend use it only for one-line validators.
+And [constructors](validators.html#module-djburger.validators.constructors) for quick constructing simple validators. You can validate anything with constructors, but recommended case - one-line validators.
 
 
 ```python
@@ -133,7 +133,7 @@ c=echo_controller
 ...
 ```
 
-Additionally DjBurger have some [built-in controllers](controllers.html) for simple cases.
+Additionally DjBurger have [built-in controllers](controllers.html) for simple cases.
 
 ```python
 c=djburger.c.Info(model=User)
@@ -151,7 +151,7 @@ postr=djburger.r.JSON()
 
 ## Exceptions
 
-You can raise `djburger.e.StatusCodeError` from validator if you want stop validation and return `errors`.
+Raise `djburger.e.StatusCodeError` from validator if you want stop validation and return `errors`.
 
 ```python
 from django import forms
@@ -174,7 +174,7 @@ prev=Validator
 
 ## SubControllers
 
-You can use controllers from controllers but if you want validate data which will be passed or returned from subcontroller then use `djburger.c.subcontroller`:
+If you need to validate data in controller, better use `djburger.c.subcontroller`:
 
 ```python
 def get_name_controller(request, data, **kwargs):

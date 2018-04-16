@@ -52,6 +52,6 @@ high cohesion and low coupling. This is main idea how DjBurger help you make goo
           raise ValueError("Can't send SMS to anonimous user!")
       send_sms(user)
   ```
-  This is bad code! When error will be raised on 5th user we already sent SMS to 4 previous users. DjBurger force input validation only before main logic.
+  This is bad code! We will send some SMS before error raising. DjBurger force input validation only before main logic.
 1. Big and implicit views. This code is unsupported and non-expandable. DjBurger split view by steps.
-1. One logic duplication in many view require more work for made changes and increases the probability of mistakes. With DjBurger you can use one controller into many views.
+1. Logic duplication in views require more time to made changes and and increase probability of mistake. With DjBurger you can use one controller into many views.

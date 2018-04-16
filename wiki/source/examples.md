@@ -28,7 +28,7 @@ class ExampleView(djburger.ViewBase):
 
 All requests without the method defined in the ``rules`` will use the rule from ``default_rule``.
 
-Big example:
+Example:
 
 ```python
 class UsersView(djburger.ViewBase):
