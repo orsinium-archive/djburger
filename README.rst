@@ -1,22 +1,42 @@
 DjBurger
 ========
 
-Documentation on other languages:
+.. figure:: wiki/source/imgs/logo.png
+   :alt: DjBurger logo
 
--  `Russian <README.ru.md>`__
+   DjBurger logo
 
-**DjBurger** -- patched views format for big projects on Django.
+|Build Status| |Documentation| |PyPI version| |Status| |Code size|
+|License|
 
-Key principles:
+**DjBurger** -- framework for big Django projects.
 
-1. Validation only before main logic.
+What DjBurger do?
+
+-  Split Django views into steps for secure and clean code.
+-  Provide built-in objects for all steps.
+-  Integrates this many side libraries like Django REST Framework and
+   Marshmallow.
+
+DjBurger doesn't depend on Django. You can use it in any projects if you
+want.
+
+Read more into
+`documentation <https://djburger.readthedocs.io/en/latest/>`__.
+
+Key principles
+--------------
+
+1. Validation logic is separate from the main logic.
 2. Reusable logic for many views.
 3. Reusable input and output data formats.
-4. More clear views.
+4. More clean views.
 
-Dataflow:
+Dataflow
+--------
 
-1. **Decorators** (``d``).
+1. **Decorators** (``d``). Feel free to use any side Django decorators
+   like ``csrf_exempt``.
 2. **Parser** (``p``). Parse request body.
 3. **PreValidator** (``prev``). Validate and clear request.
 4. **PreRenderer** (``prer``). Render and return PreValidation errors.
@@ -24,194 +44,40 @@ Dataflow:
 6. **PostValidator** (``postv``). Validate and clear response.
 7. **PostRenderer** (``postr``). Render and return PostValidation
    errors.
-8. **Renderer** (``r``). Render successfull response.
+8. **Renderer** (``r``). Render successful response.
 
-.. figure:: scheme.png
+.. figure:: wiki/source/imgs/scheme.png
    :alt: Scheme
 
    Scheme
 
 Required only Controller and Renderer.
 
-Installation
-------------
+Explore
+-------
 
-STABLE
-~~~~~~
-
-.. code:: bash
-
-    pip install djburger
-
-DEV
-~~~
-
-Using pip:
-
-.. code:: bash
-
-    sudo pip install -e git+https://github.com/orsinium/djburger.git#egg=djburger
-
-In ``requirements.txt``:
-
-.. code:: bash
-
-    -e git+https://github.com/orsinium/djburger.git#egg=djburger
-
-Components
-----------
-
-Main components:
-
-1. **Parsers** (``djburger.p``).
-2. **Validators** (``djburger.v``). Can be used as ``prev`` and
-   ``postv``.
-
-   1. **Bases** (``djburger.v.b``).
-   2. **Constructors** (``djburger.v.c``).
-   3. **Wrappers** (``djburger.v.w``)
-
-3. **Controllers** (``djburger.c``). Can be used as ``c``.
-4. **Renderers** (``djburger.r``). Can be used as ``prer``, ``postr``
-   and ``r``.
-
-Some additional components:
-
-1. ``djburger.exceptions`` -- useful exceptions.
-
-Interfaces
-----------
-
-1. **Decorator**. Any decorator which can wrap Django view
-2. **Parser**. Any callable object which get request object and return
-   parsed data.
-3. **Validator**. Have same interfaces as Django Forms, but get
-   ``request`` by initialization:
-
-   1. ``.__init__()``
-
-      -  ``request`` -- Request object
-      -  ``data`` -- data from user (prev) or controller (postv)
-      -  ``**kwargs`` -- any keyword arguments for validator
-
-   2. ``.is_valid()`` -- return True if data is valid False otherwise.
-   3. ``.errors`` -- errors if data is invalid.
-   4. ``.cleaned_data`` -- cleaned data if input data is valid.
-
-4. **Controller**. Any callable object. Kwargs:
-
-   1. ``request`` -- Request object.
-   2. ``data`` -- validated request data. 3 ``**kwargs`` -- kwargs from
-      url.
-
-5. **Renderer**. Any callable object. Kwargs:
-
-   1. ``request`` -- Request object.
-   2. ``data`` -- validated controller data (only for ``r``).
-   3. ``validator`` -- validator which not be passed (only for ``prer``
-      and ``postr``).
-   4. ``status_code`` -- HTTP status code if validator raise
-      ``djburger.e.StatusCodeError``.
-
-Usage example
--------------
-
-View definition:
-
-.. code:: python
-
-    import djburger
-
-    class ExampleView(djburger.ViewBase):
-        rules = {
-            'get': djburger.rule(
-                c=lambda request, data, **kwargs: 'Hello, World!',
-                postv=djburger.v.c.IsStr,
-                postr=djburger.r.Exception(),
-                r=djburger.r.Template(template_name='index.html'),
-            ),
-        }
-
-Minimum info:
-
-.. code:: python
-
-    class ExampleView(djburger.ViewBase):
-        default_rule = djburger.rule(
-            c=lambda request, data, **kwargs: 'Hello, World!',
-            r=djburger.r.Template(template_name='index.html'),
-        ),
-
-Rule from ``default_rule`` will be used as rule for all requests, which
-method not definited in ``rules``.
-
-Big example:
-
-.. code:: python
-
-    class UsersView(djburger.ViewBase):
-        rules = {
-            'get': djburger.rule(
-                d=[login_required, csrf_exempt],
-                prev=SomeValidator,
-                c=djburger.c.List(model=User),
-                postv=djburger.v.c.QuerySet,
-                postr=djburger.r.Exception(),
-                r=djburger.r.JSON(),
-            ),
-            'put': djburger.rule(
-                d=[csrf_exempt],
-                p=djburger.p.JSON(),
-                prev=SomeOtherValidator,
-                c=djburger.c.Add(model=User),
-                r=djburger.r.JSON(),
-            ),
-        }
-
-External libraries support
---------------------------
-
--  `BSON <https://github.com/py-bson/bson>`__
-
-   -  ``djburger.p.BSON``
-   -  ``djburger.r.BSON``
-
--  `Django REST Framework <django-rest-framework.org>`__
-
-   -  ``djburger.v.b.RESTFramework``
-   -  ``djburger.v.w.RESTFramework``
-   -  ``djburger.r.RESTFramework``
-
--  `Marshmallow <https://github.com/marshmallow-code/marshmallow>`__
-
-   -  ``djburger.v.b.Marshmallow``
-   -  ``djburger.v.w.Marshmallow``
-
--  `PySchemes <https://github.com/shivylp/pyschemes>`__
-
-   -  ``djburger.v.c.PySchemes``
-   -  ``djburger.v.w.PySchemes``
-
--  `PyYAML <https://github.com/yaml/pyyaml>`__
-
-   -  ``djburger.r.YAML``
-
--  `Tablib <https://github.com/kennethreitz/tablib>`__
-
-   -  ``djburger.r.Tablib``
-
-What's next?
-------------
-
-1. Read `documentation <https://djburger.readthedocs.io/en/latest/>`__,
-   source code docstrings or just inspect djburger from python console
-   (for example, ``help('djburger.views')``).
+1. Read `documentation <https://djburger.readthedocs.io/en/latest/>`__.
 2. See `example <example/>`__ project.
-3. If you have some questions then `view
+3. For quick help just inspect djburger from python console (for
+   example, ``help('djburger.views')``).
+4. If you have some questions then `view
    issues <https://github.com/orsinium/djburger/issues>`__ or `create
    new <https://github.com/orsinium/djburger/issues/new>`__.
-4. If you found some mistakes then fix it and `create Pull
+5. If you found some mistakes then fix it and `create Pull
    Request <https://github.com/orsinium/djburger/compare>`__.
    Contributors are welcome.
-5. `Star this project on
+6. `Star this project on
    github <https://github.com/orsinium/djburger>`__ :)
+
+.. |Build Status| image:: https://travis-ci.org/orsinium/djburger.svg?branch=master
+   :target: https://travis-ci.org/orsinium/djburger
+.. |Documentation| image:: https://readthedocs.org/projects/djburger/badge/
+   :target: https://djburger.readthedocs.io/en/latest/
+.. |PyPI version| image:: https://img.shields.io/pypi/v/djburger.svg
+   :target: https://pypi.python.org/pypi/djburger
+.. |Status| image:: https://img.shields.io/pypi/status/djburger.svg
+   :target: https://pypi.python.org/pypi/djburger
+.. |Code size| image:: https://img.shields.io/github/languages/code-size/orsinium/djburger.svg
+   :target: https://github.com/orsinium/djburger
+.. |License| image:: https://img.shields.io/pypi/l/djburger.svg
+   :target: LICENSE
