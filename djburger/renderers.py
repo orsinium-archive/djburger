@@ -38,7 +38,7 @@ except ImportError:
 __all__ = [
     'Base',
     'Template', 'HTTP',
-    'JSON', 'YAML', 'Tablib',
+    'JSON', 'BSON', 'YAML', 'Tablib',
     'Redirect', 'Exception',
     ]
 
