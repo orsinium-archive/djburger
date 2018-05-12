@@ -12,10 +12,10 @@ from . import validators
 class AuthAPIView(djburger.ViewBase):
     csrf_exempt = True
     default_rule = djburger.rule(
-        prev=AuthenticationForm,
-        c=controllers.UserController.auth,
-        postv=djburger.v.c.IsBool,
-        r=djburger.r.JSON(),
+        prevalidator=AuthenticationForm,
+        controller=controllers.UserController.auth,
+        postvalidator=djburger.v.c.IsBool,
+        renderer=djburger.r.JSON(),
     )
 
 
@@ -23,9 +23,9 @@ class GroupCommonAPIView(djburger.ViewBase):
     csrf_exempt = True
     rules = {
         'get': djburger.rule(
-            c=controllers.GroupController.list,
-            postv=djburger.v.c.QuerySet,
-            r=djburger.r.JSON(),
+            controller=controllers.GroupController.list,
+            postvalidator=djburger.v.c.QuerySet,
+            renderer=djburger.r.JSON(),
         ),
         'post': djburger.rule(
             prev=validators.GroupInputValidator,

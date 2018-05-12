@@ -4,7 +4,7 @@ import djburger
 class IndexView(djburger.ViewBase):
     rules = {
         'get': djburger.rule(
-            c=lambda request, data, **kwargs: 'Hello, World!',
-            r=djburger.r.Template(template_name='index.html'),
+            controller=lambda request, data, **kwargs: 'Hello, World!',
+            renderer=djburger.renderers.Template(template_name='index.html'),
         ),
     }
