@@ -3,7 +3,7 @@
 from functools import partial
 from json import loads as _json
 # project
-from djburger.utils import is_django_installed
+from .utils import is_django_installed
 
 
 # Django

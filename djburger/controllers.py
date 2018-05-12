@@ -259,18 +259,18 @@ class post(pre): # noQA
         return validator.cleaned_data
 
 
-def subcontroller(c, prev=None, postv=None):
+def subcontroller(controller, prevalidator=None, postvalidator=None):
     """Constructor for subcontrollers
     If any validation failed, immediately raise SubValidationError.
 
-    :param djburger.v.b.IValidator prev: validator for pre-validation.
-    :param callable c: controller.
-    :param djburger.v.b.IValidator postv: validator for post-validation.
+    :param djburger.v.b.IValidator prevalidator:
+    :param callable controller:
+    :param djburger.v.b.IValidator postvalidator:
 
     :raises djburger.e.SubValidationError: if any validation not passed
     """
-    if prev:
-        c = pre(prev)(c)
-    if postv:
-        c = post(postv)(c)
-    return c
+    if prevalidator:
+        controller = pre(prevalidator)(controller)
+    if postvalidator:
+        controller = post(postvalidator)(controller)
+    return controller

@@ -199,7 +199,7 @@ class Redirect(object):
 class Exception(object): # noQA
     """Raise Exception
 
-    I'm recommend use this renderer as `postr`.
+    We are recommend use this renderer as `postrenderer`.
     Raised exception can be handled by decorators or loggers.
 
     :param exception: exception for raising.

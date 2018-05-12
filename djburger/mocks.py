@@ -43,5 +43,5 @@ class DjangoView(object):
         return self.dispatch(*args, **kwargs)
 
 
-class QuerySet:
+class QuerySet(object):
     pass
