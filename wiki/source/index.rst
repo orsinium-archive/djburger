@@ -28,6 +28,7 @@ DjBurger doesn't depend on Django. You can use it in any projects if you want.
     interfaces
     aliases
     external
+    changelog
 
 .. toctree::
     :maxdepth: 2
