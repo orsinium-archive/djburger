@@ -6,7 +6,7 @@ from setuptools import setup
 
 setup(
     name='djburger',
-    version='0.9.0',
+    version='0.10.1',
 
     author='orsinium',
     author_email='master_fess@mail.ru',

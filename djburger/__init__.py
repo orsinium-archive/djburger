@@ -10,13 +10,14 @@ framework for big Django projects.
 
 # main package info
 __title__ = 'DjBurger'
-__version__ = '0.9.0'
+__version__ = '0.10.1'
 __author__ = 'Gram Orsinium'
 __license__ = 'LGPL 3.0'
 
 
 # version synonym
 VERSION = __version__
+
 
 # built-in
 from functools import partial       # noQA

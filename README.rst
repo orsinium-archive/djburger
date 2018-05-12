@@ -9,14 +9,17 @@ DjBurger
 |Build Status| |Documentation| |PyPI version| |Status| |Code size|
 |License|
 
-**DjBurger** -- framework for big Django projects.
+**DjBurger** -- framework for safe and maintainable web-projects.
 
 What DjBurger do?
 
--  Split Django views into steps for secure and clean code.
+-  Split Django views into
+   `steps <https://djburger.readthedocs.io/en/latest/philosophy.html#dataflow>`__
+   for secure and clean code.
 -  Provide built-in objects for all steps.
--  Integrates this many side libraries like Django REST Framework and
-   Marshmallow.
+-  Integrates this `many side
+   libraries <https://djburger.readthedocs.io/en/latest/external.html>`__
+   like Django REST Framework and Marshmallow.
 
 DjBurger doesn't depend on Django. You can use it in any projects if you
 want.
@@ -35,16 +38,15 @@ Key principles
 Dataflow
 --------
 
-1. **Decorators** (``d``). Feel free to use any side Django decorators
-   like ``csrf_exempt``.
-2. **Parser** (``p``). Parse request body.
-3. **PreValidator** (``prev``). Validate and clear request.
-4. **PreRenderer** (``prer``). Render and return PreValidation errors.
-5. **Controller** (``c``). Main logic: do some things.
-6. **PostValidator** (``postv``). Validate and clear response.
-7. **PostRenderer** (``postr``). Render and return PostValidation
-   errors.
-8. **Renderer** (``r``). Render successful response.
+1. **Decorators**. Feel free to use any side Django decorators like
+   ``csrf_exempt``.
+2. **Parser**. Parse request body.
+3. **PreValidator**. Validate and clear request.
+4. **PreRenderer**. Render and return PreValidation errors response.
+5. **Controller**. Main logic: do some things.
+6. **PostValidator**. Validate and clear response.
+7. **PostRenderer**. Render and return PostValidation errors response.
+8. **Renderer**. Render successful response.
 
 .. figure:: wiki/source/imgs/scheme.png
    :alt: Scheme

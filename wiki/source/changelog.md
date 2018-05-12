@@ -2,7 +2,7 @@
 
 See [projects tab on Github](https://github.com/orsinium/djburger/projects) for roadmap.
 
-### [v. 0.10.0](https://github.com/orsinium/djburger/releases/tag/0.10.0)
+### [v. 0.10.1](https://github.com/orsinium/djburger/releases/tag/0.10.1)
 
 * Long kwargs for rule function and subcontroller.
 * Replaced aliases to long names into documentation, tests and examples.
