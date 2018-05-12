@@ -24,9 +24,9 @@ class DjangoViewsTest(unittest.TestCase):
 
     def test_validator(self):
         class Validator(djburger.validators.bases.Form):
-            name = djburger.f.CharField(max_length=20)
-            mail = djburger.f.EmailField()
-            themes = djburger.f.MultipleChoiceField(choices=(
+            name = djburger.forms.CharField(max_length=20)
+            mail = djburger.forms.EmailField()
+            themes = djburger.forms.MultipleChoiceField(choices=(
                 (1, 'one'),
                 (2, 'two'),
                 (3, 'three'),
@@ -63,9 +63,9 @@ class DjangoViewsTest(unittest.TestCase):
 
     def test_postvalidator(self):
         class Validator(djburger.validators.bases.Form):
-            name = djburger.f.CharField(max_length=20)
-            mail = djburger.f.EmailField()
-            themes = djburger.f.MultipleChoiceField(choices=(
+            name = djburger.forms.CharField(max_length=20)
+            mail = djburger.forms.EmailField()
+            themes = djburger.forms.MultipleChoiceField(choices=(
                 (1, 'one'),
                 (2, 'two'),
                 (3, 'three'),
