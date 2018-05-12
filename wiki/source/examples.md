@@ -43,7 +43,7 @@ class UsersView(djburger.ViewBase):
         ),
         'put': djburger.rule(
             decorators=[csrf_exempt],
-            p=djburger.parsers.JSON(),
+            parser=djburger.parsers.JSON(),
             prevalidator=SomeOtherValidator,
             controller=djburger.controllers.Add(model=User),
             renderer=djburger.renderers.JSON(),
@@ -61,7 +61,7 @@ class GroupInputValidator(djburger.validators.bases.Form):
     name = djburger.forms.CharField(label='Name', max_length=80)
 ```
 
-`djburger.f` is just alias for `django.forms`.
+`djburger.forms` is useful alias for `django.forms`.
 
 Simple wrapper:
 

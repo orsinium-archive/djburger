@@ -11,18 +11,18 @@
 
 ## Dataflow
 
-1. **Decorators** (`d`). Feel free to use any side Django decorators like `csrf_exempt`.
-2. **Parser** (`p`). Parse request body.
-3. **PreValidator** (`prev`). Validate and clear request.
-4. **PreRenderer** (`prer`). Render and return PreValidation errors.
-5. **Controller** (`c`). Main logic: do some things.
-6. **PostValidator** (`postv`). Validate and clear response.
-7. **PostRenderer** (`postr`). Render and return PostValidation errors.
-8. **Renderer** (`r`). Render successful response.
+1. **Decorators**. Feel free to use any side Django decorators like `csrf_exempt`.
+2. **Parser**. Parse request body.
+3. **PreValidator**. Validate and clear request.
+4. **PreRenderer**. Render and return PreValidation errors response.
+5. **Controller**. Main logic: do some things.
+6. **PostValidator**. Validate and clear response.
+7. **PostRenderer**. Render and return PostValidation errors response.
+8. **Renderer**. Render successful response.
 
 ![Scheme](imgs/scheme.png)
 
-Required only Controller and Renderer.
+Required only controller and renderer.
 
 
 ## Related conceptions
