@@ -8,10 +8,10 @@ import djburger
 class ExampleView(djburger.ViewBase):
     rules = {
         'get': djburger.rule(
-            controller=lambda request, data, **kwargs: 'Hello, World!',  # controller
-            postvalidator=djburger.validators.constructors.IsStr,                           # post-validator
-            postrenderer=djburger.renderers.Exception(),                       # post-renderer
-            renderer=djburger.renderers.Template(template_name='index.html'),  # renderer
+            controller=lambda request, data, **kwargs: 'Hello, World!',
+            postvalidator=djburger.validators.constructors.IsStr,
+            postrenderer=djburger.renderers.Exception(),
+            renderer=djburger.renderers.Template(template_name='index.html'),
         ),
     }
 ```
@@ -26,7 +26,7 @@ class ExampleView(djburger.ViewBase):
     ),
 ```
 
-All requests without the method defined in the ``rules`` will use the rule from ``default_rule``.
+All requests without the method defined in the `rules` will use the rule from `default_rule`.
 
 Example:
 
@@ -43,7 +43,7 @@ class UsersView(djburger.ViewBase):
         ),
         'put': djburger.rule(
             decorators=[csrf_exempt],
-            p=djburger.p.JSON(),
+            p=djburger.parsers.JSON(),
             prevalidator=SomeOtherValidator,
             controller=djburger.controllers.Add(model=User),
             renderer=djburger.renderers.JSON(),

@@ -53,7 +53,7 @@ def rule(**kwargs):
         ... )
 
     :param list decorators: list of decorators.
-    :param callable parser: parse request body. `djburger.p.Default` by default.
+    :param callable parser: parse request body. `djburger.parsers.Default` by default.
     :param djburger.validators.bases.IValidator prevalidator: validate and clean user params.
     :param callable prerenderer: renderer for pre-validation errors.
     :param callable controller:

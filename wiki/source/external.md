@@ -1,7 +1,7 @@
 # External libraries support
 
 * [BSON](https://github.com/py-bson/bson)
-    * `djburger.p.BSON`
+    * `djburger.parsers.BSON`
     * `djburger.renderers.BSON`
 * [Django REST Framework](django-rest-framework.org)
     * `djburger.validators.bases.RESTFramework`

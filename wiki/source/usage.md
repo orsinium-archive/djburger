@@ -18,7 +18,7 @@ DjBurger modules:
 Keyword arguments for `djburger.rule`:
 
 1. `d` -- decorators list. Optional.
-1. `p` -- parser. `djburger.p.Default` by default.
+1. `p` -- parser. `djburger.parsers.Default` by default.
 1. `prev` -- pre-validator. Optional.
 1. `prer` -- renderer for pre-validator. If missed then `r` will be used for pre-validation errors rendering.
 1. `c` -- controller. Required.
@@ -68,10 +68,10 @@ d=[csrf_exempt]
 
 ## Parsers
 
-Parser get `request` and return `data` which will be passed as is into pre-validator. Usually `data` has `dict` or [QueryDict](https://docs.djangoproject.com/en/2.0/ref/request-response/#django.http.QueryDict) interface. DjBurger use `djburger.p.Default` as default parser. See list of built-in parsers into [parsers API](parsers.html).
+Parser get `request` and return `data` which will be passed as is into pre-validator. Usually `data` has `dict` or [QueryDict](https://docs.djangoproject.com/en/2.0/ref/request-response/#django.http.QueryDict) interface. DjBurger use `djburger.parsers.Default` as default parser. See list of built-in parsers into [parsers API](parsers.html).
 
 ```python
-p=djburger.p.JSON()
+p=djburger.parsers.JSON()
 ```
 
 
