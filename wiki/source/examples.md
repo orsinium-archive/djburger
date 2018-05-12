@@ -9,7 +9,7 @@ class ExampleView(djburger.ViewBase):
     rules = {
         'get': djburger.rule(
             controller=lambda request, data, **kwargs: 'Hello, World!',  # controller
-            postvalidator=djburger.validators.c.IsStr,                           # post-validator
+            postvalidator=djburger.validators.constructors.IsStr,                           # post-validator
             postrenderer=djburger.renderers.Exception(),                       # post-renderer
             renderer=djburger.renderers.Template(template_name='index.html'),  # renderer
         ),
@@ -37,7 +37,7 @@ class UsersView(djburger.ViewBase):
             decorators=[login_required, csrf_exempt],
             prevalidator=SomeValidator,
             controller=djburger.controllers.List(model=User),
-            postvalidator=djburger.validators.c.QuerySet,
+            postvalidator=djburger.validators.constructors.QuerySet,
             postrenderer=djburger.renderers.Exception(),
             renderer=djburger.renderers.JSON(),
         ),
@@ -57,7 +57,7 @@ class UsersView(djburger.ViewBase):
 Simple base validator:
 
 ```python
-class GroupInputValidator(djburger.validators.b.Form):
+class GroupInputValidator(djburger.validators.bases.Form):
     name = djburger.f.CharField(label='Name', max_length=80)
 ```
 
@@ -72,7 +72,7 @@ from django import forms
 class GroupInputForm(forms.Form):
     name = forms.CharField(label='Name', max_length=80)
 
-Validator = djburger.validators.w.Form(GroupInputForm)
+Validator = djburger.validators.wrappers.Form(GroupInputForm)
 ```
 
 See [usage](usage.html) for more examples and explore [example project](https://github.com/orsinium/djburger/tree/master/example).

@@ -23,7 +23,7 @@ class DjangoViewsTest(unittest.TestCase):
         self.assertEqual(response, data)
 
     def test_validator(self):
-        class Validator(djburger.validators.b.Form):
+        class Validator(djburger.validators.bases.Form):
             name = djburger.f.CharField(max_length=20)
             mail = djburger.f.EmailField()
             themes = djburger.f.MultipleChoiceField(choices=(
@@ -62,7 +62,7 @@ class DjangoViewsTest(unittest.TestCase):
             self.assertEqual(errors, {'themes', 'mail'})
 
     def test_postvalidator(self):
-        class Validator(djburger.validators.b.Form):
+        class Validator(djburger.validators.bases.Form):
             name = djburger.f.CharField(max_length=20)
             mail = djburger.f.EmailField()
             themes = djburger.f.MultipleChoiceField(choices=(

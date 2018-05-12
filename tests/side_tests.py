@@ -9,7 +9,7 @@ class MarshmallowValidatorsTest(unittest.TestCase):
 
     def test_base_validator(self):
         # BASE
-        class Base(djburger.validators.b.Marshmallow):
+        class Base(djburger.validators.bases.Marshmallow):
             name = marshmallow.fields.Str()
             mail = marshmallow.fields.Email()
         with self.subTest(src_text='base pass'):
@@ -26,7 +26,7 @@ class MarshmallowValidatorsTest(unittest.TestCase):
             name = marshmallow.fields.Str()
             mail = marshmallow.fields.Email()
 
-        Wrapped = djburger.validators.w.Marshmallow(Base) # noQA
+        Wrapped = djburger.validators.wrappers.Marshmallow(Base) # noQA
         with self.subTest(src_text='base pass'):
             data = {'name': 'John Doe', 'mail': 'test@gmail.com'}
             v = Wrapped(request=None, data=data)
@@ -42,31 +42,31 @@ class PySchemesValidatorsTest(unittest.TestCase):
     def test_base_validator(self):
         # BASE
         with self.subTest(src_text='base pass'):
-            v = djburger.validators.c.PySchemes([str, 2, int])
+            v = djburger.validators.constructors.PySchemes([str, 2, int])
             v = v(request=None, data=['3', 2, 4])
             v.is_valid()
             self.assertTrue(v.is_valid())
         with self.subTest(src_text='base not pass'):
-            v = djburger.validators.c.PySchemes([str, 2, int])
+            v = djburger.validators.constructors.PySchemes([str, 2, int])
             v = v(request=None, data=[1, 2, 4])
             self.assertFalse(v.is_valid())
         with self.subTest(src_text='base int data'):
-            v = djburger.validators.c.PySchemes(int)
+            v = djburger.validators.constructors.PySchemes(int)
             v = v(request=None, data=3)
             v.is_valid()
             self.assertEqual(v.cleaned_data, 3)
 
     def test_wrapper_validator(self):
         with self.subTest(src_text='base pass'):
-            v = djburger.validators.w.PySchemes(PySchemes([str, 2, int]))
+            v = djburger.validators.wrappers.PySchemes(PySchemes([str, 2, int]))
             v = v(request=None, data=['3', 2, 4])
             self.assertTrue(v.is_valid())
         with self.subTest(src_text='base not pass'):
-            v = djburger.validators.w.PySchemes(PySchemes([str, 2, int]))
+            v = djburger.validators.wrappers.PySchemes(PySchemes([str, 2, int]))
             v = v(request=None, data=[1, 2, 4])
             self.assertFalse(v.is_valid())
         with self.subTest(src_text='base int data'):
-            v = djburger.validators.w.PySchemes(PySchemes(int))
+            v = djburger.validators.wrappers.PySchemes(PySchemes(int))
             v = v(request=None, data=3)
             v.is_valid()
             self.assertEqual(v.cleaned_data, 3)

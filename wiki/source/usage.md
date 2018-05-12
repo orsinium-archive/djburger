@@ -42,7 +42,7 @@ class ExampleView(djburger.ViewBase):
     rules = {
         'get': djburger.rule(
             controller=lambda request, data, **kwargs: 'Hello, World!',
-            postvalidator=djburger.validators.c.IsStr,
+            postvalidator=djburger.validators.constructors.IsStr,
             postrenderer=djburger.renderers.Exception(),
             renderer=djburger.renderers.Template(template_name='index.html'),
         ),
@@ -84,7 +84,7 @@ Validators get data and validate it. They have Django Forms-like interface. See 
 ```python
 from django import forms
 
-class Validator(djburger.validators.b.Form):
+class Validator(djburger.validators.bases.Form):
     name = forms.CharField(max_length=20)
 
 ...
@@ -101,7 +101,7 @@ class DjangoValidator(forms.Form):
     name = forms.CharField(max_length=20)
 
 ...
-prev=djburger.validators.w.Form(DjangoValidator)
+prev=djburger.validators.wrappers.Form(DjangoValidator)
 ...
 ```
 
@@ -109,7 +109,7 @@ And [constructors](validators.html#module-djburger.validators.constructors) for 
 
 
 ```python
-prev=djburger.validators.c.IsDict
+prev=djburger.validators.constructors.IsDict
 ```
 
 
@@ -156,7 +156,7 @@ Raise `djburger.exceptions.StatusCodeError` from validator if you want stop vali
 ```python
 from django import forms
 
-class Validator(djburger.validators.b.Form):
+class Validator(djburger.validators.bases.Form):
     name = forms.CharField(max_length=20)
 
     def clean_name(self):

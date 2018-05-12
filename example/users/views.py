@@ -14,7 +14,7 @@ class AuthAPIView(djburger.ViewBase):
     default_rule = djburger.rule(
         prevalidator=AuthenticationForm,
         controller=controllers.UserController.auth,
-        postvalidator=djburger.validators.c.IsBool,
+        postvalidator=djburger.validators.constructors.IsBool,
         renderer=djburger.renderers.JSON(),
     )
 
@@ -24,13 +24,13 @@ class GroupCommonAPIView(djburger.ViewBase):
     rules = {
         'get': djburger.rule(
             controller=controllers.GroupController.list,
-            postvalidator=djburger.validators.c.QuerySet,
+            postvalidator=djburger.validators.constructors.QuerySet,
             renderer=djburger.renderers.JSON(),
         ),
         'post': djburger.rule(
             prevalidator=validators.GroupInputValidator,
             controller=controllers.GroupController.add,
-            postvalidator=djburger.validators.c.ModelInstance,
+            postvalidator=djburger.validators.constructors.ModelInstance,
             renderer=djburger.renderers.JSON(),
         ),
         'put': 'post',
@@ -42,19 +42,19 @@ class GroupActionsAPIView(djburger.ViewBase):
     rules = {
         'get': djburger.rule(
             controller=controllers.GroupController.info,
-            postvalidator=djburger.validators.c.ModelInstance,
+            postvalidator=djburger.validators.constructors.ModelInstance,
             renderer=djburger.renderers.JSON(),
         ),
         'patch': djburger.rule(
             prevalidator=validators.GroupInputValidator,
             controller=controllers.GroupController.edit,
-            postvalidator=djburger.validators.c.ModelInstance,
+            postvalidator=djburger.validators.constructors.ModelInstance,
             renderer=djburger.renderers.JSON(),
         ),
         'post': 'patch',
         'delete': djburger.rule(
             controller=controllers.GroupController.delete,
-            postvalidator=djburger.validators.c.IsInt,
+            postvalidator=djburger.validators.constructors.IsInt,
             renderer=djburger.renderers.JSON(),
         ),
     }

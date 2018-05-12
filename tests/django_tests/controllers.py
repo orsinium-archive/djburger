@@ -74,7 +74,7 @@ class DjangoControllersTest(unittest.TestCase):
     def test_subcontroller(self):
         with self.subTest(src_text='pre pass'):
             subcontroller = djburger.controllers.subcontroller(
-                prevalidator=djburger.validators.c.IsStr,
+                prevalidator=djburger.validators.constructors.IsStr,
                 controller=lambda data, request, **kwargs: data,
             )
             data = 'lol'
@@ -83,14 +83,14 @@ class DjangoControllersTest(unittest.TestCase):
         with self.subTest(src_text='post pass'):
             subcontroller = djburger.controllers.subcontroller(
                 controller=lambda data, request, **kwargs: data,
-                postvalidator=djburger.validators.c.IsStr,
+                postvalidator=djburger.validators.constructors.IsStr,
             )
             data = 'lol'
             result = subcontroller(data=data)
             self.assertEqual(result, data)
         with self.subTest(src_text='pre not pass'):
             subcontroller = djburger.controllers.subcontroller(
-                prevalidator=djburger.validators.c.IsStr,
+                prevalidator=djburger.validators.constructors.IsStr,
                 controller=lambda data, request, **kwargs: data,
             )
             data = 123

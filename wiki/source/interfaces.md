@@ -18,4 +18,4 @@
     1. `request` -- Request object.
     2. `data` -- validated controller data (only for `r`).
     3. `validator` -- validator which not be passed (only for `prer` and `postr`).
-    4. `status_code` -- HTTP status code if validator raise `djburger.e.StatusCodeError`.
+    4. `status_code` -- HTTP status code if validator raise `djburger.exceptions.StatusCodeError`.

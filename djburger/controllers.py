@@ -207,7 +207,7 @@ class ViewAsController(object):
 class pre(object): # noQA
     """Decorator for input data validation before subcontroller calling
 
-    :param djburger.validators.b.IValidator validator: validator for pre-validation.
+    :param djburger.validators.bases.IValidator validator: validator for pre-validation.
     :param \**kwargs: kwargs for validator.
 
     :raises djburger.exceptions.SubValidationError: if pre-validation not passed
@@ -238,7 +238,7 @@ class pre(object): # noQA
 class post(pre): # noQA
     """Decorator for output data validation before subcontroller calling
 
-    :param djburger.validators.b.IValidator validator: validator for post-validation.
+    :param djburger.validators.bases.IValidator validator: validator for post-validation.
     :param \**kwargs: kwargs for validator.
 
     :raises djburger.exceptions.SubValidationError: if post-validation not passed
@@ -263,9 +263,9 @@ def subcontroller(controller, prevalidator=None, postvalidator=None):
     """Constructor for subcontrollers
     If any validation failed, immediately raise SubValidationError.
 
-    :param djburger.validators.b.IValidator prevalidator:
+    :param djburger.validators.bases.IValidator prevalidator:
     :param callable controller:
-    :param djburger.validators.b.IValidator postvalidator:
+    :param djburger.validators.bases.IValidator postvalidator:
 
     :raises djburger.exceptions.SubValidationError: if any validation not passed
     """
