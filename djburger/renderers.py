@@ -36,11 +36,15 @@ except ImportError:
 
 
 __all__ = [
-    'Base',
-    'Template', 'HTTP',
-    'JSON', 'BSON', 'YAML', 'Tablib',
-    'Redirect', 'Exception',
-    ]
+    'BSON', 'Base', 'BaseWithHTTP',
+    'Exception',
+    'HTTP',
+    'JSON',
+    'RESTFramework',
+    'Redirect',
+    'Tablib', 'Template',
+    'YAML',
+]
 
 
 class Base(object):
