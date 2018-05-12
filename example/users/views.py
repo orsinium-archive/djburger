@@ -28,10 +28,10 @@ class GroupCommonAPIView(djburger.ViewBase):
             renderer=djburger.r.JSON(),
         ),
         'post': djburger.rule(
-            prev=validators.GroupInputValidator,
-            c=controllers.GroupController.add,
-            postv=djburger.v.c.ModelInstance,
-            r=djburger.r.JSON(),
+            prevalidator=validators.GroupInputValidator,
+            controller=controllers.GroupController.add,
+            postvalidator=djburger.v.c.ModelInstance,
+            renderer=djburger.r.JSON(),
         ),
         'put': 'post',
     }
@@ -41,20 +41,20 @@ class GroupActionsAPIView(djburger.ViewBase):
     csrf_exempt = True
     rules = {
         'get': djburger.rule(
-            c=controllers.GroupController.info,
-            postv=djburger.v.c.ModelInstance,
-            r=djburger.r.JSON(),
+            controller=controllers.GroupController.info,
+            postvalidator=djburger.v.c.ModelInstance,
+            renderer=djburger.r.JSON(),
         ),
         'patch': djburger.rule(
-            prev=validators.GroupInputValidator,
-            c=controllers.GroupController.edit,
-            postv=djburger.v.c.ModelInstance,
-            r=djburger.r.JSON(),
+            prevalidator=validators.GroupInputValidator,
+            controller=controllers.GroupController.edit,
+            postvalidator=djburger.v.c.ModelInstance,
+            renderer=djburger.r.JSON(),
         ),
         'post': 'patch',
         'delete': djburger.rule(
-            c=controllers.GroupController.delete,
-            postv=djburger.v.c.IsInt,
-            r=djburger.r.JSON(),
+            controller=controllers.GroupController.delete,
+            postvalidator=djburger.v.c.IsInt,
+            renderer=djburger.r.JSON(),
         ),
     }

@@ -41,10 +41,10 @@ import djburger
 class ExampleView(djburger.ViewBase):
     rules = {
         'get': djburger.rule(
-            c=lambda request, data, **kwargs: 'Hello, World!',
-            postv=djburger.v.c.IsStr,
-            postr=djburger.r.Exception(),
-            r=djburger.r.Template(template_name='index.html'),
+            controller=lambda request, data, **kwargs: 'Hello, World!',
+            postvalidator=djburger.v.c.IsStr,
+            postrenderer=djburger.r.Exception(),
+            renderer=djburger.r.Template(template_name='index.html'),
         ),
     }
 ```
@@ -182,9 +182,9 @@ def get_name_controller(request, data, **kwargs):
 
 def echo_controller(request, data, **kwargs):
     subc = djburger.c.subcontroller(
-        prev=djburger.c.IsDict,
-        c=get_name_controller,
-        postv=djburger.c.IsStr,
+        prevalidator=djburger.c.IsDict,
+        controller=get_name_controller,
+        postvalidator=djburger.c.IsStr,
     )
     return subc(request, data, **kwargs)
 

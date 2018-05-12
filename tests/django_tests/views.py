@@ -11,8 +11,8 @@ class DjangoViewsTest(unittest.TestCase):
     def test_controller(self):
         class Base(djburger.ViewBase):
             default_rule = djburger.rule(
-                c=lambda request, data, **kwargs: data,
-                r=lambda data, **kwargs: data,
+                controller=lambda request, data, **kwargs: data,
+                renderer=lambda data, **kwargs: data,
             )
 
         view = Base.as_view()
@@ -34,9 +34,9 @@ class DjangoViewsTest(unittest.TestCase):
 
         class Base(djburger.ViewBase):
             default_rule = djburger.rule(
-                prev=Validator,
-                c=lambda request, data, **kwargs: data,
-                r=lambda **kwargs: kwargs,
+                prevalidator=Validator,
+                controller=lambda request, data, **kwargs: data,
+                renderer=lambda **kwargs: kwargs,
             )
 
         view = Base.as_view()
@@ -73,9 +73,9 @@ class DjangoViewsTest(unittest.TestCase):
 
         class Base(djburger.ViewBase):
             default_rule = djburger.rule(
-                c=lambda request, data, **kwargs: data,
-                postv=Validator,
-                r=lambda **kwargs: kwargs,
+                controller=lambda request, data, **kwargs: data,
+                postvalidator=Validator,
+                renderer=lambda **kwargs: kwargs,
             )
 
         view = Base.as_view()

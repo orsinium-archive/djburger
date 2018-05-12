@@ -8,10 +8,10 @@ import djburger
 class ExampleView(djburger.ViewBase):
     rules = {
         'get': djburger.rule(
-            c=lambda request, data, **kwargs: 'Hello, World!',  # controller
-            postv=djburger.v.c.IsStr,                           # post-validator
-            postr=djburger.r.Exception(),                       # post-renderer
-            r=djburger.r.Template(template_name='index.html'),  # renderer
+            controller=lambda request, data, **kwargs: 'Hello, World!',  # controller
+            postvalidator=djburger.v.c.IsStr,                           # post-validator
+            postrenderer=djburger.r.Exception(),                       # post-renderer
+            renderer=djburger.r.Template(template_name='index.html'),  # renderer
         ),
     }
 ```
@@ -21,8 +21,8 @@ Minimum info:
 ```python
 class ExampleView(djburger.ViewBase):
     default_rule = djburger.rule(
-        c=lambda request, data, **kwargs: 'Hello, World!',
-        r=djburger.r.Template(template_name='index.html'),
+        controller=lambda request, data, **kwargs: 'Hello, World!',
+        renderer=djburger.r.Template(template_name='index.html'),
     ),
 ```
 
@@ -34,19 +34,19 @@ Example:
 class UsersView(djburger.ViewBase):
     rules = {
         'get': djburger.rule(
-            d=[login_required, csrf_exempt],
-            prev=SomeValidator,
-            c=djburger.c.List(model=User),
-            postv=djburger.v.c.QuerySet,
-            postr=djburger.r.Exception(),
-            r=djburger.r.JSON(),
+            decorators=[login_required, csrf_exempt],
+            prevalidator=SomeValidator,
+            controller=djburger.c.List(model=User),
+            postvalidator=djburger.v.c.QuerySet,
+            postrenderer=djburger.r.Exception(),
+            renderer=djburger.r.JSON(),
         ),
         'put': djburger.rule(
-            d=[csrf_exempt],
+            decorators=[csrf_exempt],
             p=djburger.p.JSON(),
-            prev=SomeOtherValidator,
-            c=djburger.c.Add(model=User),
-            r=djburger.r.JSON(),
+            prevalidator=SomeOtherValidator,
+            controller=djburger.c.Add(model=User),
+            renderer=djburger.r.JSON(),
         ),
     }
 ```
