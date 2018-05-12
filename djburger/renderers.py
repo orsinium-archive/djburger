@@ -36,11 +36,15 @@ except ImportError:
 
 
 __all__ = [
-    'Base',
-    'Template', 'HTTP',
-    'JSON', 'YAML', 'Tablib',
-    'Redirect', 'Exception',
-    ]
+    'BSON', 'Base', 'BaseWithHTTP',
+    'Exception',
+    'HTTP',
+    'JSON',
+    'RESTFramework',
+    'Redirect',
+    'Tablib', 'Template',
+    'YAML',
+]
 
 
 class Base(object):
@@ -105,7 +109,7 @@ class Base(object):
 class BaseWithHTTP(Base):
     """Base class wrapped by HttpResponse
 
-    :param \**kwargs: all kwargs of djburger.r.Base.
+    :param \**kwargs: all kwargs of djburger.renderers.Base.
     """
 
     def set_http_kwargs(self, **kwargs):
@@ -199,7 +203,7 @@ class Redirect(object):
 class Exception(object): # noQA
     """Raise Exception
 
-    I'm recommend use this renderer as `postr`.
+    We are recommend use this renderer as `postrenderer`.
     Raised exception can be handled by decorators or loggers.
 
     :param exception: exception for raising.

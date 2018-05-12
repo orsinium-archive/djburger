@@ -1,19 +1,19 @@
 # External libraries support
 
 * [BSON](https://github.com/py-bson/bson)
-    * `djburger.p.BSON`
-    * `djburger.r.BSON`
+    * `djburger.parsers.BSON`
+    * `djburger.renderers.BSON`
 * [Django REST Framework](django-rest-framework.org)
-    * `djburger.v.b.RESTFramework`
-    * `djburger.v.w.RESTFramework`
-    * `djburger.r.RESTFramework`
+    * `djburger.validators.bases.RESTFramework`
+    * `djburger.validators.wrappers.RESTFramework`
+    * `djburger.renderers.RESTFramework`
 * [Marshmallow](https://github.com/marshmallow-code/marshmallow)
-    * `djburger.v.b.Marshmallow`
-    * `djburger.v.w.Marshmallow`
+    * `djburger.validators.bases.Marshmallow`
+    * `djburger.validators.wrappers.Marshmallow`
 * [PySchemes](https://github.com/shivylp/pyschemes)
-    * `djburger.v.c.PySchemes`
-    * `djburger.v.w.PySchemes`
+    * `djburger.validators.constructors.PySchemes`
+    * `djburger.validators.wrappers.PySchemes`
 * [PyYAML](https://github.com/yaml/pyyaml)
-    * `djburger.r.YAML`
+    * `djburger.renderers.YAML`
 * [Tablib](https://github.com/kennethreitz/tablib)
-    * `djburger.r.Tablib`
+    * `djburger.renderers.Tablib`

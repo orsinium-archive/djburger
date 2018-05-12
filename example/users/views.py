@@ -12,10 +12,10 @@ from . import validators
 class AuthAPIView(djburger.ViewBase):
     csrf_exempt = True
     default_rule = djburger.rule(
-        prev=AuthenticationForm,
-        c=controllers.UserController.auth,
-        postv=djburger.v.c.IsBool,
-        r=djburger.r.JSON(),
+        prevalidator=AuthenticationForm,
+        controller=controllers.UserController.auth,
+        postvalidator=djburger.validators.constructors.IsBool,
+        renderer=djburger.renderers.JSON(),
     )
 
 
@@ -23,15 +23,15 @@ class GroupCommonAPIView(djburger.ViewBase):
     csrf_exempt = True
     rules = {
         'get': djburger.rule(
-            c=controllers.GroupController.list,
-            postv=djburger.v.c.QuerySet,
-            r=djburger.r.JSON(),
+            controller=controllers.GroupController.list,
+            postvalidator=djburger.validators.constructors.QuerySet,
+            renderer=djburger.renderers.JSON(),
         ),
         'post': djburger.rule(
-            prev=validators.GroupInputValidator,
-            c=controllers.GroupController.add,
-            postv=djburger.v.c.ModelInstance,
-            r=djburger.r.JSON(),
+            prevalidator=validators.GroupInputValidator,
+            controller=controllers.GroupController.add,
+            postvalidator=djburger.validators.constructors.ModelInstance,
+            renderer=djburger.renderers.JSON(),
         ),
         'put': 'post',
     }
@@ -41,20 +41,20 @@ class GroupActionsAPIView(djburger.ViewBase):
     csrf_exempt = True
     rules = {
         'get': djburger.rule(
-            c=controllers.GroupController.info,
-            postv=djburger.v.c.ModelInstance,
-            r=djburger.r.JSON(),
+            controller=controllers.GroupController.info,
+            postvalidator=djburger.validators.constructors.ModelInstance,
+            renderer=djburger.renderers.JSON(),
         ),
         'patch': djburger.rule(
-            prev=validators.GroupInputValidator,
-            c=controllers.GroupController.edit,
-            postv=djburger.v.c.ModelInstance,
-            r=djburger.r.JSON(),
+            prevalidator=validators.GroupInputValidator,
+            controller=controllers.GroupController.edit,
+            postvalidator=djburger.validators.constructors.ModelInstance,
+            renderer=djburger.renderers.JSON(),
         ),
         'post': 'patch',
         'delete': djburger.rule(
-            c=controllers.GroupController.delete,
-            postv=djburger.v.c.IsInt,
-            r=djburger.r.JSON(),
+            controller=controllers.GroupController.delete,
+            postvalidator=djburger.validators.constructors.IsInt,
+            renderer=djburger.renderers.JSON(),
         ),
     }

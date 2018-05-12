@@ -16,33 +16,33 @@ class DjangoControllersTest(unittest.TestCase):
         Group.objects.filter(name=name2).delete()
         # ADD
         with self.subTest(src_text='add'):
-            controller = djburger.c.Add(model=Group)
+            controller = djburger.controllers.Add(model=Group)
             response = controller(request=None, data={'name': name})
             self.assertEqual(response.name, name)
         # EDIT
         with self.subTest(src_text='edit'):
-            controller = djburger.c.Edit(model=Group)
+            controller = djburger.controllers.Edit(model=Group)
             response = controller(request=None, data={'name': name2}, name=name)
             self.assertEqual(response.name, name2)
         # LIST
         with self.subTest(src_text='list'):
-            controller = djburger.c.List(model=Group)
+            controller = djburger.controllers.List(model=Group)
             response = controller(request=None, data={})
             names = response.values_list('name', flat=True)
             self.assertIn(name2, names)
         with self.subTest(src_text='list filter'):
-            controller = djburger.c.List(model=Group)
+            controller = djburger.controllers.List(model=Group)
             response = controller(request=None, data={'name': name2})
             names = response.values_list('name', flat=True)
             self.assertIn(name2, names)
         # INFO
         with self.subTest(src_text='info'):
-            controller = djburger.c.Info(model=Group)
+            controller = djburger.controllers.Info(model=Group)
             response = controller(request=None, data={}, name=name2)
             self.assertEqual(response.name, name2)
         # DELETE
         with self.subTest(src_text='delete'):
-            controller = djburger.c.Delete(model=Group)
+            controller = djburger.controllers.Delete(model=Group)
             response = controller(request=None, data={}, name=name2)
             self.assertEqual(response, 1)
 
@@ -56,7 +56,7 @@ class DjangoControllersTest(unittest.TestCase):
             return HttpResponse(data)
 
         factory = RequestFactory()
-        controller = djburger.c.ViewAsController(base)
+        controller = djburger.controllers.ViewAsController(base)
 
         with self.subTest(src_text='get'):
             request = factory.get('/some/url/', {'test': 'me'})
@@ -73,26 +73,26 @@ class DjangoControllersTest(unittest.TestCase):
 
     def test_subcontroller(self):
         with self.subTest(src_text='pre pass'):
-            c = djburger.c.subcontroller(
-                prev=djburger.v.c.IsStr,
-                c=lambda data, request, **kwargs: data,
+            subcontroller = djburger.controllers.subcontroller(
+                prevalidator=djburger.validators.constructors.IsStr,
+                controller=lambda data, request, **kwargs: data,
             )
             data = 'lol'
-            result = c(data=data)
+            result = subcontroller(data=data)
             self.assertEqual(result, data)
         with self.subTest(src_text='post pass'):
-            c = djburger.c.subcontroller(
-                c=lambda data, request, **kwargs: data,
-                postv=djburger.v.c.IsStr,
+            subcontroller = djburger.controllers.subcontroller(
+                controller=lambda data, request, **kwargs: data,
+                postvalidator=djburger.validators.constructors.IsStr,
             )
             data = 'lol'
-            result = c(data=data)
+            result = subcontroller(data=data)
             self.assertEqual(result, data)
         with self.subTest(src_text='pre not pass'):
-            c = djburger.c.subcontroller(
-                prev=djburger.v.c.IsStr,
-                c=lambda data, request, **kwargs: data,
+            subcontroller = djburger.controllers.subcontroller(
+                prevalidator=djburger.validators.constructors.IsStr,
+                controller=lambda data, request, **kwargs: data,
             )
             data = 123
-            with self.assertRaises(djburger.e.SubValidationError):
-                result = c(data=data)
+            with self.assertRaises(djburger.exceptions.SubValidationError):
+                result = subcontroller(data=data)

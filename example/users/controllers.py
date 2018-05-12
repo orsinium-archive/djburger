@@ -17,8 +17,8 @@ class UserController:
 
 
 class GroupController:
-    list = staticmethod(djburger.c.List(model=Group))
-    info = staticmethod(djburger.c.Info(model=Group))
-    add = staticmethod(djburger.c.Add(model=Group))
-    edit = staticmethod(djburger.c.Edit(model=Group))
-    delete = staticmethod(djburger.c.Delete(model=Group))
+    list = staticmethod(djburger.controllers.List(model=Group))
+    info = staticmethod(djburger.controllers.Info(model=Group))
+    add = staticmethod(djburger.controllers.Add(model=Group))
+    edit = staticmethod(djburger.controllers.Edit(model=Group))
+    delete = staticmethod(djburger.controllers.Delete(model=Group))

@@ -8,10 +8,10 @@ import djburger
 class ExampleView(djburger.ViewBase):
     rules = {
         'get': djburger.rule(
-            c=lambda request, data, **kwargs: 'Hello, World!',  # controller
-            postv=djburger.v.c.IsStr,                           # post-validator
-            postr=djburger.r.Exception(),                       # post-renderer
-            r=djburger.r.Template(template_name='index.html'),  # renderer
+            controller=lambda request, data, **kwargs: 'Hello, World!',
+            postvalidator=djburger.validators.constructors.IsStr,
+            postrenderer=djburger.renderers.Exception(),
+            renderer=djburger.renderers.Template(template_name='index.html'),
         ),
     }
 ```
@@ -21,12 +21,12 @@ Minimum info:
 ```python
 class ExampleView(djburger.ViewBase):
     default_rule = djburger.rule(
-        c=lambda request, data, **kwargs: 'Hello, World!',
-        r=djburger.r.Template(template_name='index.html'),
+        controller=lambda request, data, **kwargs: 'Hello, World!',
+        renderer=djburger.renderers.Template(template_name='index.html'),
     ),
 ```
 
-All requests without the method defined in the ``rules`` will use the rule from ``default_rule``.
+All requests without the method defined in the `rules` will use the rule from `default_rule`.
 
 Example:
 
@@ -34,19 +34,19 @@ Example:
 class UsersView(djburger.ViewBase):
     rules = {
         'get': djburger.rule(
-            d=[login_required, csrf_exempt],
-            prev=SomeValidator,
-            c=djburger.c.List(model=User),
-            postv=djburger.v.c.QuerySet,
-            postr=djburger.r.Exception(),
-            r=djburger.r.JSON(),
+            decorators=[login_required, csrf_exempt],
+            prevalidator=SomeValidator,
+            controller=djburger.controllers.List(model=User),
+            postvalidator=djburger.validators.constructors.QuerySet,
+            postrenderer=djburger.renderers.Exception(),
+            renderer=djburger.renderers.JSON(),
         ),
         'put': djburger.rule(
-            d=[csrf_exempt],
-            p=djburger.p.JSON(),
-            prev=SomeOtherValidator,
-            c=djburger.c.Add(model=User),
-            r=djburger.r.JSON(),
+            decorators=[csrf_exempt],
+            parser=djburger.parsers.JSON(),
+            prevalidator=SomeOtherValidator,
+            controller=djburger.controllers.Add(model=User),
+            renderer=djburger.renderers.JSON(),
         ),
     }
 ```
@@ -57,11 +57,11 @@ class UsersView(djburger.ViewBase):
 Simple base validator:
 
 ```python
-class GroupInputValidator(djburger.v.b.Form):
-    name = djburger.f.CharField(label='Name', max_length=80)
+class GroupInputValidator(djburger.validators.bases.Form):
+    name = djburger.forms.CharField(label='Name', max_length=80)
 ```
 
-`djburger.f` is just alias for `django.forms`.
+`djburger.forms` is useful alias for `django.forms`.
 
 Simple wrapper:
 
@@ -72,7 +72,7 @@ from django import forms
 class GroupInputForm(forms.Form):
     name = forms.CharField(label='Name', max_length=80)
 
-Validator = djburger.v.w.Form(GroupInputForm)
+Validator = djburger.validators.wrappers.Form(GroupInputForm)
 ```
 
 See [usage](usage.html) for more examples and explore [example project](https://github.com/orsinium/djburger/tree/master/example).

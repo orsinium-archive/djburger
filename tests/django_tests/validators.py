@@ -21,9 +21,9 @@ class DjangoFormValidatorsTest(unittest.TestCase):
         Group.objects.get(name='TEST_IT_2').delete()
 
     def test_base_validator(self):
-        class Base(djburger.v.b.Form):
-            name = djburger.f.CharField(max_length=20)
-            mail = djburger.f.EmailField()
+        class Base(djburger.validators.bases.Form):
+            name = djburger.forms.CharField(max_length=20)
+            mail = djburger.forms.EmailField()
         with self.subTest(src_text='base pass'):
             data = {'name': 'John Doe', 'mail': 'test@gmail.com'}
             v = Base(request=None, data=data)
@@ -34,10 +34,10 @@ class DjangoFormValidatorsTest(unittest.TestCase):
             self.assertFalse(v.is_valid())
 
     def test_wrapper_validator(self):
-        class Base(djburger.f.Form):
-            name = djburger.f.CharField(max_length=20)
-            mail = djburger.f.EmailField()
-        Wrapped = djburger.v.w.Form(Base) # noQA
+        class Base(djburger.forms.Form):
+            name = djburger.forms.CharField(max_length=20)
+            mail = djburger.forms.EmailField()
+        Wrapped = djburger.validators.wrappers.Form(Base) # noQA
         with self.subTest(src_text='base pass'):
             data = {'name': 'John Doe', 'mail': 'test@gmail.com'}
             v = Wrapped(request=None, data=data)

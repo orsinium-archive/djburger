@@ -2,29 +2,27 @@
 
 ## Components structure
 
-Use short notation from [dataflow](philosophy.html#dataflow).
-
 DjBurger modules:
 
-+ `djburger.p`. Parsers. Can be used as `p`.
-+ `djburger.v`. Validators. Can be used as `prev` and `postv`.
-  + `djburger.v.b`. Validators that can be used as **base** class for your own validators.
-  + `djburger.v.c`. Validators that can be used as **constructors** for simple validators.
-  + `djburger.v.w`. Validators that can be used as **wrappers** for external validators.
-+ `djburger.c`. Controllers. Can be used as `c`.
-+ `djburger.r`. Renderers. Can be used as `prer`, `postr` and `r`.
-+ `djburger.e`. Exceptions.
++ `djburger.parsers`. Parsers. Can be used as `parser`.
++ `djburger.validators`. Can be used as `prevalidator` and `postvalidator`.
+  + `djburger.validators.bases`. Validators that can be used as base class for your own validators.
+  + `djburger.validators.constructors`. Validators that can be used as constructors for simple validators.
+  + `djburger.validators.wrappers`. Validators that can be used as wrappers for external validators.
++ `djburger.controllers`. Can be used as `controller`.
++ `djburger.renderers`. Can be used as `prerenderer`, `postrenderer` and `renderer`.
++ `djburger.exceptions`.
 
 Keyword arguments for `djburger.rule`:
 
-1. `d` -- decorators list. Optional.
-1. `p` -- parser. `djburger.p.Default` by default.
-1. `prev` -- pre-validator. Optional.
-1. `prer` -- renderer for pre-validator. If missed then `r` will be used for pre-validation errors rendering.
-1. `c` -- controller. Required.
-1. `postv` -- post-validator. Optional.
-1. `postr` -- renderer for post-validator. If missed then `r` will be used for post-validation errors rendering.
-1. `r` -- renderer for success response. Required.
+1. `decorators` -- decorators list. Optional.
+1. `parser` -- parser. `djburger.parsers.Default` by default.
+1. `prevalidator` -- pre-validator. Optional.
+1. `prerenderer` -- renderer for pre-validator. If missed then `r` will be used for pre-validation errors rendering.
+1. `controller` -- controller. Required.
+1. `postvalidator` -- post-validator. Optional.
+1. `postrenderer` -- renderer for post-validator. If missed then `r` will be used for post-validation errors rendering.
+1. `renderer` -- renderer for success response. Required.
 
 
 ## View
@@ -41,10 +39,10 @@ import djburger
 class ExampleView(djburger.ViewBase):
     rules = {
         'get': djburger.rule(
-            c=lambda request, data, **kwargs: 'Hello, World!',
-            postv=djburger.v.c.IsStr,
-            postr=djburger.r.Exception(),
-            r=djburger.r.Template(template_name='index.html'),
+            controller=lambda request, data, **kwargs: 'Hello, World!',
+            postvalidator=djburger.validators.constructors.IsStr,
+            postrenderer=djburger.renderers.Exception(),
+            renderer=djburger.renderers.Template(template_name='index.html'),
         ),
     }
 ```
@@ -62,16 +60,16 @@ More info:
 You can use any Django decorators like `csrf_exempt`. `djburger.ViewBase` wraps into decorators view's `validate_request` method that get `request` object, `**kwargs` from URL resolver and returns renderer's result (usually Django HttpResponse).
 
 ```python
-d=[csrf_exempt]
+decorators=[csrf_exempt]
 ```
 
 
 ## Parsers
 
-Parser get `request` and return `data` which will be passed as is into pre-validator. Usually `data` has `dict` or [QueryDict](https://docs.djangoproject.com/en/2.0/ref/request-response/#django.http.QueryDict) interface. DjBurger use `djburger.p.Default` as default parser. See list of built-in parsers into [parsers API](parsers.html).
+Parser get `request` and return `data` which will be passed as is into pre-validator. Usually `data` has `dict` or [QueryDict](https://docs.djangoproject.com/en/2.0/ref/request-response/#django.http.QueryDict) interface. DjBurger use `djburger.parsers.Default` as default parser. See list of built-in parsers into [parsers API](parsers.html).
 
 ```python
-p=djburger.p.JSON()
+parser=djburger.parsers.JSON()
 ```
 
 
@@ -84,11 +82,11 @@ Validators get data and validate it. They have Django Forms-like interface. See 
 ```python
 from django import forms
 
-class Validator(djburger.v.b.Form):
+class Validator(djburger.validators.bases.Form):
     name = forms.CharField(max_length=20)
 
 ...
-prev=Validator
+prevalidator=Validator
 ...
 ```
 
@@ -101,7 +99,7 @@ class DjangoValidator(forms.Form):
     name = forms.CharField(max_length=20)
 
 ...
-prev=djburger.v.w.Form(DjangoValidator)
+prevalidator=djburger.validators.wrappers.Form(DjangoValidator)
 ...
 ```
 
@@ -109,15 +107,15 @@ And [constructors](validators.html#module-djburger.validators.constructors) for 
 
 
 ```python
-prev=djburger.v.c.IsDict
+prevalidator=djburger.validators.constructors.IsDict
 ```
 
 
 How to choose validator type:
 
-1. `djburger.v.c` -- for one-line simple validation.
-1. `djburger.v.w` -- for using validators which also used into non-DjBurger components.
-1. `djburger.v.b` -- for any other cases.
+1. `djburger.validators.constructors` -- for one-line simple validation.
+1. `djburger.validators.wrappers` -- for using validators which also used into non-DjBurger components.
+1. `djburger.validators.bases` -- for any other cases.
 
 
 ## Controllers
@@ -129,14 +127,14 @@ def echo_controller(request, data, **kwargs):
     return data
 
 ...
-c=echo_controller
+controller=echo_controller
 ...
 ```
 
 Additionally DjBurger have [built-in controllers](controllers.html) for simple cases.
 
 ```python
-c=djburger.c.Info(model=User)
+controller=djburger.controllers.Info(model=User)
 ```
 
 
@@ -145,52 +143,52 @@ c=djburger.c.Info(model=User)
 Renderer get errors or cleaned data from validator and return [HttpResponse](https://docs.djangoproject.com/en/2.0/ref/request-response/#httpresponse-objects) or any other view result.
 
 ```python
-postr=djburger.r.JSON()
+postrenderer=djburger.renderers.JSON()
 ```
 
 
 ## Exceptions
 
-Raise `djburger.e.StatusCodeError` from validator if you want stop validation and return `errors`.
+Raise `djburger.exceptions.StatusCodeError` from validator if you want stop validation and return `errors`.
 
 ```python
 from django import forms
 
-class Validator(djburger.v.b.Form):
+class Validator(djburger.validators.bases.Form):
     name = forms.CharField(max_length=20)
 
     def clean_name(self):
         name = self.cleaned_data['name']
         if name == 'admin':
             self.errors = {'__all__': ['User not found']}
-            raise djburger.e.StatusCodeError(404, 'User not found')
+            raise djburger.exceptions.StatusCodeError(404)
         return name
 
 ...
-prev=Validator
+prevalidator=Validator
 ...
 ```
 
 
 ## SubControllers
 
-If you need to validate data in controller, better use `djburger.c.subcontroller`:
+If you need to validate data in controller, better use `djburger.controllers.subcontroller`:
 
 ```python
 def get_name_controller(request, data, **kwargs):
     return data['name']
 
 def echo_controller(request, data, **kwargs):
-    subc = djburger.c.subcontroller(
-        prev=djburger.c.IsDict,
-        c=get_name_controller,
-        postv=djburger.c.IsStr,
+    subc = djburger.controllers.subcontroller(
+        prevalidator=djburger.controllers.IsDict,
+        controller=get_name_controller,
+        postvalidator=djburger.controllers.IsStr,
     )
     return subc(request, data, **kwargs)
 
 ...
-c=echo_controller
+controller=echo_controller
 ...
 ```
 
-If data passed to subcontroller is invalid then `djburger.e.SubValidationError` will be immediately raised. View catch error and pass error to `postr`.
+If data passed to subcontroller is invalid then `djburger.exceptions.SubValidationError` will be immediately raised. View catch error and pass error to `postrenderer`.

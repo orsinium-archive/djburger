@@ -20,7 +20,9 @@ else:
 __all__ = ['rule', 'ViewBase']
 
 
-_fields = ['d', 'p', 'prev', 'c', 'postv', 'prer', 'postr', 'r']
+_fields = ('decorators', 'parser', 'prevalidator', 'prerenderer', 'controller',
+           'postvalidator', 'postrenderer', 'renderer')
+_aliases = ('d', 'p', 'prev', 'prer', 'c', 'postv', 'postr', 'r')
 _Rule = namedtuple('Rule', _fields)
 
 
@@ -39,55 +41,65 @@ def rule(**kwargs):
 
     Example::
         >>> rule(
-        ...     d=[login_required, csrf_exempt],    # decorators
-        ...     prev=SomeDjangoForm,    # pre-validator
-        ...     c=some_controller,      # controller
-        ...     postv=None,             # post-validator
+        ...     decorators=[login_required, csrf_exempt],
+        ...     prevalidator=SomeDjangoForm,
+        ...     prerenderer='postrenderer',
+        ...     # ^ here `prerenderer` point to `postrenderer`
+        ...     controller=some_controller,
+        ...     postvalidator=None,
         ...     # ^ here post-validator is missed
-        ...     prer='postr',           # renderer for pre-validator errors
-        ...     # ^ here `prer` point to `postr`
-        ...     postr='r',              # renderer for post-validator errors
-        ...     r=djburger.r.JSON(),    # renderer
+        ...     postrenderer='renderer',
+        ...     renderer=djburger.renderers.JSON(),
         ... )
 
-    :param list d: list of decorators.
-    :param callable p: parser. Parse request body. `djburger.p.Default` by default.
-    :param djburger.v.b.IValidator prev: Validate and clean user params.
-    :param callable prer: renderer for pre-validation errors.
-    :param callable c: controller.
-    :param djburger.v.b.IValidator postv: post-validator. Validate and clean response.
-    :param callable postr: renderer for post-validation errors.
-    :param callable r: renderer for successfull response.
+    :param list decorators: list of decorators.
+    :param callable parser: parse request body. `djburger.parsers.Default` by default.
+    :param djburger.validators.bases.IValidator prevalidator: validate and clean user params.
+    :param callable prerenderer: renderer for pre-validation errors.
+    :param callable controller:
+    :param djburger.validators.bases.IValidator postvalidator: validate and clean response.
+    :param callable postrenderer: renderer for post-validation errors.
+    :param callable renderer: renderer for successfull response.
 
     :return: rule.
     :rtype: djburger._Rule
 
     :raises TypeError: if missed `c` or `r`.
     """
+    # aliases support
+    for field, alias in zip(_fields, _aliases):
+        if alias in kwargs:
+            kwargs[field] = kwargs[alias]
+
     # check required kwargs
-    if 'c' not in kwargs:
+    if 'controller' not in kwargs:
         TypeError('Controller is required')
-    if 'r' not in kwargs:
+    if 'renderer' not in kwargs:
         TypeError('Renderer is required')
     # set default parser
-    if 'p' not in kwargs:
-        kwargs['p'] = _DefaultParser()
+    if 'parser' not in kwargs:
+        kwargs['parser'] = _DefaultParser()
     # set 'r' as default for error-renderers
-    for f in ('prer', 'postr'):
-        if f not in kwargs:
-            kwargs[f] = 'r'
+    for field in ('prerenderer', 'postrenderer'):
+        if field not in kwargs:
+            kwargs[field] = 'renderer'
     # set None as default for others
-    for f in ('d', 'prev', 'postv'):
-        if f not in kwargs:
-            kwargs[f] = None
+    for field in ('decorators', 'prevalidator', 'postvalidator'):
+        if field not in kwargs:
+            kwargs[field] = None
 
+    # crosslinks support
     for k, v in kwargs.items():
         kwargs[k] = _get_value(v, kwargs)
+
+    # drop aliases and junk
+    kwargs = {field: kwargs[field] for field in _fields}
+    # make namedtuple
     return _Rule(**kwargs)
 
 
 class ViewBase(View):
-    """Base views for DjBurger usage
+    """Base views for DjBurger usage.
 
     :param django.http.request.HttpRequest request: user request object.
     :param \**kwargs: kwargs from urls.py.
@@ -135,8 +147,8 @@ class ViewBase(View):
 
         # decorators
         base = self.validate_request
-        if self.rule.d:
-            for decorator in self.rule.d:
+        if self.rule.decorators:
+            for decorator in self.rule.decorators:
                 base = decorator(base)
 
         return base(request, **kwargs)
@@ -148,7 +160,7 @@ class ViewBase(View):
 
         :return: parsed data.
         """
-        return self.rule.p(request)
+        return self.rule.parser(request)
 
     # pre-validator
     def validate_request(self, request, **kwargs):
@@ -166,11 +178,11 @@ class ViewBase(View):
         data = self.get_data(request)
 
         # no validator
-        if not self.rule.prev:
+        if not self.rule.prevalidator:
             return self.request_valid(data, **kwargs)
 
         # validate
-        validator = self.rule.prev(**self.get_validator_kwargs(data))
+        validator = self.rule.prevalidator(**self.get_validator_kwargs(data))
         try:
             is_valid = validator.is_valid()
         except StatusCodeError as e:
@@ -187,13 +199,13 @@ class ViewBase(View):
     def request_invalid(self, validator, status_code):
         """Return result of prer (renderer for pre-validator errors)
 
-        :param djburger.v.b.IValidator validator: validator object with `errors` attr.
+        :param djburger.validators.bases.IValidator validator: validator object with `errors` attr.
         :param int status_code: status code for HTTP-response.
 
         :return: django response.
         :rtype: django.http.HttpResponse
         """
-        return self.rule.prer(
+        return self.rule.prerenderer(
             request=self.request,
             validator=validator,
             status_code=status_code,
@@ -214,7 +226,7 @@ class ViewBase(View):
         """
         # get response from controller
         try:
-            response = self.rule.c(self.request, data, **kwargs)
+            response = self.rule.controller(self.request, data, **kwargs)
         except SubValidationError as e:
             validator = e.args[0]
             return self.subvalidation_invalid(validator)
@@ -235,12 +247,12 @@ class ViewBase(View):
         :rtype: django.http.HttpResponse
         """
         # no post-validator
-        if not self.rule.postv:
+        if not self.rule.postvalidator:
             return self.make_response(data=response)
 
         # post-validation
         params = self.get_validator_kwargs(response)
-        validator = self.rule.postv(**params)
+        validator = self.rule.postvalidator(**params)
         try:
             is_valid = validator.is_valid()
         except StatusCodeError as e:
@@ -257,7 +269,7 @@ class ViewBase(View):
     def subvalidation_invalid(self, validator, status_code=200):
         """Return result of postr (renderer for post-validation errors).
 
-        :param djburger.v.b.IValidator validator: validator object with `errors` attr.
+        :param djburger.validators.bases.IValidator validator: validator object with `errors` attr.
         :param int status_code: status code for HTTP-response.
 
         :return: django response.
@@ -269,13 +281,13 @@ class ViewBase(View):
     def response_invalid(self, validator, status_code):
         """Return result of postr (renderer for post-validation errors).
 
-        :param djburger.v.b.IValidator validator: validator object with `errors` attr.
+        :param djburger.validators.bases.IValidator validator: validator object with `errors` attr.
         :param int status_code: status code for HTTP-response.
 
         :return: django response.
         :rtype: django.http.HttpResponse
         """
-        return self.rule.postr(
+        return self.rule.postrenderer(
             request=self.request,
             validator=validator,
             status_code=status_code,
@@ -286,7 +298,7 @@ class ViewBase(View):
         """Return result of make_response.
         This method calls only if postv is not None.
 
-        :param djburger.v.b.IValidator validator: validator object with `cleaned_data` attr.
+        :param djburger.validators.bases.IValidator validator: validator object with `cleaned_data` attr.
 
         :return: django response.
         :rtype: django.http.HttpResponse
@@ -301,7 +313,7 @@ class ViewBase(View):
         :return: django response.
         :rtype: django.http.HttpResponse
         """
-        return self.rule.r(request=self.request, data=data)
+        return self.rule.renderer(request=self.request, data=data)
 
     # send request and data into validator
     def get_validator_kwargs(self, data):

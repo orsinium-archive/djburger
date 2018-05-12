@@ -26,6 +26,7 @@ DjBurger doesn't depend on Django. You can use it in any projects if you want.
     usage
     examples
     interfaces
+    aliases
     external
 
 .. toctree::
@@ -37,3 +38,4 @@ DjBurger doesn't depend on Django. You can use it in any projects if you want.
     validators
     controllers
     renderers
+

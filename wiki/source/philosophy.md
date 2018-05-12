@@ -11,18 +11,18 @@
 
 ## Dataflow
 
-1. **Decorators** (`d`). Feel free to use any side Django decorators like `csrf_exempt`.
-2. **Parser** (`p`). Parse request body.
-3. **PreValidator** (`prev`). Validate and clear request.
-4. **PreRenderer** (`prer`). Render and return PreValidation errors.
-5. **Controller** (`c`). Main logic: do some things.
-6. **PostValidator** (`postv`). Validate and clear response.
-7. **PostRenderer** (`postr`). Render and return PostValidation errors.
-8. **Renderer** (`r`). Render successful response.
+1. **Decorators**. Feel free to use any side Django decorators like `csrf_exempt`.
+2. **Parser**. Parse request body.
+3. **PreValidator**. Validate and clear request.
+4. **PreRenderer**. Render and return PreValidation errors response.
+5. **Controller**. Main logic: do some things.
+6. **PostValidator**. Validate and clear response.
+7. **PostRenderer**. Render and return PostValidation errors response.
+8. **Renderer**. Render successful response.
 
 ![Scheme](imgs/scheme.png)
 
-Required only Controller and Renderer.
+Required only controller and renderer.
 
 
 ## Related conceptions
@@ -43,8 +43,8 @@ Required only Controller and Renderer.
 ## Solved problems
 
 1. [Mixins chaos and wrong usage](https://reactjs.org/blog/2016/07/13/mixins-considered-harmful.html). Mixins is good but dangerous conception. Use it carefully.
-1. You can decorate Django view in so many places: urls, view, dispatch method, get/post method, form_valid mrthod etc. DjhBurger have [special place for all decorators](usage.html#decorators)
-1. Validation and main logic mixing. In bad code you can validate and apply some data in one loop, and if you found and return validation error operation will be applied partially. Example:
+1. You can decorate Django view in so many places: urls, view, dispatch method, get/post method, form_valid method etc. DjBurger has [special place for all decorators](usage.html#decorators).
+1. Validation and main logic mixing. In bad code you can validate and apply some data in one loop, and if you found and return validation error then operation will be applied partially. Example:
   ```python
   for user in users:
       if user.is_anonymous():

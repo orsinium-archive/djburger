@@ -17,7 +17,7 @@ class DjangoParsersTest(unittest.TestCase):
                 'themes': ['1', '2', '4'],
             }
             request = factory.get('/some/url/', data)
-            p = djburger.p.Default()
+            p = djburger.parsers.Default()
             parsed_data = p(request)
             self.assertEqual(parsed_data, data)
 
@@ -34,7 +34,7 @@ class DjangoParsersTest(unittest.TestCase):
                 data=json.dumps(data),
                 content_type='application/json',
             )
-            p = djburger.p.JSON()
+            p = djburger.parsers.JSON()
             parsed_data = p(request)
             self.assertEqual(parsed_data, data)
 
@@ -51,6 +51,6 @@ class DjangoParsersTest(unittest.TestCase):
                 data=bson.dumps(data),
                 content_type='application/json',
             )
-            p = djburger.p.BSON()
+            p = djburger.parsers.BSON()
             parsed_data = p(request)
             self.assertEqual(parsed_data, data)
