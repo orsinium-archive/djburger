@@ -25,7 +25,7 @@ class DjangoOtherValidatorsTest(unittest.TestCase):
 
     def test_pyschemes(self):
         with self.subTest(src_text='pyschemes'):
-            v = djburger.v.c.PySchemes(
+            v = djburger.validators.c.PySchemes(
                 {'name': str, 'id': int},
                 policy='drop'
             )
@@ -34,26 +34,26 @@ class DjangoOtherValidatorsTest(unittest.TestCase):
 
     def test_marshmallow(self):
         with self.subTest(src_text='marshmallow base'):
-            class Base(djburger.v.b.Marshmallow):
+            class Base(djburger.validators.b.Marshmallow):
                 name = marshmallow.fields.Str()
             v = Base(request=None, data=self.obj)
             self.assertTrue(v.is_valid())
         with self.subTest(src_text='marshmallow wrapper'):
             class Base(marshmallow.Schema):
                 name = marshmallow.fields.Str()
-            Wrapped = djburger.v.w.Marshmallow(Base) # noQA
+            Wrapped = djburger.validators.w.Marshmallow(Base) # noQA
             v = Wrapped(request=None, data=self.obj)
             self.assertTrue(v.is_valid())
 
     def test_rest(self):
         with self.subTest(src_text='rest framework base'):
-            class Base(djburger.v.b.RESTFramework):
+            class Base(djburger.validators.b.RESTFramework):
                 name = rest_framework.serializers.CharField(max_length=20)
             v = Base(request=None, data=self.obj)
             self.assertTrue(v.is_valid())
         with self.subTest(src_text='rest framework wrapper'):
             class Base(rest_framework.serializers.Serializer):
                 name = rest_framework.serializers.CharField(max_length=20)
-            Wrapped = djburger.v.w.RESTFramework(Base) # noQA
+            Wrapped = djburger.validators.w.RESTFramework(Base) # noQA
             v = Wrapped(request=None, data=self.obj)
             self.assertTrue(v.is_valid())

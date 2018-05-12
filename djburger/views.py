@@ -49,15 +49,15 @@ def rule(**kwargs):
         ...     postvalidator=None,
         ...     # ^ here post-validator is missed
         ...     postrenderer='renderer',
-        ...     renderer=djburger.r.JSON(),
+        ...     renderer=djburger.renderers.JSON(),
         ... )
 
     :param list decorators: list of decorators.
     :param callable parser: parse request body. `djburger.p.Default` by default.
-    :param djburger.v.b.IValidator prevalidator: validate and clean user params.
+    :param djburger.validators.b.IValidator prevalidator: validate and clean user params.
     :param callable prerenderer: renderer for pre-validation errors.
     :param callable controller:
-    :param djburger.v.b.IValidator postvalidator: validate and clean response.
+    :param djburger.validators.b.IValidator postvalidator: validate and clean response.
     :param callable postrenderer: renderer for post-validation errors.
     :param callable renderer: renderer for successfull response.
 
@@ -199,7 +199,7 @@ class ViewBase(View):
     def request_invalid(self, validator, status_code):
         """Return result of prer (renderer for pre-validator errors)
 
-        :param djburger.v.b.IValidator validator: validator object with `errors` attr.
+        :param djburger.validators.b.IValidator validator: validator object with `errors` attr.
         :param int status_code: status code for HTTP-response.
 
         :return: django response.
@@ -269,7 +269,7 @@ class ViewBase(View):
     def subvalidation_invalid(self, validator, status_code=200):
         """Return result of postr (renderer for post-validation errors).
 
-        :param djburger.v.b.IValidator validator: validator object with `errors` attr.
+        :param djburger.validators.b.IValidator validator: validator object with `errors` attr.
         :param int status_code: status code for HTTP-response.
 
         :return: django response.
@@ -281,7 +281,7 @@ class ViewBase(View):
     def response_invalid(self, validator, status_code):
         """Return result of postr (renderer for post-validation errors).
 
-        :param djburger.v.b.IValidator validator: validator object with `errors` attr.
+        :param djburger.validators.b.IValidator validator: validator object with `errors` attr.
         :param int status_code: status code for HTTP-response.
 
         :return: django response.
@@ -298,7 +298,7 @@ class ViewBase(View):
         """Return result of make_response.
         This method calls only if postv is not None.
 
-        :param djburger.v.b.IValidator validator: validator object with `cleaned_data` attr.
+        :param djburger.validators.b.IValidator validator: validator object with `cleaned_data` attr.
 
         :return: django response.
         :rtype: django.http.HttpResponse

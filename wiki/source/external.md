@@ -2,18 +2,18 @@
 
 * [BSON](https://github.com/py-bson/bson)
     * `djburger.p.BSON`
-    * `djburger.r.BSON`
+    * `djburger.renderers.BSON`
 * [Django REST Framework](django-rest-framework.org)
-    * `djburger.v.b.RESTFramework`
-    * `djburger.v.w.RESTFramework`
-    * `djburger.r.RESTFramework`
+    * `djburger.validators.b.RESTFramework`
+    * `djburger.validators.w.RESTFramework`
+    * `djburger.renderers.RESTFramework`
 * [Marshmallow](https://github.com/marshmallow-code/marshmallow)
-    * `djburger.v.b.Marshmallow`
-    * `djburger.v.w.Marshmallow`
+    * `djburger.validators.b.Marshmallow`
+    * `djburger.validators.w.Marshmallow`
 * [PySchemes](https://github.com/shivylp/pyschemes)
-    * `djburger.v.c.PySchemes`
-    * `djburger.v.w.PySchemes`
+    * `djburger.validators.c.PySchemes`
+    * `djburger.validators.w.PySchemes`
 * [PyYAML](https://github.com/yaml/pyyaml)
-    * `djburger.r.YAML`
+    * `djburger.renderers.YAML`
 * [Tablib](https://github.com/kennethreitz/tablib)
-    * `djburger.r.Tablib`
+    * `djburger.renderers.Tablib`

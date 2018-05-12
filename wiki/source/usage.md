@@ -8,9 +8,9 @@ DjBurger modules:
 
 + `djburger.p`. Parsers. Can be used as `p`.
 + `djburger.v`. Validators. Can be used as `prev` and `postv`.
-  + `djburger.v.b`. Validators that can be used as **base** class for your own validators.
-  + `djburger.v.c`. Validators that can be used as **constructors** for simple validators.
-  + `djburger.v.w`. Validators that can be used as **wrappers** for external validators.
+  + `djburger.validators.b`. Validators that can be used as **base** class for your own validators.
+  + `djburger.validators.c`. Validators that can be used as **constructors** for simple validators.
+  + `djburger.validators.w`. Validators that can be used as **wrappers** for external validators.
 + `djburger.c`. Controllers. Can be used as `c`.
 + `djburger.r`. Renderers. Can be used as `prer`, `postr` and `r`.
 + `djburger.e`. Exceptions.
@@ -42,9 +42,9 @@ class ExampleView(djburger.ViewBase):
     rules = {
         'get': djburger.rule(
             controller=lambda request, data, **kwargs: 'Hello, World!',
-            postvalidator=djburger.v.c.IsStr,
-            postrenderer=djburger.r.Exception(),
-            renderer=djburger.r.Template(template_name='index.html'),
+            postvalidator=djburger.validators.c.IsStr,
+            postrenderer=djburger.renderers.Exception(),
+            renderer=djburger.renderers.Template(template_name='index.html'),
         ),
     }
 ```
@@ -84,7 +84,7 @@ Validators get data and validate it. They have Django Forms-like interface. See 
 ```python
 from django import forms
 
-class Validator(djburger.v.b.Form):
+class Validator(djburger.validators.b.Form):
     name = forms.CharField(max_length=20)
 
 ...
@@ -101,7 +101,7 @@ class DjangoValidator(forms.Form):
     name = forms.CharField(max_length=20)
 
 ...
-prev=djburger.v.w.Form(DjangoValidator)
+prev=djburger.validators.w.Form(DjangoValidator)
 ...
 ```
 
@@ -109,15 +109,15 @@ And [constructors](validators.html#module-djburger.validators.constructors) for 
 
 
 ```python
-prev=djburger.v.c.IsDict
+prev=djburger.validators.c.IsDict
 ```
 
 
 How to choose validator type:
 
-1. `djburger.v.c` -- for one-line simple validation.
-1. `djburger.v.w` -- for using validators which also used into non-DjBurger components.
-1. `djburger.v.b` -- for any other cases.
+1. `djburger.validators.c` -- for one-line simple validation.
+1. `djburger.validators.w` -- for using validators which also used into non-DjBurger components.
+1. `djburger.validators.b` -- for any other cases.
 
 
 ## Controllers
@@ -136,7 +136,7 @@ c=echo_controller
 Additionally DjBurger have [built-in controllers](controllers.html) for simple cases.
 
 ```python
-c=djburger.c.Info(model=User)
+c=djburger.controllers.Info(model=User)
 ```
 
 
@@ -145,25 +145,25 @@ c=djburger.c.Info(model=User)
 Renderer get errors or cleaned data from validator and return [HttpResponse](https://docs.djangoproject.com/en/2.0/ref/request-response/#httpresponse-objects) or any other view result.
 
 ```python
-postr=djburger.r.JSON()
+postr=djburger.renderers.JSON()
 ```
 
 
 ## Exceptions
 
-Raise `djburger.e.StatusCodeError` from validator if you want stop validation and return `errors`.
+Raise `djburger.exceptions.StatusCodeError` from validator if you want stop validation and return `errors`.
 
 ```python
 from django import forms
 
-class Validator(djburger.v.b.Form):
+class Validator(djburger.validators.b.Form):
     name = forms.CharField(max_length=20)
 
     def clean_name(self):
         name = self.cleaned_data['name']
         if name == 'admin':
             self.errors = {'__all__': ['User not found']}
-            raise djburger.e.StatusCodeError(404, 'User not found')
+            raise djburger.exceptions.StatusCodeError(404, 'User not found')
         return name
 
 ...
@@ -174,17 +174,17 @@ prev=Validator
 
 ## SubControllers
 
-If you need to validate data in controller, better use `djburger.c.subcontroller`:
+If you need to validate data in controller, better use `djburger.controllers.subcontroller`:
 
 ```python
 def get_name_controller(request, data, **kwargs):
     return data['name']
 
 def echo_controller(request, data, **kwargs):
-    subc = djburger.c.subcontroller(
-        prevalidator=djburger.c.IsDict,
+    subc = djburger.controllers.subcontroller(
+        prevalidator=djburger.controllers.IsDict,
         controller=get_name_controller,
-        postvalidator=djburger.c.IsStr,
+        postvalidator=djburger.controllers.IsStr,
     )
     return subc(request, data, **kwargs)
 
@@ -193,4 +193,4 @@ c=echo_controller
 ...
 ```
 
-If data passed to subcontroller is invalid then `djburger.e.SubValidationError` will be immediately raised. View catch error and pass error to `postr`.
+If data passed to subcontroller is invalid then `djburger.exceptions.SubValidationError` will be immediately raised. View catch error and pass error to `postr`.

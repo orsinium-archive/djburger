@@ -14,8 +14,8 @@ class AuthAPIView(djburger.ViewBase):
     default_rule = djburger.rule(
         prevalidator=AuthenticationForm,
         controller=controllers.UserController.auth,
-        postvalidator=djburger.v.c.IsBool,
-        renderer=djburger.r.JSON(),
+        postvalidator=djburger.validators.c.IsBool,
+        renderer=djburger.renderers.JSON(),
     )
 
 
@@ -24,14 +24,14 @@ class GroupCommonAPIView(djburger.ViewBase):
     rules = {
         'get': djburger.rule(
             controller=controllers.GroupController.list,
-            postvalidator=djburger.v.c.QuerySet,
-            renderer=djburger.r.JSON(),
+            postvalidator=djburger.validators.c.QuerySet,
+            renderer=djburger.renderers.JSON(),
         ),
         'post': djburger.rule(
             prevalidator=validators.GroupInputValidator,
             controller=controllers.GroupController.add,
-            postvalidator=djburger.v.c.ModelInstance,
-            renderer=djburger.r.JSON(),
+            postvalidator=djburger.validators.c.ModelInstance,
+            renderer=djburger.renderers.JSON(),
         ),
         'put': 'post',
     }
@@ -42,19 +42,19 @@ class GroupActionsAPIView(djburger.ViewBase):
     rules = {
         'get': djburger.rule(
             controller=controllers.GroupController.info,
-            postvalidator=djburger.v.c.ModelInstance,
-            renderer=djburger.r.JSON(),
+            postvalidator=djburger.validators.c.ModelInstance,
+            renderer=djburger.renderers.JSON(),
         ),
         'patch': djburger.rule(
             prevalidator=validators.GroupInputValidator,
             controller=controllers.GroupController.edit,
-            postvalidator=djburger.v.c.ModelInstance,
-            renderer=djburger.r.JSON(),
+            postvalidator=djburger.validators.c.ModelInstance,
+            renderer=djburger.renderers.JSON(),
         ),
         'post': 'patch',
         'delete': djburger.rule(
             controller=controllers.GroupController.delete,
-            postvalidator=djburger.v.c.IsInt,
-            renderer=djburger.r.JSON(),
+            postvalidator=djburger.validators.c.IsInt,
+            renderer=djburger.renderers.JSON(),
         ),
     }

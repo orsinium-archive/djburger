@@ -105,7 +105,7 @@ class Base(object):
 class BaseWithHTTP(Base):
     """Base class wrapped by HttpResponse
 
-    :param \**kwargs: all kwargs of djburger.r.Base.
+    :param \**kwargs: all kwargs of djburger.renderers.Base.
     """
 
     def set_http_kwargs(self, **kwargs):

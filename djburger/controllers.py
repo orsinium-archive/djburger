@@ -207,10 +207,10 @@ class ViewAsController(object):
 class pre(object): # noQA
     """Decorator for input data validation before subcontroller calling
 
-    :param djburger.v.b.IValidator validator: validator for pre-validation.
+    :param djburger.validators.b.IValidator validator: validator for pre-validation.
     :param \**kwargs: kwargs for validator.
 
-    :raises djburger.e.SubValidationError: if pre-validation not passed
+    :raises djburger.exceptions.SubValidationError: if pre-validation not passed
     """
     def __init__(self, validator, **kwargs):
         self.validator = validator
@@ -238,10 +238,10 @@ class pre(object): # noQA
 class post(pre): # noQA
     """Decorator for output data validation before subcontroller calling
 
-    :param djburger.v.b.IValidator validator: validator for post-validation.
+    :param djburger.validators.b.IValidator validator: validator for post-validation.
     :param \**kwargs: kwargs for validator.
 
-    :raises djburger.e.SubValidationError: if post-validation not passed
+    :raises djburger.exceptions.SubValidationError: if post-validation not passed
     """
     def _wrapper(self, data, request=None, **kwargs):
         result = self.controller(
@@ -263,11 +263,11 @@ def subcontroller(controller, prevalidator=None, postvalidator=None):
     """Constructor for subcontrollers
     If any validation failed, immediately raise SubValidationError.
 
-    :param djburger.v.b.IValidator prevalidator:
+    :param djburger.validators.b.IValidator prevalidator:
     :param callable controller:
-    :param djburger.v.b.IValidator postvalidator:
+    :param djburger.validators.b.IValidator postvalidator:
 
-    :raises djburger.e.SubValidationError: if any validation not passed
+    :raises djburger.exceptions.SubValidationError: if any validation not passed
     """
     if prevalidator:
         controller = pre(prevalidator)(controller)
