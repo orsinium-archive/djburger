@@ -43,8 +43,8 @@ Required only controller and renderer.
 ## Solved problems
 
 1. [Mixins chaos and wrong usage](https://reactjs.org/blog/2016/07/13/mixins-considered-harmful.html). Mixins is good but dangerous conception. Use it carefully.
-1. You can decorate Django view in so many places: urls, view, dispatch method, get/post method, form_valid mrthod etc. DjhBurger have [special place for all decorators](usage.html#decorators)
-1. Validation and main logic mixing. In bad code you can validate and apply some data in one loop, and if you found and return validation error operation will be applied partially. Example:
+1. You can decorate Django view in so many places: urls, view, dispatch method, get/post method, form_valid method etc. DjBurger has [special place for all decorators](usage.html#decorators).
+1. Validation and main logic mixing. In bad code you can validate and apply some data in one loop, and if you found and return validation error then operation will be applied partially. Example:
   ```python
   for user in users:
       if user.is_anonymous():
