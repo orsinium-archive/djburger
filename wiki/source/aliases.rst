@@ -2,7 +2,7 @@ Short names
 ===========
 
 DjBurger provide some short aliases. Please, do not use it into big and
-Open Source packages. Only for personal packages.
+Open Source packages. Use it only for personal projects.
 
 Rule
 ----
