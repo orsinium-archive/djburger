@@ -232,8 +232,7 @@ class RESTFramework(BaseWithHTTP):
             renderer=renderer.render,
             content_name='data',
             flat=flat,
-            **kwargs
-        )
+            **kwargs)
 
 
 class YAML(BaseWithHTTP):
@@ -251,8 +250,7 @@ class YAML(BaseWithHTTP):
             renderer=_yaml.dump,
             content_name='data',
             flat=flat,
-            **kwargs
-        )
+            **kwargs)
 
 
 class BSON(BaseWithHTTP):
@@ -270,8 +268,7 @@ class BSON(BaseWithHTTP):
             renderer=_bson.dumps,
             content_name='obj',
             flat=flat,
-            **kwargs
-        )
+            **kwargs)
 
 
 class Tablib(BaseWithHTTP):
@@ -294,8 +291,7 @@ class Tablib(BaseWithHTTP):
             renderer=self.render,
             content_name='data',
             flat=True,
-            **kwargs
-        )
+            **kwargs)
 
     def render(self, data):
         dataset = _Tablib(*data, headers=self.headers)

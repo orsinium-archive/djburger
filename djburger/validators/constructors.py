@@ -151,8 +151,7 @@ class _DictMixed(IValidator):
         if policy not in ('error', 'except', 'ignore', 'drop'):
             raise KeyError(
                 'Bad policy value.'
-                'Allowed "error", "except", "ignore" or "drop".'
-            )
+                'Allowed "error", "except", "ignore" or "drop".')
         self.policy = policy
 
     def __call__(self, data, **kwargs):

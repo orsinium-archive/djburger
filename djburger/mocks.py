@@ -36,8 +36,8 @@ class DjangoView(object):
     def as_view(self, **kwargs):
         raise ImportError(
             "Django is not installed yet. "
-            "Please, install Django or make your own as_view method for ViewBase."
-        )
+            "Please, install Django "
+            "or make your own as_view method for ViewBase.")
 
     def __call__(self, *args, **kwargs):
         return self.dispatch(*args, **kwargs)
