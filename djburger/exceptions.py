@@ -1,4 +1,5 @@
 
+# project
 from .utils import is_django_installed
 
 

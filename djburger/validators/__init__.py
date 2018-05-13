@@ -1,7 +1,6 @@
 
-from . import bases
-from . import constructors
-from . import wrappers
+# project
+from . import bases, constructors, wrappers
 
 
 b = bases

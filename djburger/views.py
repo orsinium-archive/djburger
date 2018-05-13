@@ -2,6 +2,7 @@
 
 # built-in
 from collections import namedtuple
+
 # project
 from .exceptions import StatusCodeError, SubValidationError
 from .parsers import Default as _DefaultParser

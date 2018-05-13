@@ -7,10 +7,12 @@ Use this classes for constructing your own validators.
 from collections import Iterator
 from functools import update_wrapper
 from itertools import repeat
+
 # project
+from ..utils import is_django_installed, safe_model_to_dict
 from .bases import IValidator
 from .wrappers import Form, ModelForm
-from djburger.utils import safe_model_to_dict, is_django_installed
+
 
 # Django
 if is_django_installed:

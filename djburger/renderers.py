@@ -1,5 +1,6 @@
 # built-in
 from functools import partial
+
 # project
 from .exceptions import ValidationError
 from .utils import is_django_installed

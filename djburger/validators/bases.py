@@ -5,10 +5,12 @@ Use this classes as base class for your own validators.
 
 # built-in
 import abc
+
 # external
 from six import with_metaclass
+
 # project
-from djburger.utils import safe_model_to_dict, is_django_installed, is_django_active
+from ..utils import is_django_active, is_django_installed, safe_model_to_dict
 
 
 __all__ = ['Form', 'IValidator', 'Marshmallow', 'ModelForm', 'RESTFramework']

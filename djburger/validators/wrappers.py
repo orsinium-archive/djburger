@@ -4,7 +4,7 @@ Use this classes as wrappers for non-djburger validators
 '''
 
 # project
-from djburger.utils import safe_model_to_dict
+from ..utils import safe_model_to_dict
 
 
 __all__ = ['Form', 'Marshmallow', 'ModelForm', 'PySchemes', 'RESTFramework']

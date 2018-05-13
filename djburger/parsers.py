@@ -2,6 +2,7 @@
 # built-in
 from functools import partial
 from json import loads as _json
+
 # project
 from .utils import is_django_installed
 

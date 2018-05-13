@@ -20,20 +20,18 @@ VERSION = __version__
 
 
 # built-in
-from functools import partial       # noQA
-
+from functools import partial  # noQA
 
 # project
-from . import controllers   # noQA
-from . import exceptions    # noQA
-from . import parsers       # noQA
-from . import renderers     # noQA
-from . import validators    # noQA
-
-from .views import rule, ViewBase    # noQA
-
-
+from . import controllers  # noQA
+from . import exceptions  # noQA
+from . import parsers  # noQA
+from . import renderers  # noQA
+from . import validators  # noQA
 from .utils import is_django_active  # noQA
+from .views import ViewBase, rule  # noQA
+
+
 # django
 if is_django_active:
     from django import forms
