@@ -16,7 +16,7 @@ setup(
     keywords='djburger framework django contracts pre post validation',
 
     packages=['djburger', 'djburger.validators'],
-    requires=['six'],
+    install_requires=['six'],
 
     url='https://github.com/orsinium/djburger',
     download_url='https://github.com/orsinium/djburger/tarball/master',

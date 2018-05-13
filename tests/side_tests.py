@@ -2,6 +2,7 @@
 from __main__ import unittest, djburger
 # external
 import marshmallow
+import wtforms
 from pyschemes import Scheme as PySchemes
 
 
@@ -12,6 +13,7 @@ class MarshmallowValidatorsTest(unittest.TestCase):
         class Base(djburger.validators.bases.Marshmallow):
             name = marshmallow.fields.Str()
             mail = marshmallow.fields.Email()
+
         with self.subTest(src_text='base pass'):
             data = {'name': 'John Doe', 'mail': 'test@gmail.com'}
             v = Base(request=None, data=data)
@@ -34,6 +36,24 @@ class MarshmallowValidatorsTest(unittest.TestCase):
         with self.subTest(src_text='base not pass'):
             data = {'name': 'John Doe', 'mail': 'test.gmail.com'}
             v = Wrapped(request=None, data=data)
+            self.assertFalse(v.is_valid())
+
+
+class WTFormsValidatorsTest(unittest.TestCase):
+
+    def test_base_validator(self):
+        # BASE
+        class Base(djburger.validators.bases.WTForms):
+            name = wtforms.StringField('Name', [wtforms.validators.DataRequired()])
+            mail = wtforms.StringField('E-Mail', [wtforms.validators.DataRequired(), wtforms.validators.Email()])
+
+        with self.subTest(src_text='base pass'):
+            data = {'name': 'John Doe', 'mail': 'test@gmail.com'}
+            v = Base(request=None, data=data)
+            self.assertTrue(v.is_valid())
+        with self.subTest(src_text='base not pass'):
+            data = {'name': 'John Doe', 'mail': 'test.gmail.com'}
+            v = Base(request=None, data=data)
             self.assertFalse(v.is_valid())
 
 

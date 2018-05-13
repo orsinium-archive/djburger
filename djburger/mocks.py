@@ -9,6 +9,11 @@ class MarshmallowBase(object):
         raise ImportError("Marshmallow is not installed yet")
 
 
+class WTFormsBase(object):
+    def __init__(self, **kwargs):
+        raise ImportError("WTForms is not installed yet")
+
+
 class RESTFrameworkBase(object):
     def __init__(self, **kwargs):
         raise ImportError("Django REST Framework is not installed yet")

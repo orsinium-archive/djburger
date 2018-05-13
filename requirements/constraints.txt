@@ -6,4 +6,5 @@ pyschemes
 PyYAML
 six
 tablib
+wtforms
 
