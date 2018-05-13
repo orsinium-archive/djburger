@@ -1,4 +1,5 @@
 bson
+cerberus
 marshmallow
 pyschemes
 PyYAML

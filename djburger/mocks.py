@@ -21,7 +21,12 @@ class RESTFrameworkBase(object):
 
 class PySchemes(object):
     def __init__(self, **kwargs):
-        raise ImportError("PySchemes not installed yet")
+        raise ImportError("PySchemes is not installed yet")
+
+
+class Cerberus(object):
+    def __init__(self, **kwargs):
+        raise ImportError("Cerberus is not installed yet")
 
 
 def model_to_dict(*args, **kwargs):

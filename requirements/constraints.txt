@@ -1,4 +1,5 @@
 bson
+cerberus
 django>=1.7
 djangorestframework>=3.5
 marshmallow

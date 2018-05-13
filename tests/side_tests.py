@@ -3,6 +3,7 @@ from __main__ import unittest, djburger
 # external
 import marshmallow
 import wtforms
+import cerberus
 from pyschemes import Scheme as PySchemes
 
 
@@ -74,7 +75,7 @@ class WTFormsValidatorsTest(unittest.TestCase):
 
 class PySchemesValidatorsTest(unittest.TestCase):
 
-    def test_base_validator(self):
+    def test_constructor_validator(self):
         # BASE
         with self.subTest(src_text='base pass'):
             v = djburger.validators.constructors.PySchemes([str, 2, int])
@@ -105,3 +106,21 @@ class PySchemesValidatorsTest(unittest.TestCase):
             v = v(request=None, data=3)
             v.is_valid()
             self.assertEqual(v.cleaned_data, 3)
+
+
+class CerberusValidatorsTest(unittest.TestCase):
+
+    def test_constructor_validator(self):
+        validator = djburger.validators.constructors.Cerberus({'name': {'type': 'string'}})
+        with self.subTest(src_text='base pass'):
+            v = validator(request=None, data={'name': 'Max'})
+            self.assertTrue(v.is_valid())
+        with self.subTest(src_text='base not pass'):
+            v = validator(request=None, data={'name': [1, 2, 3]})
+            self.assertFalse(v.is_valid())
+
+        validator = djburger.validators.constructors.Cerberus({'count': {'type': 'number'}})
+        with self.subTest(src_text='base int data'):
+            v = validator(request=None, data={'count': 3})
+            self.assertTrue(v.is_valid())
+            self.assertEqual(v.cleaned_data, {'count': 3})

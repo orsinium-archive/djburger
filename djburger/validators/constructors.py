@@ -33,9 +33,16 @@ except ImportError:
     from djburger.mocks import PySchemes as _PySchemesScheme
 
 
+# Cerberus
+try:
+    from cerberus import Validator as _CerberusValidator
+except ImportError:
+    from djburger.mocks import Cerberus as _CerberusValidator
+
+
 __all__ = [
     'Any', 'All',
-    'Chain',
+    'Cerberus', 'Chain',
     'Dict', 'DictForm', 'DictMixed', 'DictModelForm',
     'IsBool', 'IsDict', 'IsFloat', 'IsInt', 'IsIter', 'IsList', 'IsStr',
     'Lambda', 'List', 'ListForm', 'ListModelForm',
@@ -67,6 +74,26 @@ class _PySchemes(_PySchemesScheme):
             self.errors = {'__all__': list(e.args)}
             return False
         return True
+
+
+class Cerberus(_CerberusValidator):
+    """Validate data by Cerberus.
+
+    :param dict schema: validation scheme for Cerberus.
+    :param bool allow_unknown:
+    """
+
+    def __call__(self, request, data, **kwargs):
+        self.request = request
+        self.data = safe_model_to_dict(data)
+        return self
+
+    def is_valid(self):
+        return self.validate(self.data)
+
+    @property
+    def cleaned_data(self):
+        return self.document
 
 
 class _List(IValidator):
