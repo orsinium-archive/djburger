@@ -7,7 +7,10 @@ Use this classes as wrappers for non-djburger validators
 from ..utils import safe_model_to_dict
 
 
-__all__ = ['Form', 'Marshmallow', 'ModelForm', 'PySchemes', 'RESTFramework']
+__all__ = [
+    'Form', 'ModelForm',
+    'Marshmallow', 'PySchemes', 'RESTFramework', 'WTForms',
+]
 
 
 class _BaseWrapper(object):
@@ -63,6 +66,25 @@ class PySchemes(_BaseWrapper):
             self.errors = {'__all__': list(e.args)}
             return False
         return True
+
+
+class WTForms(_BaseWrapper):
+    """Wrapper for use WTForms form as validator.
+    """
+
+    def __call__(self, request, data, **kwargs):
+        data = safe_model_to_dict(data)
+        obj = self.validator(data=data, **kwargs)
+        obj.request = request
+        # bound methods to obj
+        obj.is_valid = obj.validate
+        obj.cleaned_data = self.cleaned_data.__get__(obj)
+        return obj
+
+    @staticmethod
+    @property
+    def cleaned_data(self):
+        return self.data
 
 
 class RESTFramework(_BaseWrapper):

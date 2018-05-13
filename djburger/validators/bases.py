@@ -135,7 +135,7 @@ class Marshmallow(_MarshmallowSchema):
 
 
 class WTForms(_WTForms):
-    """Validator based on marshmallow schema.
+    """Validator based on WTForms form.
     """
 
     def __init__(self, data, request=None, **kwargs):

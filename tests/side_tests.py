@@ -56,6 +56,21 @@ class WTFormsValidatorsTest(unittest.TestCase):
             v = Base(request=None, data=data)
             self.assertFalse(v.is_valid())
 
+    def test_wrapper_validator(self):
+        class Base(wtforms.Form):
+            name = wtforms.StringField('Name', [wtforms.validators.DataRequired()])
+            mail = wtforms.StringField('E-Mail', [wtforms.validators.DataRequired(), wtforms.validators.Email()])
+
+        Wrapped = djburger.validators.wrappers.WTForms(Base) # noQA
+        with self.subTest(src_text='base pass'):
+            data = {'name': 'John Doe', 'mail': 'test@gmail.com'}
+            v = Wrapped(request=None, data=data)
+            self.assertTrue(v.is_valid())
+        with self.subTest(src_text='base not pass'):
+            data = {'name': 'John Doe', 'mail': 'test.gmail.com'}
+            v = Wrapped(request=None, data=data)
+            self.assertFalse(v.is_valid())
+
 
 class PySchemesValidatorsTest(unittest.TestCase):
 
