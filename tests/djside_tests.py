@@ -3,7 +3,6 @@ from __main__ import unittest, djburger
 # external
 from django.contrib.auth.models import Group
 import marshmallow
-from pyschemes import Scheme as PySchemes
 import rest_framework
 
 
@@ -26,8 +25,7 @@ class DjangoOtherValidatorsTest(unittest.TestCase):
     def test_pyschemes(self):
         with self.subTest(src_text='pyschemes'):
             v = djburger.validators.constructors.PySchemes(
-                {'name': str, 'id': int},
-                policy='drop'
+                {'name': str, 'id': int, str: object},
             )
             v = v(request=None, data=self.obj)
             self.assertTrue(v.is_valid())

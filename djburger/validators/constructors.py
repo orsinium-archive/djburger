@@ -54,7 +54,7 @@ __all__ = [
 ]
 
 
-class _PySchemes(_PySchemesScheme):
+class PySchemes(_PySchemesScheme):
     """Validate data by PySchemes.
 
     :param scheme: validation scheme for pyschemes.
@@ -444,26 +444,6 @@ def DictMixed(validators, policy='error'): # noQA
     ])
 
 
-def PySchemes(scheme, policy='error'): # noQA
-    if scheme and type(scheme) is dict:
-        scheme = {k: PySchemes(v, policy) for k, v in scheme.items()}
-        return Chain(
-            Type((dict, _Model)),
-            _ModelInstance,  # convert models to dict if possible
-            _DictMixed(scheme, policy),
-        )
-    elif scheme and type(scheme) is list:
-        scheme = [PySchemes(v) for v in scheme]
-        return Chain(
-            Type((list, _QuerySet)),
-            _List(_ModelInstance),
-            # ^ convert querysets to list of dicts if possible
-            _List(*scheme),
-        )
-    else:
-        return _PySchemes(scheme)
-
-
 def ListForm(form): # noQA
     """Validate list elements by Django Forms
     """
@@ -495,4 +475,3 @@ All = Chain
 List = update_wrapper(List, _List)
 Dict = update_wrapper(Dict, _Dict)
 DictMixed = update_wrapper(DictMixed, _DictMixed)
-PySchemes = update_wrapper(PySchemes, _PySchemes)
