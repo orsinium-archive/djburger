@@ -1,5 +1,10 @@
+# built-in
 import copy
+
+# external
 import six
+
+# project
 from ..exceptions import MultiDictKeyError
 
 

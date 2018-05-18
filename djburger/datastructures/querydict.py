@@ -1,9 +1,13 @@
+# built-in
 import copy
 import re
+
+# external
+from six.moves.urllib.parse import quote, unquote, urlencode
+
+# project
 from ..exceptions import TooManyFieldsSent
 from .multidict import MultiDict
-
-from six.moves.urllib.parse import quote, unquote, urlencode
 
 
 FIELDS_MATCH = re.compile('[&;]')
