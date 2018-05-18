@@ -1,7 +1,5 @@
 from __main__ import djburger
 import cerberus
-import marshmallow
-import pyschemes
 import wtforms
 
 
@@ -30,16 +28,6 @@ class PreWTFormsWrapped(wtforms.Form):
     ])
 
 
-scheme = {
-    'name': str,
-    'mail': str,
-    'count': int,
-    str: object,
-}
-PrePySchemesConstructed = djburger.validators.constructors.PySchemes(scheme)
-PrePySchemesWrapped = djburger.validators.wrappers.PySchemes(pyschemes.Scheme(scheme))
-
-
 scheme = dict(
     name=dict(type='string', required=True),
     mail=dict(
@@ -57,7 +45,5 @@ PreCerberusConstructed = djburger.validators.constructors.Cerberus(scheme, purge
 prevalidators = [
     PreWTFormsBase,
     PreWTFormsWrapped,
-    PrePySchemesConstructed,
-    PrePySchemesWrapped,
     PreCerberusConstructed,
 ]

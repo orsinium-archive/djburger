@@ -1,5 +1,6 @@
 from __main__ import djburger
 import marshmallow
+import pyschemes
 
 
 class PostMarshmallowBase(djburger.validators.bases.Marshmallow):
@@ -15,7 +16,18 @@ class PostMarshmallowWrapped(marshmallow.Schema):
     count = marshmallow.fields.Int(required=True)
 
 
+scheme = {
+    'name': str,
+    'mail': str,
+    'count': int,
+}
+PostPySchemesConstructed = djburger.validators.constructors.PySchemes(scheme)
+PostPySchemesWrapped = djburger.validators.wrappers.PySchemes(pyschemes.Scheme(scheme))
+
+
 postvalidators = [
     PostMarshmallowBase,
     PostMarshmallowWrapped,
+    PostPySchemesConstructed,
+    PostPySchemesWrapped,
 ]
