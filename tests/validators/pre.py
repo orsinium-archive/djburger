@@ -39,11 +39,12 @@ scheme = dict(
     count=dict(type='integer', required=True, coerce=int),
 )
 PreCerberusConstructed = djburger.validators.constructors.Cerberus(scheme, purge_unknown=True)
-# CerberusWrapped = djburger.validators.wrappers.Cerberus(scheme)
+CerberusWrapped = djburger.validators.wrappers.Cerberus(cerberus.Validator(scheme, purge_unknown=True))
 
 
 prevalidators = [
     PreWTFormsBase,
     PreWTFormsWrapped,
     PreCerberusConstructed,
+    CerberusWrapped,
 ]

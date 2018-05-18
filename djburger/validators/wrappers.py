@@ -69,6 +69,22 @@ class PySchemes(_BaseWrapper):
         return True
 
 
+class Cerberus(_BaseWrapper):
+    """Wrapper for use Cerberus as validator.
+    """
+
+    def __call__(self, request, data, **kwargs):
+        self.request = request
+        self.data = data
+        return self
+
+    def is_valid(self):
+        result = self.validator.validate(self.data)
+        self.cleaned_data = self.validator.document
+        self.errors = self.validator.errors
+        return result
+
+
 class WTForms(_BaseWrapper):
     """Wrapper for use WTForms form as validator.
     """
@@ -111,7 +127,7 @@ class RESTFramework(_BaseWrapper):
         obj.is_valid = self.is_valid.__get__(obj)
         return obj
 
-    # method binded to wrapped walidator
+    # method binded to wrapped validator
     @staticmethod
     def is_valid(self):
         result = super(self.__class__, self).is_valid()
