@@ -15,7 +15,7 @@ class ValidatorsTest(unittest.TestCase):
         }
         for validator in validators:
             with self.subTest(validator=validator.__class__.__name__):
-                v = validator(request=None, data=data)
+                v = validator(request=True, data=data)
                 self.assertTrue(v.is_valid())
                 self.assertEqual(v.cleaned_data, data)
 
@@ -26,7 +26,7 @@ class ValidatorsTest(unittest.TestCase):
         }
         for validator in validators:
             with self.subTest(validator=validator.__class__.__name__):
-                v = validator(request=None, data=data)
+                v = validator(request=True, data=data)
                 self.assertFalse(v.is_valid())
                 self.assertTrue(v.errors)
 
@@ -38,7 +38,7 @@ class ValidatorsTest(unittest.TestCase):
         }
         for validator in validators:
             with self.subTest(validator=validator.__class__.__name__):
-                v = validator(request=None, data=data)
+                v = validator(request=True, data=data)
                 self.assertFalse(v.is_valid())
                 self.assertTrue(v.errors)
 
@@ -52,9 +52,9 @@ class PreValidatorsTest(unittest.TestCase):
         }
         for validator in prevalidators:
             with self.subTest(validator=validator.__class__.__name__):
-                v = validator(request=None, data=data)
-                self.assertFalse(v.is_valid())
-                self.assertTrue(v.errors)
+                v = validator(request=True, data=data)
+                self.assertTrue(v.is_valid())
+                self.assertFalse(v.errors)
 
     def test_explicit_keys(self):
         data = {
@@ -65,7 +65,7 @@ class PreValidatorsTest(unittest.TestCase):
         }
         for validator in prevalidators:
             with self.subTest(validator=validator.__class__.__name__):
-                v = validator(request=None, data=data)
+                v = validator(request=True, data=data)
                 self.assertTrue(v.is_valid())
                 self.assertFalse(v.errors)
                 # doesn't work for pyschemes:

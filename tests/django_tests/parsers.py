@@ -8,7 +8,7 @@ from django.test import RequestFactory
 
 class DjangoParsersTest(unittest.TestCase):
 
-    def test_default_parser(self):
+    def test_dict_parser(self):
         factory = RequestFactory()
         with self.subTest(src_text='mixed'):
             data = {
@@ -17,7 +17,7 @@ class DjangoParsersTest(unittest.TestCase):
                 'themes': ['1', '2', '4'],
             }
             request = factory.get('/some/url/', data)
-            p = djburger.parsers.Default()
+            p = djburger.parsers.DictMixed()
             parsed_data = p(request)
             self.assertEqual(parsed_data, data)
 

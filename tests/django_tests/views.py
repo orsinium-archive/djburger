@@ -11,6 +11,7 @@ class DjangoViewsTest(unittest.TestCase):
     def test_controller(self):
         class Base(djburger.ViewBase):
             default_rule = djburger.rule(
+                parser=djburger.parsers.DictMixed(),
                 controller=lambda request, data, **kwargs: data,
                 renderer=lambda data, **kwargs: data,
             )

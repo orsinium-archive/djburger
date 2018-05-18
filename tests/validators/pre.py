@@ -48,16 +48,15 @@ scheme = dict(
         # http://docs.python-cerberus.org/en/stable/validation-rules.html#regex
         regex=r'^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$',
     ),
-    count=dict(type='integer', required=True),
+    count=dict(type='integer', required=True, coerce=int),
 )
 PreCerberusConstructed = djburger.validators.constructors.Cerberus(scheme, purge_unknown=True)
 # CerberusWrapped = djburger.validators.wrappers.Cerberus(scheme)
 
 
 prevalidators = [
-    # https://github.com/wtforms/wtforms/issues/390
-    # PreWTFormsBase,
-    # PreWTFormsWrapped,
+    PreWTFormsBase,
+    PreWTFormsWrapped,
     PrePySchemesConstructed,
     PrePySchemesWrapped,
     PreCerberusConstructed,
