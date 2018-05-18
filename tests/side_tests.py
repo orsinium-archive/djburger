@@ -55,6 +55,8 @@ class PreValidatorsTest(unittest.TestCase):
                 v = validator(request=True, data=data)
                 self.assertTrue(v.is_valid())
                 self.assertFalse(v.errors)
+                self.assertIn('count', v.cleaned_data)
+                self.assertEqual(v.cleaned_data['count'], 10)
 
     def test_explicit_keys(self):
         data = {
@@ -68,5 +70,4 @@ class PreValidatorsTest(unittest.TestCase):
                 v = validator(request=True, data=data)
                 self.assertTrue(v.is_valid())
                 self.assertFalse(v.errors)
-                # doesn't work for pyschemes:
-                # self.assertNotIn('junk', v.cleaned_data)
+                self.assertNotIn('junk', v.cleaned_data)

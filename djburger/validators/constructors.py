@@ -174,9 +174,11 @@ class _DictMixed(IValidator):
     cleaned_data = None
     errors = None
     error_msg = 'No validator for {}'
+    error_msg_required = 'Field {} required'
 
-    def __init__(self, validators, policy='error'):
+    def __init__(self, validators, policy='error', required=False):
         self.validators = validators
+        self.required = required
         if policy not in ('error', 'except', 'ignore', 'drop'):
             raise KeyError(
                 'Bad policy value.'
@@ -190,6 +192,12 @@ class _DictMixed(IValidator):
 
     def is_valid(self):
         self.cleaned_data = {}
+
+        if self.required:
+            for field in self.validators:
+                if field not in self.data_dict:
+                    self.errors = {'__all__': [self.error_msg_required.format(field)]}
+                    return False
 
         for key, data in self.data_dict.items():
             if key in self.validators:  # founded
@@ -437,10 +445,10 @@ def Dict(validator): # noQA
         _Dict(validator),
     ])
 
-def DictMixed(validators, policy='error'): # noQA
+def DictMixed(validators, policy='error', required=False): # noQA
     return Chain([
         IsDict,
-        _DictMixed(validators, policy=policy),
+        _DictMixed(validators, policy=policy, required=required),
     ])
 
 
