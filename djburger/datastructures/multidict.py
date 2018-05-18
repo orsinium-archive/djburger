@@ -162,13 +162,13 @@ class MultiDict(dict):
         itervalues = _itervalues
 
         def items(self):
-            return list(self.iteritems())
+            return list(self.iteritems())  # noQA
 
         def lists(self):
-            return list(self.iterlists())
+            return list(self.iterlists())  # noQA
 
         def values(self):
-            return list(self.itervalues())
+            return list(self.itervalues())  # noQA
 
     def copy(self):
         """Returns a shallow copy of this object."""
