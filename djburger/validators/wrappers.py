@@ -10,7 +10,7 @@ from ..utils import safe_model_to_dict
 
 __all__ = [
     'Form', 'ModelForm',
-    'Marshmallow', 'PySchemes', 'RESTFramework', 'WTForms',
+    'Marshmallow', 'PySchemes', 'Cerberus', 'RESTFramework', 'WTForms',
 ]
 
 
