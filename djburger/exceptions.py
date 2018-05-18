@@ -36,7 +36,7 @@ class SubValidationError(ValidationError):
     pass
 
 
-class MultiValueDictKeyError(KeyError):
+class MultiDictKeyError(KeyError):
     pass
 
 
