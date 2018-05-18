@@ -34,3 +34,11 @@ class SubValidationError(ValidationError):
     subcontroller's validator.
     """
     pass
+
+
+class MultiValueDictKeyError(KeyError):
+    pass
+
+
+class TooManyFieldsSent(Exception):
+    pass

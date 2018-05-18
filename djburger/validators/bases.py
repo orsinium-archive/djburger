@@ -10,6 +10,7 @@ import abc
 from six import with_metaclass
 
 # project
+from ..datastructures import MultiDict
 from ..utils import is_django_active, is_django_installed, safe_model_to_dict
 
 
@@ -23,9 +24,11 @@ __all__ = [
 # Django
 if is_django_installed:
     from django.forms import Form as _Form, ModelForm as _ModelForm
+    from django.http.request import QueryDict
 else:
     from djburger.mocks import DjangoFormBase as _Form
     _ModelForm = _Form
+    QueryDict = None
 
 
 # marshmallow
@@ -140,8 +143,18 @@ class WTForms(_WTForms):
 
     def __init__(self, data, request=None, **kwargs):
         self.request = request
-        data = safe_model_to_dict(data)
-        super(WTForms, self).__init__(data=data, **kwargs)
+        # prevalidation uses MultiDict
+        if hasattr(data, 'getlist'):
+            super(WTForms, self).__init__(data, **kwargs)
+        # if prevalidation try convert to MultiDict
+        elif request:
+            data = {k: (v if isinstance(v, (list, tuple)) else [v]) for k, v in data.items()}
+            data = MultiDict(data)
+            super(WTForms, self).__init__(data, **kwargs)
+        # postvalidation
+        else:
+            data = safe_model_to_dict(data)
+            super(WTForms, self).__init__(data=data, **kwargs)
 
     def is_valid(self):
         return self.validate()

@@ -4,6 +4,7 @@ Use this classes as wrappers for non-djburger validators
 '''
 
 # project
+from ..datastructures import MultiDict
 from ..utils import safe_model_to_dict
 
 
@@ -73,8 +74,19 @@ class WTForms(_BaseWrapper):
     """
 
     def __call__(self, request, data, **kwargs):
-        data = safe_model_to_dict(data)
-        obj = self.validator(data=data, **kwargs)
+        # prevalidation uses MultiDict
+        if hasattr(data, 'getlist'):
+            obj = self.validator(data, **kwargs)
+        # if prevalidation try convert to MultiDict
+        elif request:
+            data = {k: (v if isinstance(v, (list, tuple)) else [v]) for k, v in data.items()}
+            data = MultiDict(data)
+            obj = self.validator(data, **kwargs)
+        # postvalidation
+        else:
+            data = safe_model_to_dict(data)
+            obj = self.validator(data=data, **kwargs)
+
         obj.request = request
         # bound methods to obj
         obj.is_valid = obj.validate
