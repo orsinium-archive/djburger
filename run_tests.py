@@ -21,6 +21,12 @@ else:
     os.environ.setdefault("DJANGO_SETTINGS_MODULE", "project.settings")
     django.setup()
 
+    try:
+        from django.test.runner import setup_databases
+    except ImportError:
+        from django.test.utils import setup_databases
+    setup_databases(0, False)
+
 
 import djburger  # noQA
 
