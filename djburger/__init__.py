@@ -10,7 +10,7 @@ framework for big Django projects.
 
 # main package info
 __title__ = 'DjBurger'
-__version__ = '0.10.1'
+__version__ = '0.11.0'
 __author__ = 'Gram Orsinium'
 __license__ = 'LGPL 3.0'
 
