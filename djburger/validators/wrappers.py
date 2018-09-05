@@ -4,10 +4,14 @@ Use this classes as wrappers for non-djburger validators
 '''
 
 # project
+from ..datastructures import MultiDict
 from ..utils import safe_model_to_dict
 
 
-__all__ = ['Form', 'Marshmallow', 'ModelForm', 'PySchemes', 'RESTFramework']
+__all__ = [
+    'Form', 'ModelForm',
+    'Marshmallow', 'PySchemes', 'Cerberus', 'RESTFramework', 'WTForms',
+]
 
 
 class _BaseWrapper(object):
@@ -65,6 +69,52 @@ class PySchemes(_BaseWrapper):
         return True
 
 
+class Cerberus(_BaseWrapper):
+    """Wrapper for use Cerberus as validator.
+    """
+
+    def __call__(self, request, data, **kwargs):
+        self.request = request
+        self.data = data
+        return self
+
+    def is_valid(self):
+        result = self.validator.validate(self.data)
+        self.cleaned_data = self.validator.document
+        self.errors = self.validator.errors
+        return result
+
+
+class WTForms(_BaseWrapper):
+    """Wrapper for use WTForms form as validator.
+    """
+
+    def __call__(self, request, data, **kwargs):
+        # prevalidation uses MultiDict
+        if hasattr(data, 'getlist'):
+            obj = self.validator(data, **kwargs)
+        # if prevalidation try convert to MultiDict
+        elif request:
+            data = {k: (v if isinstance(v, (list, tuple)) else [v]) for k, v in data.items()}
+            data = MultiDict(data)
+            obj = self.validator(data, **kwargs)
+        # postvalidation
+        else:
+            data = safe_model_to_dict(data)
+            obj = self.validator(data=data, **kwargs)
+
+        obj.request = request
+        # bound methods to obj
+        obj.is_valid = obj.validate
+        obj.cleaned_data = self.cleaned_data.__get__(obj)
+        return obj
+
+    @staticmethod
+    @property
+    def cleaned_data(self):
+        return self.data
+
+
 class RESTFramework(_BaseWrapper):
     """Wrapper for use Django REST Framework serializer as validator.
     """
@@ -77,7 +127,7 @@ class RESTFramework(_BaseWrapper):
         obj.is_valid = self.is_valid.__get__(obj)
         return obj
 
-    # method binded to wrapped walidator
+    # method binded to wrapped validator
     @staticmethod
     def is_valid(self):
         result = super(self.__class__, self).is_valid()

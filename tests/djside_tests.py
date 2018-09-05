@@ -1,10 +1,8 @@
 # built-in
-from __main__ import unittest, djburger
+from __main__ import unittest
+from .validators.djpost import postvalidators as validators
 # external
 from django.contrib.auth.models import Group
-import marshmallow
-from pyschemes import Scheme as PySchemes
-import rest_framework
 
 
 class DjangoOtherValidatorsTest(unittest.TestCase):
@@ -23,37 +21,12 @@ class DjangoOtherValidatorsTest(unittest.TestCase):
         Group.objects.get(name='TEST_IT').delete()
         Group.objects.get(name='TEST_IT_2').delete()
 
-    def test_pyschemes(self):
-        with self.subTest(src_text='pyschemes'):
-            v = djburger.validators.constructors.PySchemes(
-                {'name': str, 'id': int},
-                policy='drop'
-            )
-            v = v(request=None, data=self.obj)
-            self.assertTrue(v.is_valid())
-
-    def test_marshmallow(self):
-        with self.subTest(src_text='marshmallow base'):
-            class Base(djburger.validators.bases.Marshmallow):
-                name = marshmallow.fields.Str()
-            v = Base(request=None, data=self.obj)
-            self.assertTrue(v.is_valid())
-        with self.subTest(src_text='marshmallow wrapper'):
-            class Base(marshmallow.Schema):
-                name = marshmallow.fields.Str()
-            Wrapped = djburger.validators.wrappers.Marshmallow(Base) # noQA
-            v = Wrapped(request=None, data=self.obj)
-            self.assertTrue(v.is_valid())
-
-    def test_rest(self):
-        with self.subTest(src_text='rest framework base'):
-            class Base(djburger.validators.bases.RESTFramework):
-                name = rest_framework.serializers.CharField(max_length=20)
-            v = Base(request=None, data=self.obj)
-            self.assertTrue(v.is_valid())
-        with self.subTest(src_text='rest framework wrapper'):
-            class Base(rest_framework.serializers.Serializer):
-                name = rest_framework.serializers.CharField(max_length=20)
-            Wrapped = djburger.validators.wrappers.RESTFramework(Base) # noQA
-            v = Wrapped(request=None, data=self.obj)
-            self.assertTrue(v.is_valid())
+    def test_obj_serializing(self):
+        for validator in validators:
+            with self.subTest(validator=validator.__class__.__name__):
+                v = validator(request=True, data=self.obj)
+                self.assertTrue(v.is_valid())
+                self.assertFalse(v.errors)
+                self.assertIn('id', v.cleaned_data)
+                self.assertIn('name', v.cleaned_data)
+                self.assertEqual(v.cleaned_data['name'], 'TEST_IT')

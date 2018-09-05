@@ -9,6 +9,11 @@ class MarshmallowBase(object):
         raise ImportError("Marshmallow is not installed yet")
 
 
+class WTFormsBase(object):
+    def __init__(self, **kwargs):
+        raise ImportError("WTForms is not installed yet")
+
+
 class RESTFrameworkBase(object):
     def __init__(self, **kwargs):
         raise ImportError("Django REST Framework is not installed yet")
@@ -16,7 +21,12 @@ class RESTFrameworkBase(object):
 
 class PySchemes(object):
     def __init__(self, **kwargs):
-        raise ImportError("PySchemes not installed yet")
+        raise ImportError("PySchemes is not installed yet")
+
+
+class Cerberus(object):
+    def __init__(self, **kwargs):
+        raise ImportError("Cerberus is not installed yet")
 
 
 def model_to_dict(*args, **kwargs):

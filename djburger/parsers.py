@@ -4,14 +4,7 @@ from functools import partial
 from json import loads as _json
 
 # project
-from .utils import is_django_installed
-
-
-# Django
-if is_django_installed:
-    from django.http.request import QueryDict
-else:
-    QueryDict = None
+from .datastructures import QueryDict
 
 
 # BSON
@@ -21,10 +14,70 @@ except ImportError:
     _bson = None
 
 
-__all__ = ['Default', 'Base', 'JSON', 'BSON']
+__all__ = [
+    'MultiDict', 'DictList', 'DictMixed', 'Dict',
+    'Base', 'JSON', 'BSON', 'Default',
+]
 
 
-class Default(object):
+class MultiDict(object):
+    """Parse standart GET/POST query to MultiDict
+
+    :param str method: optional method which will be forced for request
+
+    :return: parsed data.
+    :rtype: django.http.request.QueryDict
+    """
+
+    def __init__(self, method=None):
+        self.method = method
+
+    @staticmethod
+    def convert(query_dict):
+        return query_dict
+
+    def __call__(self, request):
+        method = (self.method or request.method).upper()
+        # get parsed request body
+        if method in ('GET', 'POST'):
+            return self.convert(getattr(request, method))
+        # parse request body if exists
+        if request.body:
+            return self.convert(QueryDict(request.body))
+        # return GET params
+        return self.convert(request.GET)
+
+
+class DictList(MultiDict):
+    """Parse standart GET/POST query to dict of lists
+
+    :param str method: optional method which will be forced for request
+
+    :return: parsed data.
+    :rtype: Dict[list]
+    """
+    @staticmethod
+    def convert(query_dict):
+        return {k: v for k, v in query_dict.lists()}
+
+
+class DictMixed(MultiDict):
+    """Parse standart GET/POST query to dict of lists or values
+
+    :param str method: optional method which will be forced for request
+
+    :return: parsed data.
+    :rtype: dict
+    """
+    @staticmethod
+    def convert(query_dict):
+        data = {}
+        for k, v in query_dict.lists():
+            data[k] = v[0] if len(v) == 1 else v
+        return data
+
+
+class Dict(MultiDict):
     """Parse standart GET/POST query to dict
 
     :param str method: optional method which will be forced for request
@@ -32,27 +85,9 @@ class Default(object):
     :return: parsed data.
     :rtype: dict
     """
-
-    def __init__(self, method=None):
-        self.method = method
-
     @staticmethod
-    def _to_dict(query_dict):
-        data = {}
-        for k, v in query_dict.lists():
-            data[k] = v[0] if len(v) == 1 else v
-        return data
-
-    def __call__(self, request):
-        method = (self.method or request.method).upper()
-        # get parsed request body
-        if method in ('GET', 'POST'):
-            return self._to_dict(getattr(request, method))
-        # parse request body if exists
-        if request.body and QueryDict is not None:
-            return self._to_dict(QueryDict(request.body))
-        # return GET params
-        return self._to_dict(request.GET)
+    def convert(query_dict):
+        return dict(query_dict)
 
 
 class Base(object):
@@ -97,3 +132,7 @@ BSON = partial(Base, parser=_bson, encoding=None)
 
 :raises ImportError: if `bson` module not installed yet.
 """
+
+
+# alias
+Default = MultiDict

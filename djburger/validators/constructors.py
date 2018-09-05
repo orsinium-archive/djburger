@@ -33,9 +33,16 @@ except ImportError:
     from djburger.mocks import PySchemes as _PySchemesScheme
 
 
+# Cerberus
+try:
+    from cerberus import Validator as _CerberusValidator
+except ImportError:
+    from djburger.mocks import Cerberus as _CerberusValidator
+
+
 __all__ = [
     'Any', 'All',
-    'Chain',
+    'Cerberus', 'Chain',
     'Dict', 'DictForm', 'DictMixed', 'DictModelForm',
     'IsBool', 'IsDict', 'IsFloat', 'IsInt', 'IsIter', 'IsList', 'IsStr',
     'Lambda', 'List', 'ListForm', 'ListModelForm',
@@ -47,7 +54,7 @@ __all__ = [
 ]
 
 
-class _PySchemes(_PySchemesScheme):
+class PySchemes(_PySchemesScheme):
     """Validate data by PySchemes.
 
     :param scheme: validation scheme for pyschemes.
@@ -67,6 +74,26 @@ class _PySchemes(_PySchemesScheme):
             self.errors = {'__all__': list(e.args)}
             return False
         return True
+
+
+class Cerberus(_CerberusValidator):
+    """Validate data by Cerberus.
+
+    :param dict schema: validation scheme for Cerberus.
+    :param bool allow_unknown:
+    """
+
+    def __call__(self, request, data, **kwargs):
+        self.request = request
+        self.data = safe_model_to_dict(data)
+        return self
+
+    def is_valid(self):
+        return self.validate(self.data)
+
+    @property
+    def cleaned_data(self):
+        return self.document
 
 
 class _List(IValidator):
@@ -147,9 +174,11 @@ class _DictMixed(IValidator):
     cleaned_data = None
     errors = None
     error_msg = 'No validator for {}'
+    error_msg_required = 'Field {} required'
 
-    def __init__(self, validators, policy='error'):
+    def __init__(self, validators, policy='error', required=False):
         self.validators = validators
+        self.required = required
         if policy not in ('error', 'except', 'ignore', 'drop'):
             raise KeyError(
                 'Bad policy value.'
@@ -163,6 +192,12 @@ class _DictMixed(IValidator):
 
     def is_valid(self):
         self.cleaned_data = {}
+
+        if self.required:
+            for field in self.validators:
+                if field not in self.data_dict:
+                    self.errors = {'__all__': [self.error_msg_required.format(field)]}
+                    return False
 
         for key, data in self.data_dict.items():
             if key in self.validators:  # founded
@@ -410,31 +445,11 @@ def Dict(validator): # noQA
         _Dict(validator),
     ])
 
-def DictMixed(validators, policy='error'): # noQA
+def DictMixed(validators, policy='error', required=False): # noQA
     return Chain([
         IsDict,
-        _DictMixed(validators, policy=policy),
+        _DictMixed(validators, policy=policy, required=required),
     ])
-
-
-def PySchemes(scheme, policy='error'): # noQA
-    if scheme and type(scheme) is dict:
-        scheme = {k: PySchemes(v, policy) for k, v in scheme.items()}
-        return Chain(
-            Type((dict, _Model)),
-            _ModelInstance,  # convert models to dict if possible
-            _DictMixed(scheme, policy),
-        )
-    elif scheme and type(scheme) is list:
-        scheme = [PySchemes(v) for v in scheme]
-        return Chain(
-            Type((list, _QuerySet)),
-            _List(_ModelInstance),
-            # ^ convert querysets to list of dicts if possible
-            _List(*scheme),
-        )
-    else:
-        return _PySchemes(scheme)
 
 
 def ListForm(form): # noQA
@@ -468,4 +483,3 @@ All = Chain
 List = update_wrapper(List, _List)
 Dict = update_wrapper(Dict, _Dict)
 DictMixed = update_wrapper(DictMixed, _DictMixed)
-PySchemes = update_wrapper(PySchemes, _PySchemes)

@@ -6,3 +6,4 @@ dist/
 wiki/build
 .tox
 src
+.idea
