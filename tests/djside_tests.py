@@ -2,7 +2,6 @@
 from __main__ import unittest
 from .validators.djpost import postvalidators as validators
 # external
-from django.test import TestCase
 from django.contrib.auth.models import Group
 
 
