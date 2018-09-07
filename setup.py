@@ -6,7 +6,7 @@ from setuptools import setup
 
 setup(
     name='djburger',
-    version='0.11.0',
+    version='0.11.1',
 
     author='orsinium',
     author_email='master_fess@mail.ru',
@@ -15,7 +15,11 @@ setup(
     long_description=open('README.rst').read(),
     keywords='djburger framework django contracts pre post validation',
 
-    packages=['djburger', 'djburger.validators'],
+    packages=[
+        'djburger',
+        'djburger.validators',
+        'djburger.datastructures',
+    ],
     install_requires=['six'],
 
     url='https://github.com/orsinium/djburger',
